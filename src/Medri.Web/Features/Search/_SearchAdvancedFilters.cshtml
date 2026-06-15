@@ -1,0 +1,64 @@
+@using System.Collections.Generic
+@using System.Globalization
+@using Medri.Web.Features.Search
+@model Medri.Web.Features.Search.SearchIndexViewModel
+@{
+    SearchMultiSelectViewModel AdvancedFilter(string id, string name, string placeholder, IReadOnlyList<SearchFilterOptionViewModel> options, IReadOnlyCollection<string> selectedValues) =>
+        new SearchMultiSelectViewModel { Id = id, Name = name, Placeholder = placeholder, Options = options, SelectedValues = selectedValues };
+    var minPrice = Model.Filters.MinPrice?.ToString("0", CultureInfo.InvariantCulture) ?? "0";
+    var maxPrice = Model.Filters.MaxPrice?.ToString("0", CultureInfo.InvariantCulture) ?? "1000000";
+}
+@{
+    var basicWrapperClasses = Model.Filters.IsMapView ? null : "d-md-none";
+}
+<div class="advanced-search-panel" data-advanced-filters-panel>
+    <div class="search-drawer-basic @basicWrapperClasses" data-search-drawer-basic>
+        <div class="advanced-search-section">
+            <span class="advanced-search-label">Contratto</span>
+            <partial name="_SearchMultiSelect" model='AdvancedFilter("advanced-contracts", "contracts", "Contratto", Model.AvailableFilters.Contracts, Model.Filters.Contracts)' />
+        </div>
+        <div class="advanced-search-section">
+            <span class="advanced-search-label">Tipologia</span>
+            <partial name="_SearchMultiSelect" model='AdvancedFilter("advanced-property-types", "propertyTypes", "Tipologia", Model.AvailableFilters.PropertyTypes, Model.Filters.PropertyTypes)' />
+        </div>
+        <div class="advanced-search-section">
+            <span class="advanced-search-label">Locali</span>
+            <partial name="_SearchMultiSelect" model='AdvancedFilter("advanced-rooms", "rooms", "Locali", Model.AvailableFilters.Rooms, Model.Filters.Rooms)' />
+        </div>
+    </div>
+    <div class="advanced-search-section advanced-search-price">
+        <span class="advanced-search-label">Prezzo</span>
+        <div class="advanced-price-ranges">
+            <label>
+                <span>Min</span>
+                <input class="form-range" type="range" name="minPrice" min="0" max="1000000" step="50000" value="@minPrice" data-price-range-input data-price-range-role="min" />
+                <output data-price-range-output="min">@minPrice</output>
+            </label>
+            <label>
+                <span>Max</span>
+                <input class="form-range" type="range" name="maxPrice" min="0" max="1000000" step="50000" value="@maxPrice" data-price-range-input data-price-range-role="max" />
+                <output data-price-range-output="max">@maxPrice</output>
+            </label>
+        </div>
+    </div>
+    <div class="advanced-search-section">
+        <span class="advanced-search-label">Superficie</span>
+        <partial name="_SearchMultiSelect" model='AdvancedFilter("advanced-surface-ranges", "surfaceRanges", "Superficie", Model.AvailableFilters.SurfaceRanges, Model.Filters.SurfaceRanges)' />
+    </div>
+    <div class="advanced-search-section">
+        <span class="advanced-search-label">Bagni</span>
+        <partial name="_SearchMultiSelect" model='AdvancedFilter("advanced-bathrooms", "bathrooms", "Bagni", Model.AvailableFilters.Bathrooms, Model.Filters.Bathrooms)' />
+    </div>
+    <div class="advanced-search-section">
+        <span class="advanced-search-label">Zona</span>
+        <partial name="_SearchMultiSelect" model='AdvancedFilter("advanced-zones", "zones", "Zona", Model.AvailableFilters.Zones, Model.Filters.Zones)' />
+    </div>
+    <div class="advanced-search-section">
+        <span class="advanced-search-label">Classe energetica</span>
+        <partial name="_SearchMultiSelect" model='AdvancedFilter("advanced-energy-classes", "energyClasses", "Classe energetica", Model.AvailableFilters.EnergyClasses, Model.Filters.EnergyClasses)' />
+    </div>
+    <div class="advanced-search-section advanced-search-section-wide">
+        <span class="advanced-search-label">Caratteristiche</span>
+        <partial name="_SearchMultiSelect" model='AdvancedFilter("advanced-features", "features", "Caratteristiche", Model.AvailableFilters.Features, Model.Filters.Features)' />
+    </div>
+</div>

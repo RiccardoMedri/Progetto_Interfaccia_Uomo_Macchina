@@ -1,0 +1,12 @@
+@use "tokens";
+
+@mixin focus-ring {
+  outline: 0;
+  box-shadow: 0 0 0 tokens.$focus-ring-size tokens.$focus-ring-color;
+}
+
+@mixin desktop-up($breakpoint) {
+  @media (min-width: $breakpoint) {
+    @content;
+  }
+}

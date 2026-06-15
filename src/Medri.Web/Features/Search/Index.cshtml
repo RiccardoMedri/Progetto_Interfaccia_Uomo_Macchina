@@ -1,0 +1,223 @@
+@model Medri.Web.Features.Search.SearchIndexViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "search";
+    ViewData["Title"] = "Immobili disponibili - Agenzia Immobiliare Medri";
+    ViewData["BodyClass"] = Model.BodyClass;
+    ViewData["MedriShellClass"] = "medri-public-shell medri-search-shell";
+}
+
+<div id="search-map-app" class="medri-search search-mode-@Model.Filters.NormalizedView" data-search-map-root>
+    <partial name="_SaveSearchForm" model="Model.SaveSearchForm" />
+
+    <nav class="search-breadcrumb breadcrumb" aria-label="Percorso">
+        <a class="breadcrumb-item" href="/">Home</a>
+        <a class="breadcrumb-item" href="@Model.Filters.ToUrl()">Immobili</a>
+        @if (!string.IsNullOrWhiteSpace(Model.BreadcrumbSuffix))
+        {
+            <span class="breadcrumb-item active" aria-current="page">@Model.BreadcrumbSuffix</span>
+        }
+    </nav>
+
+    <main id="contenuto" class="search-page" aria-label="Ricerca immobili">
+        <div class="search-content row g-3">
+            <div class="search-results-stack @Model.ResultsStackClasses">
+                <section class="search-toolbar-section" aria-label="Filtri ricerca">
+                    <form id="searchFiltersDesktop" class="search-filter-form" method="get" action="/immobili">
+                        @if (Model.Filters.NormalizedView != "split")
+                        {
+                            <input type="hidden" name="view" value="@Model.Filters.NormalizedView" />
+                        }
+                        @if (!Model.Filters.IsMapView && !string.IsNullOrWhiteSpace(Model.Filters.NormalizedSort))
+                        {
+                            <input type="hidden" name="sort" value="@Model.Filters.NormalizedSort" />
+                        }
+
+                        <div class="search-toolbar-row">
+                            <nav class="search-view-switcher nav nav-pills" aria-label="Cambia layout risultati">
+                                <a class="nav-link @(Model.Filters.NormalizedView == "split" ? "is-active active" : null)" href="@Model.Filters.ToUrl("split")" aria-current="@(Model.Filters.NormalizedView == "split" ? "page" : null)">Split</a>
+                                <a class="nav-link @(Model.Filters.NormalizedView == "list" ? "is-active active" : null)" href="@Model.Filters.ToUrl("list")" aria-current="@(Model.Filters.NormalizedView == "list" ? "page" : null)">Lista</a>
+                                <a class="nav-link @(Model.Filters.NormalizedView == "map" ? "is-active active" : null)" href="@Model.Filters.ToUrl("map")" aria-current="@(Model.Filters.NormalizedView == "map" ? "page" : null)">Mappa</a>
+                            </nav>
+
+                            @if (!Model.Filters.IsMapView)
+                            {
+                                <div class="search-filter-field">
+                                    <span class="form-label">Contratto</span>
+                                    <partial name="_SearchMultiSelect" model="Model.ToolbarContractsFilter" />
+                                </div>
+                                <div class="search-filter-field">
+                                    <span class="form-label">Tipologia</span>
+                                    <partial name="_SearchMultiSelect" model="Model.ToolbarPropertyTypesFilter" />
+                                </div>
+                                <div class="search-filter-field">
+                                    <span class="form-label">Locali</span>
+                                    <partial name="_SearchMultiSelect" model="Model.ToolbarRoomsFilter" />
+                                </div>
+                            }
+
+                            <div class="search-advanced-dropdown">
+                                <button class="search-action-button advanced-filters-button btn btn-outline-secondary" type="button" data-search-filters-open aria-haspopup="dialog" aria-expanded="false">
+                                    <span>Filtri</span>
+                                    <i class="ph ph-sliders-horizontal" aria-hidden="true"></i>
+                                </button>
+                            </div>
+
+                            <div class="search-submit-actions" aria-label="Azioni ricerca">
+                                <button class="search-action-button filter-action-button btn btn-outline-secondary" type="submit">Applica</button>
+                                @if (!Model.Filters.IsMapView)
+                                {
+                                    <button class="search-action-button save-search-button @(Model.IsSavedSearch ? "is-selected" : null) btn btn-outline-primary" type="submit" form="saveSearchDesktop" data-save-search-button aria-pressed="@(Model.IsSavedSearch ? "true" : "false")">@(Model.IsSavedSearch ? "Ricerca salvata" : "Salva ricerca")</button>
+                                }
+                            </div>
+                            @if (!Model.Filters.IsMapView)
+                            {
+                                <details class="sort-results-dropdown">
+                                    <summary class="search-action-button sort-results-button btn btn-outline-secondary">Ordina</summary>
+                                    <nav class="dropdown-menu sort-results-menu" aria-label="Ordina risultati">
+                                        <a class="dropdown-item @(Model.Filters.NormalizedSort == "price-asc" ? "active" : null)" href="@Model.Filters.ToUrl(sort: "price-asc")" aria-current="@(Model.Filters.NormalizedSort == "price-asc" ? "true" : null)">Prezzo crescente</a>
+                                        <a class="dropdown-item @(Model.Filters.NormalizedSort == "price-desc" ? "active" : null)" href="@Model.Filters.ToUrl(sort: "price-desc")" aria-current="@(Model.Filters.NormalizedSort == "price-desc" ? "true" : null)">Prezzo decrescente</a>
+                                        <a class="dropdown-item @(Model.Filters.NormalizedSort == "size-asc" ? "active" : null)" href="@Model.Filters.ToUrl(sort: "size-asc")" aria-current="@(Model.Filters.NormalizedSort == "size-asc" ? "true" : null)">Superficie crescente</a>
+                                        <a class="dropdown-item @(Model.Filters.NormalizedSort == "size-desc" ? "active" : null)" href="@Model.Filters.ToUrl(sort: "size-desc")" aria-current="@(Model.Filters.NormalizedSort == "size-desc" ? "true" : null)">Superficie decrescente</a>
+                                    </nav>
+                                </details>
+                            }
+                        </div>
+                    </form>
+                </section>
+
+                <section class="results-panel @Model.ResultsPanelClasses" aria-label="Lista immobili">
+                    <div class="search-results-meta">
+                        <h1>Immobili disponibili</h1>
+                    </div>
+
+                    @if (!Model.Filters.IsMapView)
+                    {
+                        <div class="search-compare-bar" aria-label="Selezione confronto">
+                            <div>
+                                <strong data-compare-count>@Model.SelectedComparisonCountLabel</strong>
+                                <span>Puoi confrontare da 2 a 4 annunci.</span>
+                            </div>
+                            <a class="search-compare-link is-disabled" data-compare-link aria-disabled="true" tabindex="-1">Confronta immobili</a>
+                        </div>
+                    }
+
+                    @if (Model.Results.Count == 0)
+                    {
+                        <div class="search-empty-state">
+                            <strong>Nessun immobile trovato</strong>
+                            <p>Prova a modificare i filtri selezionati.</p>
+                        </div>
+                    }
+
+                    <div class="results-grid @Model.ResultsGridClasses">
+                        @foreach (var property in Model.VisibleResults)
+                        {
+                            <div class="col">
+                                <article class="search-card" data-map-card-id="@property.Id" data-property-id="@property.Id" data-property-detail-url="@property.DetailUrl">
+                                    <div class="search-card-media" style="background-image: linear-gradient(to top, rgba(23, 40, 64, 0.34), transparent 58%), url('@property.ImageUrl')">
+                                        <button class="search-compare-button btn btn-sm btn-outline-primary" type="button" aria-label="Seleziona @property.Title per il confronto" aria-pressed="false" data-compare-button data-property-id="@property.Id">
+                                            <i class="ph ph-plus" data-unselected-icon aria-hidden="true"></i>
+                                            <i class="ph ph-check" data-selected-icon aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    <div class="search-card-body">
+                                        <span class="search-card-tag">@property.Tag</span>
+                                        <strong class="search-card-price">@property.PriceLabel</strong>
+                                        <div class="search-card-title-row">
+                                            <h2><a href="@property.DetailUrl">@property.Title</a></h2>
+                                            <p class="search-card-location">@property.DisplayLocation</p>
+                                        </div>
+                                        <div class="search-card-bottom-row">
+                                            <p class="search-card-facts">@property.FactsLabel</p>
+                                            <form class="search-favorite-form" action="@Model.FavoriteAction(property.IsSaved)" method="post" data-favorite-form data-property-id="@property.Id">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="propertyId" value="@property.Id" />
+                                                <input type="hidden" name="returnUrl" value="@Model.FavoriteReturnUrl" />
+                                                <button class="search-favorite-button @(property.IsSaved ? "is-selected" : null) btn btn-sm btn-outline-secondary" type="submit" aria-label="@(property.IsSaved ? $"Rimuovi {property.Title} dai preferiti" : $"Salva {property.Title} nei preferiti")" aria-pressed="@(property.IsSaved ? "true" : "false")" data-favorite-button data-property-id="@property.Id" data-property-title="@property.Title"></button>
+                                            </form>
+                                        </div>
+                                        <div class="search-card-mobile-facts" aria-label="Caratteristiche principali">
+                                            @foreach (var fact in property.MobileFactsLabel.Split(" - "))
+                                            {
+                                                <span>@fact</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+
+            <section class="map-panel @Model.MapPanelClasses" aria-label="Mappa annunci">
+                <div class="map-canvas" data-map-canvas>
+                    <div class="google-map-surface" data-google-map></div>
+                    <div class="google-map-fallback" data-map-fallback @(Model.IsGoogleMapsConfigured ? "hidden" : null)>Mappa non disponibile.</div>
+                    <article class="map-card search-card" data-map-preview hidden>
+                        <button class="map-card-close btn btn-sm btn-outline-secondary" type="button" aria-label="Chiudi annuncio selezionato" data-map-preview-close>
+                            <i class="ph ph-x" aria-hidden="true"></i>
+                        </button>
+                        <a class="map-card-link" href="@Model.SelectedMarker?.DetailUrl" aria-label="Apri annuncio selezionato" data-map-preview-link>
+                            <div class="search-card-media map-card-media" data-map-preview-image></div>
+                            <div class="search-card-body">
+                                <span class="search-card-tag" data-map-preview-tag>@Model.SelectedMarker?.Tag</span>
+                                <strong class="search-card-price" data-map-preview-price>@Model.SelectedMarker?.PriceLabel</strong>
+                                <h2 data-map-preview-title>@Model.SelectedMarker?.Title</h2>
+                                <p data-map-preview-location>@Model.SelectedMarker?.DisplayLocation</p>
+                                <p data-map-preview-facts>@Model.SelectedMarker?.FactsLabel</p>
+                            </div>
+                        </a>
+                    </article>
+                    <div class="map-controls">
+                        <button class="btn btn-outline-secondary" type="button" data-map-zoom-in>+</button>
+                        <button class="btn btn-outline-secondary" type="button" data-map-zoom-out>-</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div class="search-filters-dialog" data-search-filters-dialog hidden>
+        <div class="search-filters-scrim" data-search-filters-close></div>
+        <aside class="search-filters-drawer" role="dialog" aria-modal="true" aria-label="Filtri ricerca">
+            <header class="search-filters-drawer-header">
+                <strong>Filtri</strong>
+                <button class="search-filters-close btn btn-sm btn-outline-secondary" type="button" data-search-filters-close aria-label="Chiudi filtri"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </header>
+            <div class="search-filters-drawer-body">
+                <partial name="_SearchAdvancedFilters" model="Model" />
+            </div>
+            <footer class="search-filters-drawer-footer">
+                <button class="search-action-button filter-action-button btn btn-outline-secondary" type="submit" form="searchFiltersDesktop">Applica filtri</button>
+            </footer>
+        </aside>
+    </div>
+
+    <a class="mobile-search-mode-toggle d-md-none" href="@(Model.Filters.IsMapView ? Model.Filters.ToUrl("list") : Model.Filters.ToUrl("map"))">
+        @(Model.Filters.IsMapView ? "Vedi lista" : "Vedi mappa")
+    </a>
+
+    <script type="application/json" id="search-map-config">@Html.Raw(Model.MapConfigJson())</script>
+    <span data-search-map-vue-controller hidden></span>
+</div>
+
+@section scripts {
+    <environment include="Development">
+        <script src="/js/bundle-medri-home.js" defer asp-append-version="true"></script>
+        @if (!Model.Filters.IsListView)
+        {
+            <script src="/js/bundle-vue.js" defer asp-append-version="true"></script>
+            <script src="/js/bundle-medri-search-map.js" defer asp-append-version="true"></script>
+        }
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/bundle-medri-home.min.js" defer asp-append-version="true"></script>
+        @if (!Model.Filters.IsListView)
+        {
+            <script src="/js/bundle-vue.min.js" defer asp-append-version="true"></script>
+            <script src="/js/bundle-medri-search-map.min.js" defer asp-append-version="true"></script>
+        }
+    </environment>
+}

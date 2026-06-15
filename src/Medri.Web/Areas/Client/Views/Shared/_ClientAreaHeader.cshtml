@@ -1,0 +1,38 @@
+@model Medri.Web.Areas.Client.ClientAreaNavigationViewModel
+
+<nav class="detail-breadcrumb breadcrumb medri-client-area__breadcrumb d-none d-md-flex" aria-label="Percorso">
+    <a class="breadcrumb-item" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+    <a class="breadcrumb-item" asp-area="Client" asp-controller="Saved" asp-action="Index">Area cliente</a>
+    <span class="breadcrumb-item active" aria-current="page">@Model.CurrentLabel</span>
+</nav>
+
+<section class="medri-client-panel" aria-label="Area privata cliente">
+    <form id="client-logout-form" class="d-none" method="post" asp-area="" asp-controller="Login" asp-action="Logout">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <div class="medri-client-panel__heading">
+        <div>
+            <span>Area cliente</span>
+            <h1>Area cliente</h1>
+        </div>
+        <button class="medri-client-logout btn btn-outline-secondary" type="submit" form="client-logout-form">Esci</button>
+    </div>
+
+    <nav class="medri-client-tabs nav nav-tabs" aria-label="Navigazione account">
+        @foreach (var tab in Model.Tabs)
+        {
+            <a class="@tab.LinkCssClass"
+               asp-area="@tab.Area"
+               asp-controller="@tab.Controller"
+               asp-action="@tab.Action"
+               aria-current="@tab.AriaCurrent">
+                <span>@tab.Label</span>
+                @if (tab.Count.HasValue)
+                {
+                    <span class="badge text-bg-light">@tab.Count.Value</span>
+                }
+            </a>
+        }
+    </nav>
+</section>

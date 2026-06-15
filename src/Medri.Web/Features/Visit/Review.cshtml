@@ -1,0 +1,99 @@
+@model Medri.Web.Features.Visit.VisitReviewViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "funnels";
+    ViewData["Title"] = "Controlla e invia la richiesta";
+    ViewData["BodyClass"] = "medri-request-body";
+    ViewData["RenderMedriFooter"] = false;
+    ViewData["MedriShellClass"] = "medri-public-shell medri-request-shell";
+    ViewData["NavSection"] = Model.Property.NavSection;
+}
+
+<main id="contenuto" class="medri-request-funnel medri-request-funnel--review">
+    <section class="container-xxl medri-request-funnel__shell">
+        <nav class="detail-breadcrumb breadcrumb medri-request-funnel__breadcrumb" aria-label="Percorso">
+            <a class="breadcrumb-item" asp-controller="Home" asp-action="Index">Home</a>
+            <a class="breadcrumb-item" asp-controller="Search" asp-action="Index">Immobili</a>
+            <a class="breadcrumb-item" asp-controller="Property" asp-action="Detail" asp-route-slug="@Model.Property.Slug">@Model.Property.Title</a>
+            <span class="breadcrumb-item active" aria-current="page">Riepilogo</span>
+        </nav>
+
+        <form class="visit-shell medri-request-funnel__form row g-4 align-items-start" method="post" asp-controller="Visit" asp-action="Submit" asp-route-slug="@Model.Property.Slug" asp-route-appointmentId="@Model.AppointmentId">
+            @Html.AntiForgeryToken()
+
+            <div class="col-12">
+                <div class="visit-heading-row medri-request-funnel__heading-row">
+                    <div class="visit-heading medri-request-funnel__heading">
+                        <span>Richiedi informazioni</span>
+                        <h1>Controlla e invia la richiesta</h1>
+                        <p>Verifica i dati e invia la richiesta: un agente avra gia il contesto dell'annuncio.</p>
+                    </div>
+                    <ol class="visit-stepper medri-request-funnel__stepper" aria-label="Avanzamento richiesta">
+                        <li class="is-complete"><span>1</span>Opzione</li>
+                        <li class="is-active"><span>2</span>Riepilogo</li>
+                        <li><span>3</span>Invio</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="visit-main medri-request-funnel__main col-12 col-lg-8">
+                <section class="visit-section medri-request-funnel__section">
+                    <h2>I tuoi dati</h2>
+                    <div class="review-grid row row-cols-1 row-cols-md-2 g-3">
+                        <div class="col">
+                            <article>
+                                <span>Nome e cognome</span>
+                                <strong>@Model.FullName</strong>
+                            </article>
+                        </div>
+                        <div class="col">
+                            <article>
+                                <span>Telefono</span>
+                                <strong>@Model.Phone</strong>
+                            </article>
+                        </div>
+                        <div class="col">
+                            <article>
+                                <span>Email</span>
+                                <strong>@Model.Email</strong>
+                            </article>
+                        </div>
+                        <div class="col">
+                            <article>
+                                <span>Messaggio</span>
+                                <p>@Model.DisplayMessage</p>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="visit-section medri-request-funnel__section">
+                    <h2>Riepilogo richiesta</h2>
+                    <div class="review-grid row row-cols-1 row-cols-md-2 g-3">
+                        <div class="col">
+                            <article>
+                                <span>Modalita scelta</span>
+                                <strong>@Model.PreferredContactMode</strong>
+                            </article>
+                        </div>
+                        <div class="col">
+                            <article>
+                                <span>Quando</span>
+                                <strong>@Model.WhenLabel</strong>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="visit-actions medri-request-funnel__actions d-flex flex-column flex-sm-row justify-content-sm-end gap-2">
+                    <a class="secondary-cta btn btn-outline-secondary" asp-controller="Visit" asp-action="Option" asp-route-slug="@Model.Property.Slug" asp-route-appointmentId="@Model.AppointmentId">Indietro</a>
+                    <button class="primary-cta btn btn-primary" type="submit">Invia richiesta</button>
+                </div>
+            </div>
+
+            <aside class="medri-request-funnel__aside col-12 col-lg-4" aria-label="Immobile collegato">
+                <partial name="_VisitPropertySummary" model="Model.Property" />
+            </aside>
+        </form>
+    </section>
+</main>

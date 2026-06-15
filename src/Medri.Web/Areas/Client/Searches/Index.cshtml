@@ -1,0 +1,56 @@
+@model Medri.Web.Areas.Client.Searches.ClientSearchesViewModel
+@{
+    ViewData["Title"] = "Area cliente - Ricerche salvate";
+}
+
+<main id="contenuto" class="medri-client-area medri-client-area--searches">
+    <div class="container-xxl medri-client-area__container">
+        <partial name="~/Areas/Client/Views/Shared/_ClientAreaHeader.cshtml" model="Model.Navigation" />
+
+        <section class="medri-client-content" aria-label="Ricerche salvate">
+            @if (Model.IsJustSaved)
+            {
+                <aside class="medri-client-search-card" role="status" aria-live="polite">
+                    <div class="medri-client-search-card__body">
+                        <span class="medri-client-search-card__kicker">Ricerca salvata</span>
+                        <p class="medri-client-search-card__label">La ricerca e stata aggiunta alla tua area cliente.</p>
+                    </div>
+                    <div class="medri-client-search-card__actions">
+                        <a class="btn btn-primary medri-client-search-card__open" asp-area="" asp-controller="Search" asp-action="Index">Torna agli immobili</a>
+                    </div>
+                </aside>
+            }
+
+            @if (Model.HasSearches)
+            {
+                <div class="medri-client-search-list">
+                    @foreach (var search in Model.Searches)
+                    {
+                        <article class="medri-client-search-card">
+                            <div class="medri-client-search-card__body">
+                                <span class="medri-client-search-card__kicker">Ricerca salvata</span>
+                                <p class="medri-client-search-card__label">@search.Label</p>
+                            </div>
+                            <div class="medri-client-search-card__actions">
+                                <a class="btn btn-primary medri-client-search-card__open" href="@search.ResultsUrl">Vedi risultati</a>
+                                <form method="post" asp-area="Client" asp-controller="Searches" asp-action="Remove">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@search.Id" />
+                                    <button class="btn btn-outline-secondary medri-client-search-card__remove" type="submit" aria-label="Rimuovi ricerca salvata">Rimuovi</button>
+                                </form>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+            else
+            {
+                <section class="medri-client-empty-state" aria-label="Nessuna ricerca salvata">
+                    <h2>Nessuna ricerca salvata</h2>
+                    <p>Salva una ricerca dalla pagina immobili con "Salva ricerca": comparira qui per riaprire la lista filtrata.</p>
+                    <a class="btn btn-primary" asp-area="" asp-controller="Search" asp-action="Index">Cerca annuncio</a>
+                </section>
+            }
+        </section>
+    </div>
+</main>

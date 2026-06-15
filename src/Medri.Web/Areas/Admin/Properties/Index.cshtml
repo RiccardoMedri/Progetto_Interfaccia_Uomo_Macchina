@@ -1,0 +1,442 @@
+@model Medri.Web.Areas.Admin.Properties.AdminPropertyListViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Immobili - Area riservata Medri";
+    string FilterSummary(IEnumerable<Medri.Web.Areas.Admin.Properties.AdminPropertyOptionViewModel> options, string emptyLabel)
+    {
+        var labels = options
+            .Where(option => option.IsSelected && !string.IsNullOrWhiteSpace(option.Value))
+            .Select(option => option.Label)
+            .ToArray();
+
+        return labels.Length == 0 ? emptyLabel : string.Join(", ", labels);
+    }
+}
+
+<div class="admin-page admin-property-page container-fluid px-0">
+    <section class="admin-page-heading admin-property-heading card">
+        <div class="row g-3 align-items-stretch">
+            <div class="col-12 col-md-3 d-flex align-items-center">
+                <div>
+                    <h1>Gestione annunci</h1>
+                </div>
+            </div>
+            <div class="col-12 col-md-7">
+                <div class="lead-status-strip property-status-strip row row-cols-1 row-cols-md-4 g-3 h-100" aria-label="Filtri rapidi per stato annuncio">
+                    @foreach (var card in Model.StatusCards)
+                    {
+                        <div class="col">
+                            <a class="lead-status-card btn btn-outline-secondary h-100 w-100 @(card.IsSelected ? "active" : null)"
+                               asp-area="Admin"
+                               asp-controller="Properties"
+                               asp-action="Index"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-Status="@card.ToggledStatusFilter"
+                               asp-route-Contract="@Model.Contract"
+                               asp-route-Advisor="@Model.Advisor"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               aria-pressed="@(card.IsSelected ? "true" : "false")">
+                                <span>@card.Label</span>
+                                <strong>@card.Count</strong>
+                                <small>@card.Description</small>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="admin-heading-actions col-12 col-md-2">
+                <a class="admin-public-site-link btn" href="/">Sito pubblico</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="admin-main-grid row g-3 align-items-start">
+        <div class="admin-main-column col-12 col-md">
+            <section class="admin-panel admin-table-panel property-list-panel card">
+                <div class="admin-panel-heading">
+                    <div>
+                        <h2>Immobili in lavorazione</h2>
+                        <p>Il codice immobile e interno all'agenzia e non viene mostrato agli utenti pubblici.</p>
+                    </div>
+                </div>
+
+                <form class="lead-list-tools property-list-tools row g-2 align-items-end" method="get" aria-label="Filtri lista immobili">
+                    <input type="hidden" name="Page" value="1" />
+                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                    <div class="col-12 col-md">
+                        <label class="form-label" for="propertySearchTerm">Ricerca testuale</label>
+                        <input class="form-control" id="propertySearchTerm" name="SearchTerm" type="search" placeholder="Codice, titolo, comune, quartiere..." value="@Model.SearchTerm" />
+                    </div>
+                    <div class="col-12 col-md">
+                        <span class="form-label">Stato</span>
+                        <details class="admin-filter-dropdown">
+                            <summary><span>@FilterSummary(Model.StatusOptions, "Tutti")</span></summary>
+                            <div class="admin-filter-options">
+                                @foreach (var option in Model.StatusOptions)
+                                {
+                                    <label class="admin-filter-option">
+                                        <input type="checkbox" name="Statuses" value="@option.Value" checked="@option.IsSelected" />
+                                        <span>@option.Label</span>
+                                    </label>
+                                }
+                            </div>
+                        </details>
+                    </div>
+                    <div class="col-12 col-md">
+                        <span class="form-label">Contratto</span>
+                        <details class="admin-filter-dropdown">
+                            <summary><span>@FilterSummary(Model.ContractOptions, "Tutti")</span></summary>
+                            <div class="admin-filter-options">
+                                @foreach (var option in Model.ContractOptions.Where(option => !string.IsNullOrWhiteSpace(option.Value)))
+                                {
+                                    <label class="admin-filter-option">
+                                        <input type="checkbox" name="Contracts" value="@option.Value" checked="@option.IsSelected" />
+                                        <span>@option.Label</span>
+                                    </label>
+                                }
+                            </div>
+                        </details>
+                    </div>
+                    <div class="col-12 col-md">
+                        <span class="form-label">Referente</span>
+                        <details class="admin-filter-dropdown">
+                            <summary><span>@FilterSummary(Model.AdvisorOptions, "Tutti")</span></summary>
+                            <div class="admin-filter-options">
+                                @foreach (var option in Model.AdvisorOptions.Where(option => !string.IsNullOrWhiteSpace(option.Value)))
+                                {
+                                    <label class="admin-filter-option">
+                                        <input type="checkbox" name="Advisors" value="@option.Value" checked="@option.IsSelected" />
+                                        <span>@option.Label</span>
+                                    </label>
+                                }
+                            </div>
+                        </details>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <button class="btn btn-outline-secondary lead-filter-submit w-100" type="submit">
+                            <i class="ph ph-funnel" aria-hidden="true"></i>
+                            <span>Filtra</span>
+                        </button>
+                    </div>
+                </form>
+
+                <form id="propertyBulkForm" class="admin-table-form" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ReturnTo" value="Index" />
+                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                    <input type="hidden" name="Status" value="@Model.Status" />
+                    <input type="hidden" name="Contract" value="@Model.Contract" />
+                    <input type="hidden" name="Advisor" value="@Model.Advisor" />
+                    <input type="hidden" name="Page" value="@Model.Page" />
+                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+
+                    <div class="admin-table-scroll table-responsive">
+                        <table class="table admin-table property-admin-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    <span class="lead-select-heading">
+                                        <span class="lead-select-spacer" aria-hidden="true"></span>
+                                        <span>Immobile</span>
+                                    </span>
+                                </th>
+                                <th scope="col">Contratto</th>
+                                <th scope="col">Stato</th>
+                                <th scope="col">Qualita scheda</th>
+                                <th scope="col">Mancano</th>
+                                <th scope="col">Referente</th>
+                                <th class="text-end" scope="col">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.HasProperties)
+                            {
+                                foreach (var property in Model.Properties)
+                                {
+                                    var featureActionTitle = property.IsFeatured
+                                        ? "Gia in evidenza"
+                                        : property.CanFeature
+                                            ? "Metti in evidenza"
+                                            : "Pubblica prima di mettere in evidenza";
+                                    <tr>
+                                        <td>
+                                            <div class="lead-select-contact property-select-contact">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" id="propertySelect_@property.Reference" name="SelectedPropertyReferences" type="checkbox" value="@property.Reference" aria-label="Seleziona immobile @property.Reference" />
+                                                </div>
+                                                <div class="property-admin-title">
+                                                    @if (!string.IsNullOrWhiteSpace(property.ThumbnailUrl))
+                                                    {
+                                                        <img class="property-thumb" src="@property.ThumbnailUrl" alt="" loading="lazy" decoding="async" width="58" height="58" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="property-thumb" aria-hidden="true">Foto</span>
+                                                    }
+                                                    <div>
+                                                        <span class="property-code badge text-bg-light">@property.Reference</span>
+                                                        <strong>@property.Title</strong>
+                                                        <p>@property.DisplayLocation</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@property.ContractLabel</td>
+                                        <td><span class="admin-status-pill badge rounded-pill @property.StatusClass">@property.StatusLabel</span></td>
+                                        <td>
+                                            <div class="property-completion">
+                                                <strong>@property.CompletionPercent%</strong>
+                                                <span class="progress" role="progressbar" aria-valuenow="@property.CompletionPercent" aria-valuemin="0" aria-valuemax="100">
+                                                    <i class="progress-bar" style="width: @property.CompletionPercent%"></i>
+                                                </span>
+                                                <small>Prontezza pubblicazione</small>
+                                            </div>
+                                        </td>
+                                        <td><p class="property-missing-items">@property.MissingItems</p></td>
+                                        <td>@property.AdvisorLabel</td>
+                                        <td class="text-end">
+                                            <div class="property-row-actions d-inline-flex gap-1">
+                                                <a class="property-icon-button btn btn-sm btn-outline-secondary"
+                                                   asp-area="Admin"
+                                                   asp-controller="Properties"
+                                                   asp-action="Edit"
+                                                   asp-route-reference="@property.Reference"
+                                                   aria-label="Apri editor @property.Reference"
+                                                   title="Apri editor">
+                                                    <i class="ph ph-pencil-simple" aria-hidden="true"></i>
+                                                </a>
+                                                <a class="property-icon-button btn btn-sm btn-outline-secondary"
+                                                   asp-area="Admin"
+                                                   asp-controller="Properties"
+                                                   asp-action="Preview"
+                                                   asp-route-reference="@property.Reference"
+                                                   aria-label="Anteprima @property.Reference"
+                                                   title="Anteprima">
+                                                    <i class="ph ph-eye" aria-hidden="true"></i>
+                                                </a>
+                                                <button class="property-icon-button btn btn-sm btn-outline-secondary"
+                                                        type="submit"
+                                                        formaction="@Url.Action("Feature", "Properties", new { area = "Admin", reference = property.Reference })"
+                                                        disabled="@(!property.CanFeature)"
+                                                        aria-label="@featureActionTitle @property.Reference"
+                                                        title="@featureActionTitle"
+                                                        data-featured-row-button
+                                                        data-feature-reference="@property.Reference">
+                                                    <i class="ph ph-star" aria-hidden="true"></i>
+                                                </button>
+                                                <button class="property-icon-button btn btn-sm btn-outline-secondary"
+                                                        type="submit"
+                                                        formaction="@Url.Action("Publish", "Properties", new { area = "Admin", reference = property.Reference })"
+                                                        aria-label="Pubblica @property.Reference"
+                                                        title="Pubblica">
+                                                    <i class="ph ph-upload-simple" aria-hidden="true"></i>
+                                                </button>
+                                                <button class="property-icon-button btn btn-sm btn-outline-secondary"
+                                                        type="submit"
+                                                        formaction="@Url.Action("Archive", "Properties", new { area = "Admin", reference = property.Reference })"
+                                                        disabled="@(!property.CanArchive)"
+                                                        aria-label="Archivia annuncio @property.Reference"
+                                                        title="Archivia annuncio">
+                                                    <i class="ph ph-trash" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="admin-empty-state">
+                                            <strong>Nessun immobile trovato</strong>
+                                            <p>Modifica i filtri per tornare agli annunci operativi.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        </table>
+                    </div>
+                </form>
+
+                <nav class="admin-pagination" aria-label="Paginazione immobili">
+                    <div class="admin-pagination-metrics">
+                        <span>Risultati</span>
+                        <strong>@Model.TotalItems immobili</strong>
+                    </div>
+                    <div class="admin-pagination-main">
+                        <div class="admin-pagination-stepper">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <a class="admin-pagination-link"
+                                   asp-area="Admin"
+                                   asp-controller="Properties"
+                                   asp-action="Index"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-Status="@Model.Status"
+                                   asp-route-Contract="@Model.Contract"
+                                   asp-route-Advisor="@Model.Advisor"
+                                   asp-route-Page="@(Model.Page - 1)"
+                                   asp-route-PageSize="@Model.PageSize"
+                                   aria-label="Pagina precedente">
+                                    <i class="ph ph-caret-left" aria-hidden="true"></i>
+                                    <span>Precedente</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="admin-pagination-link is-disabled" aria-disabled="true">
+                                    <i class="ph ph-caret-left" aria-hidden="true"></i>
+                                    <span>Precedente</span>
+                                </span>
+                            }
+
+                            <span class="admin-pagination-current" aria-current="page">
+                                <span>Pagina</span>
+                                <strong>@Model.Page / @Model.TotalPages</strong>
+                            </span>
+
+                            @if (Model.HasNextPage)
+                            {
+                                <a class="admin-pagination-link"
+                                   asp-area="Admin"
+                                   asp-controller="Properties"
+                                   asp-action="Index"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-Status="@Model.Status"
+                                   asp-route-Contract="@Model.Contract"
+                                   asp-route-Advisor="@Model.Advisor"
+                                   asp-route-Page="@(Model.Page + 1)"
+                                   asp-route-PageSize="@Model.PageSize"
+                                   aria-label="Pagina successiva">
+                                    <span>Successiva</span>
+                                    <i class="ph ph-caret-right" aria-hidden="true"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="admin-pagination-link is-disabled" aria-disabled="true">
+                                    <span>Successiva</span>
+                                    <i class="ph ph-caret-right" aria-hidden="true"></i>
+                                </span>
+                            }
+                        </div>
+                        <form class="admin-page-size-form" method="get" aria-label="Elementi per pagina immobili">
+                            <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                            <input type="hidden" name="Status" value="@Model.Status" />
+                            <input type="hidden" name="Contract" value="@Model.Contract" />
+                            <input type="hidden" name="Advisor" value="@Model.Advisor" />
+                            <input type="hidden" name="Page" value="1" />
+                            <label for="propertyPageSize">Righe</label>
+                            <select class="form-select form-select-sm" id="propertyPageSize" name="PageSize">
+                                @foreach (var pageSize in Model.PageSizeOptions)
+                                {
+                                    if (pageSize == Model.PageSize)
+                                    {
+                                        <option value="@pageSize" selected>@pageSize</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@pageSize">@pageSize</option>
+                                    }
+                                }
+                            </select>
+                            <button class="admin-page-size-submit btn btn-outline-secondary btn-sm" type="submit">Applica</button>
+                        </form>
+                    </div>
+                </nav>
+            </section>
+        </div>
+
+        <div class="admin-side-column col-12 col-md-auto">
+            <aside class="admin-panel admin-side-panel property-side-panel card">
+                <div class="admin-panel-heading">
+                    <div>
+                        <h2>Azioni rapide</h2>
+                    </div>
+                </div>
+                <div class="property-quick-actions d-grid gap-2">
+                    <a class="admin-primary-action btn admin-btn-create" asp-area="Admin" asp-controller="Properties" asp-action="Create">
+                        <i class="ph ph-plus" aria-hidden="true"></i>
+                        <span>Nuovo Immobile</span>
+                    </a>
+                    <label class="lead-bulk-advisor">
+                        <span>Referente bulk</span>
+                        <select class="form-select" name="BulkAssignedAgencyUserId" form="propertyBulkForm">
+                            <option value="">Seleziona referente</option>
+                            @foreach (var option in Model.AdvisorOptions)
+                            {
+                                if (!string.IsNullOrWhiteSpace(option.Value) && option.Value != "unassigned")
+                                {
+                                    <option value="@option.Value">@option.Label</option>
+                                }
+                            }
+                        </select>
+                    </label>
+                    <button class="btn btn-outline-secondary" form="propertyBulkForm" formaction="@Url.Action("BulkAssign", "Properties", new { area = "Admin" })" type="submit">Assegna selezionati</button>
+                </div>
+
+                <section class="featured-homepage-panel" aria-label="Gestione immobili in evidenza homepage" aria-live="polite" data-featured-panel>
+                    <div class="featured-homepage-heading">
+                        <span>Homepage</span>
+                        <h3>Immobili in evidenza</h3>
+                    </div>
+                    <div class="featured-slot-list">
+                        @if (Model.HasFeaturedSlots)
+                        {
+                            foreach (var slot in Model.FeaturedSlots)
+                            {
+                                <article class="featured-slot card">
+                                    <div class="featured-slot-topline">
+                                        <span>Slot @slot.SlotNumber</span>
+                                        <strong>@slot.Reference</strong>
+                                    </div>
+                                    <h4>@slot.Title</h4>
+                                    <p>@slot.DisplayLocation</p>
+                                    <div class="featured-slot-actions">
+                                        <form asp-area="Admin" asp-controller="Properties" asp-action="RemoveFeature" asp-route-reference="@slot.Reference" method="post" data-featured-form>
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn admin-btn-danger" type="submit">Rimuovi</button>
+                                        </form>
+                                        <div class="featured-slot-reorder" aria-label="Riordina slot @slot.SlotNumber">
+                                            <form asp-area="Admin" asp-controller="Properties" asp-action="MoveFeature" asp-route-reference="@slot.Reference" asp-route-direction="-1" method="post" data-featured-form>
+                                                @Html.AntiForgeryToken()
+                                                <button class="featured-slot-arrow btn btn-outline-secondary" type="submit" disabled="@(slot.SlotNumber == 1)" aria-label="Sposta su" title="Sposta su">
+                                                    <i class="ph ph-arrow-up" aria-hidden="true"></i>
+                                                </button>
+                                            </form>
+                                            <form asp-area="Admin" asp-controller="Properties" asp-action="MoveFeature" asp-route-reference="@slot.Reference" asp-route-direction="1" method="post" data-featured-form>
+                                                @Html.AntiForgeryToken()
+                                                <button class="featured-slot-arrow btn btn-outline-secondary" type="submit" disabled="@(slot.SlotNumber == Model.FeaturedSlots.Count)" aria-label="Sposta giu" title="Sposta giu">
+                                                    <i class="ph ph-arrow-down" aria-hidden="true"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+                        }
+                        else
+                        {
+                            <div class="admin-empty-state">
+                                <strong>Nessuno slot configurato</strong>
+                                <p>Gli slot homepage saranno modificabili nella pagina editor dedicata.</p>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <environment include="Development">
+        <script src="/js/bundle-admin-featured-slots.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/bundle-admin-featured-slots.min.js" asp-append-version="true"></script>
+    </environment>
+}

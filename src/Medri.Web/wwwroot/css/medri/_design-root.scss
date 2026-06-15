@@ -1,0 +1,136 @@
+
+
+
+
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap");
+@import url("/medri-reference/phosphor/style.css");
+
+@font-face {
+  font-family: "Phosphor-Fill";
+  src:
+    url("/medri-reference/phosphor-fill/Phosphor-Fill.woff2") format("woff2"),
+    url("/medri-reference/phosphor-fill/Phosphor-Fill.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+:root {
+  --ink: #18202b;
+  --muted: #66707b;
+  --line: #d8d5cb;
+  --soft-line: #ebe7dc;
+  --surface: #fffdf7;
+  --surface-alt: #f5f1e8;
+  --surface-strong: #e7dfd0;
+
+  
+  --role-trust: oklch(33% 0.075 252);
+  --role-trust-strong: oklch(24.5% 0.064 253);
+  --role-trust-soft: oklch(93% 0.025 249);
+  --role-valuation: oklch(66% 0.12 78);
+  --role-valuation-strong: oklch(48% 0.095 74);
+  --role-valuation-soft: oklch(92.5% 0.04 82);
+  --role-match: oklch(53% 0.082 148);
+  --role-match-strong: oklch(39% 0.071 151);
+  --role-match-soft: oklch(92.2% 0.035 151);
+  --role-info: oklch(57% 0.075 213);
+  --role-info-soft: oklch(93% 0.03 214);
+  --role-risk: oklch(48% 0.095 28);
+  --role-risk-strong: oklch(36% 0.082 27);
+  --role-risk-soft: oklch(92.5% 0.035 29);
+
+  
+  --button: var(--role-trust);
+  --button-strong: var(--role-trust-strong);
+  --accent: var(--role-valuation);
+  --accent-soft: var(--role-valuation-soft);
+  --brand-blue: var(--role-trust);
+  --brand-gold: var(--role-valuation);
+  --brand-sage: var(--role-match);
+  --success: var(--role-match);
+  --danger: var(--role-risk);
+
+  --radius-sm: 0.625rem;
+  --radius-md: 1.125rem;
+  --radius-lg: 1.875rem;
+  --shadow-sm: 0 0.5rem 1.375rem rgba(37, 63, 99, 0.08);
+  --shadow-md: 0 1.125rem 2.8125rem rgba(37, 63, 99, 0.12);
+  --shadow-lg: 0 1.875rem 5.125rem rgba(24, 32, 43, 0.16);
+
+  
+  --admin-page-bg:
+    radial-gradient(circle at 0 0, rgba(199, 161, 80, 0.14), transparent 30rem),
+    #eef0ec;
+  --admin-sidebar-bg:
+    radial-gradient(circle at 0 0, rgba(199, 161, 80, 0.22), transparent 22rem),
+    linear-gradient(180deg, #172840, #253f63 68%, #1c314f);
+  --admin-on-dark: #fff;
+  --admin-on-dark-muted: rgba(255, 255, 255, 0.7);
+  --admin-on-dark-soft: rgba(255, 255, 255, 0.82);
+  --admin-on-dark-line: rgba(255, 255, 255, 0.18);
+  --admin-on-dark-line-soft: rgba(255, 255, 255, 0.15);
+  --admin-on-dark-bg: rgba(255, 255, 255, 0.14);
+  --admin-on-dark-bg-strong: rgba(255, 255, 255, 0.16);
+  --admin-panel-bg: rgba(255, 253, 247, 0.94);
+  --admin-panel-bg-soft: rgba(255, 253, 247, 0.92);
+  --admin-panel-bg-subtle: rgba(255, 253, 247, 0.86);
+  --admin-panel-bg-faint: rgba(255, 253, 247, 0.72);
+  --admin-panel-bg-light: rgba(255, 253, 247, 0.8);
+  --admin-panel-bg-strong: rgba(255, 253, 247, 0.88);
+  --admin-panel-bg-solidish: rgba(255, 253, 247, 0.9);
+  --admin-panel-bg-muted: rgba(246, 241, 231, 0.78);
+  --admin-panel-bg-muted-strong: rgba(246, 241, 231, 0.9);
+  --admin-panel-bg-alt-soft: rgba(245, 241, 232, 0.58);
+  --admin-panel-bg-alt: rgba(245, 241, 232, 0.62);
+  --admin-panel-bg-alt-strong: rgba(245, 241, 232, 0.72);
+  --admin-panel-bg-whitewash: rgba(255, 255, 255, 0.74);
+  --admin-panel-gradient: linear-gradient(180deg, #fffdf7, #f6f1e7);
+  --admin-panel-gradient-soft: linear-gradient(180deg, rgba(255, 253, 247, 0.96), rgba(246, 241, 231, 0.78));
+  --admin-accent-panel-gradient: linear-gradient(180deg, rgba(199, 161, 80, 0.18), rgba(246, 241, 231, 0.92));
+  --admin-preview-gradient:
+    radial-gradient(circle at 100% 0%, rgba(199, 161, 80, 0.18), transparent 12rem),
+    linear-gradient(135deg, rgba(255, 253, 247, 0.98), rgba(245, 241, 232, 0.92));
+  --admin-featured-gradient:
+    linear-gradient(135deg, rgba(199, 161, 80, 0.12), rgba(255, 253, 247, 0.92)),
+    var(--surface);
+  --admin-contact-gradient:
+    radial-gradient(circle at 100% 0%, rgba(199, 161, 80, 0.2), transparent 9rem),
+    var(--surface-alt);
+  --admin-line: rgba(37, 63, 99, 0.1);
+  --admin-line-soft: rgba(37, 63, 99, 0.08);
+  --admin-line-medium: rgba(37, 63, 99, 0.14);
+  --admin-line-strong: rgba(37, 63, 99, 0.16);
+  --admin-line-control: rgba(37, 63, 99, 0.28);
+  --admin-button-soft-bg: rgba(37, 63, 99, 0.08);
+  --admin-button-soft-bg-muted: rgba(37, 63, 99, 0.05);
+  --admin-control-fill: rgba(37, 63, 99, 0.12);
+  --admin-muted-icon: rgba(37, 63, 99, 0.4);
+  --admin-muted-ink: rgba(24, 32, 43, 0.48);
+  --admin-muted-ink-medium: rgba(24, 32, 43, 0.54);
+  --admin-muted-ink-strong: rgba(24, 32, 43, 0.56);
+  --admin-card-shadow: 0 0.625rem 1.75rem rgba(31, 54, 88, 0.09);
+  --admin-popover-shadow: 0 0.9rem 1.8rem rgba(24, 32, 43, 0.13);
+  --admin-status-info-border: rgba(42, 99, 158, 0.36);
+  --admin-status-info-border-soft: rgba(42, 99, 158, 0.34);
+  --admin-status-info-bg: rgba(42, 99, 158, 0.12);
+  --admin-status-info-text: #1e4d7d;
+  --admin-status-success-border: rgba(79, 109, 87, 0.36);
+  --admin-status-success-bg: rgba(79, 109, 87, 0.13);
+  --admin-status-success-text: #34533c;
+  --admin-status-warning-border: rgba(192, 154, 75, 0.42);
+  --admin-status-warning-bg: rgba(192, 154, 75, 0.16);
+  --admin-status-warning-text: #674a12;
+  --admin-status-update-border: rgba(112, 76, 135, 0.34);
+  --admin-status-update-bg: rgba(112, 76, 135, 0.12);
+  --admin-status-update-text: #5b396f;
+  --admin-status-danger-border: rgba(147, 65, 50, 0.34);
+  --admin-status-danger-bg: rgba(147, 65, 50, 0.12);
+  --admin-status-danger-text: #743428;
+  --admin-status-neutral-bg: rgba(37, 63, 99, 0.07);
+  --admin-accent-border: rgba(199, 161, 80, 0.56);
+  --admin-accent-border-soft: rgba(199, 161, 80, 0.28);
+  --admin-accent-bg: rgba(199, 161, 80, 0.16);
+  --admin-accent-bg-soft: rgba(199, 161, 80, 0.14);
+  --admin-focus-shadow: 0 0 0 0.18rem rgba(199, 161, 80, 0.13);
+}

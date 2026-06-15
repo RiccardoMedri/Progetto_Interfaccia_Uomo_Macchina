@@ -1,0 +1,28 @@
+@model Medri.Web.Features.LeadIntake.LeadFunnelContactPreferencesViewModel
+
+<section class="@Model.SectionClass">
+    <h2>@Model.Heading</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+        @for (var index = 0; index < Model.Options.Count; index++)
+        {
+            var option = Model.Options[index];
+            var optionId = Model.IdPrefix + "-" + index;
+            var isSelected = option.Value == Model.SelectedValue;
+            <div class="col">
+                <label class="choice-card contact-option-card h-100 @(isSelected ? "is-selected" : null)" for="@optionId" data-contact-choice>
+                    <input class="visually-hidden"
+                           id="@optionId"
+                           name="@Model.FieldName"
+                           type="radio"
+                           value="@option.Value"
+                           checked="@isSelected" />
+                    <span class="contact-option-icon @option.IconClass" aria-hidden="true"></span>
+                    <span class="selection-dot" aria-hidden="true"></span>
+                    <h3>@option.Title</h3>
+                    <p>@option.Description</p>
+                </label>
+            </div>
+        }
+    </div>
+    <span class="text-danger field-validation-valid" data-valmsg-for="@Model.FieldName" data-valmsg-replace="true"></span>
+</section>

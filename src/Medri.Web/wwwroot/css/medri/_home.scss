@@ -1,0 +1,1353 @@
+@use "tokens";
+@use "mixins";
+
+$home-radius: 0.5rem;
+$home-control-radius: 1.75rem;
+$home-icon-radius: 0.75rem;
+$home-section-block: 2.25rem;
+$home-section-block-lg: 4.5rem;
+$home-gutter: tokens.$space-4;
+$home-container-max: 82.5rem;
+$home-shell-gutter: 1.5rem;
+$home-blue: var(--button);
+$home-blue-strong: var(--button-strong);
+$home-muted: var(--muted);
+$home-card-shadow: 0 0.875rem 2rem rgba(31, 54, 88, 0.09);
+$home-panel-shadow: 0 1.25rem 3rem rgba(31, 54, 88, 0.16);
+
+.medri-home-body {
+  min-width: 0;
+  overflow-x: clip;
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
+.medri-home-shell {
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  background: var(--surface-alt);
+}
+
+.medri-home-header {
+  position: sticky;
+  top: 0;
+  z-index: tokens.$z-home-header;
+  width: min(100%, tokens.$public-frame-max);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: tokens.$space-3;
+  margin-inline: auto;
+  
+  
+  margin-block: 0;
+  padding: tokens.$space-3 tokens.$space-4;
+  border: 0;
+  border-bottom: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 86%);
+  border-radius: 0;
+  background: color-mix(in oklch, var(--surface), transparent 8%);
+  box-shadow: 0 0.4rem 1.4rem rgba(31, 54, 88, 0.08);
+  backdrop-filter: blur(0.875rem);
+
+  .brand {
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: tokens.$space-3;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .brand-icon {
+    flex: 0 0 auto;
+    width: 2.9rem;
+    height: 2.9rem;
+    display: block !important;
+    object-fit: contain;
+    padding: 0.16rem;
+    border: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 72%) !important;
+    border-radius: 0.5rem;
+    background: var(--surface) !important;
+    box-shadow: 0 0.25rem 0.9rem rgba(31, 54, 88, 0.08);
+  }
+
+  .brand-copy {
+    min-width: 0;
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .brand strong,
+  .brand small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brand strong {
+    font-size: 1.04rem;
+  }
+
+  .brand small {
+    font-size: 0.68rem;
+  }
+
+  .header-account-cta,
+  .menu-button {
+    width: 2.65rem;
+    height: 2.65rem;
+    display: grid;
+    place-content: center;
+    border: 0.0625rem solid var(--line);
+    border-radius: $home-radius;
+    background: var(--surface);
+    color: $home-blue-strong;
+  }
+
+  .header-account-cta,
+  .primary-nav > .account-nav-trigger {
+    border-color: $home-blue;
+    background: $home-blue;
+    color: var(--surface);
+  }
+
+  .header-account-cta i {
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .menu-state {
+    position: absolute;
+    inline-size: 0.0625rem;
+    block-size: 0.0625rem;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .menu-button {
+    gap: 0.3rem;
+    cursor: pointer;
+  }
+
+  .menu-button span {
+    width: 1.15rem;
+    height: 0.13rem;
+    display: block;
+    background: currentColor;
+  }
+
+  .primary-nav {
+    grid-column: 1 / -1;
+    display: none;
+    grid-template-columns: 1fr;
+    gap: tokens.$space-2;
+    padding-top: tokens.$space-3;
+    
+    
+    
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .menu-state:checked ~ .primary-nav {
+    display: grid;
+  }
+
+  .nav-group {
+    min-width: 0;
+    position: relative;
+  }
+
+  .nav-trigger,
+  .primary-nav > a {
+    width: 100%;
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 tokens.$space-3;
+    border: 0.0625rem solid var(--line);
+    border-radius: $home-radius;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.88rem;
+    font-weight: 760;
+    text-decoration: none;
+  }
+
+  .primary-nav > .login-link,
+  .primary-nav > .account-nav-trigger {
+    border-radius: 999rem;
+  }
+
+  button.nav-trigger {
+    cursor: default;
+  }
+
+  .nav-dropdown {
+    width: 100%;
+    display: none;
+    gap: tokens.$space-1;
+    margin-top: tokens.$space-2;
+    padding: tokens.$space-2;
+    border: 0.0625rem solid var(--line);
+    border-radius: $home-radius;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .nav-group:hover .nav-dropdown,
+  .nav-group:focus-within .nav-dropdown {
+    display: grid;
+  }
+
+  .dropdown-item {
+    border-radius: calc($home-radius - 0.12rem);
+  }
+
+  .header-contact {
+    display: none;
+  }
+}
+
+
+
+
+@media (max-width: 61.99rem) {
+  .medri-home-header .account-nav-trigger {
+    display: none;
+  }
+}
+
+.medri-home {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+
+  .container-xxl {
+    min-width: 0;
+  }
+}
+
+.medri-home-hero {
+  position: relative;
+  isolation: isolate;
+  z-index: tokens.$z-home-hero;
+  min-height: 38rem;
+  display: grid;
+  align-items: stretch;
+  padding-block: 3rem;
+  overflow: visible;
+  background:
+    linear-gradient(180deg, rgba(19, 40, 63, 0.34), rgba(19, 40, 63, 0.72)),
+    url("/medri-reference/assets/properties/property-02.jpg") center / cover;
+  color: var(--surface);
+  text-align: center;
+
+  
+  
+  > .container-xxl {
+    display: flex;
+    flex-direction: column;
+
+    > .row {
+      flex: 1;
+
+      > div {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+.medri-home-hero-copy {
+  flex: 1;
+  display: grid;
+  align-content: center;
+  max-width: 64rem;
+  margin-inline: auto;
+  padding-block: 1rem 1.75rem;
+
+  h1 {
+    margin: 0;
+    color: var(--surface);
+    font-size: 2.05rem;
+    font-weight: 850;
+    line-height: 0.98;
+    letter-spacing: 0;
+    text-shadow: 0 1.1rem 3rem rgba(0, 0, 0, 0.24);
+  }
+}
+
+.medri-home-hero-text {
+  max-width: 38rem;
+  margin: tokens.$space-4 auto 0;
+  color: color-mix(in oklch, var(--surface), transparent 10%);
+  font-size: 1.2rem;
+  line-height: 1.55;
+}
+
+.medri-home-search {
+  position: relative;
+  z-index: tokens.$z-home-search;
+  --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+  width: fit-content;
+  max-width: min(58rem, 100%);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: tokens.$space-3;
+  overflow: visible;
+  isolation: isolate;
+  margin: 0 auto;
+  padding: tokens.$space-4;
+  border: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 84%);
+  border-radius: $home-radius;
+  background: color-mix(in oklch, var(--surface), transparent 4%);
+  box-shadow: $home-panel-shadow;
+  color: var(--ink);
+  text-align: left;
+
+  > .col,
+  > .search-filter-field {
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .search-filter-field {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+  }
+
+  .home-native-filter,
+  .home-native-filter-summary {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .home-native-filter {
+    position: relative;
+  }
+
+  .home-native-filter-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.15rem tokens.$space-2;
+    padding: 0.42rem tokens.$space-3;
+    border: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 82%);
+    background: color-mix(in oklch, var(--surface), transparent 4%);
+    color: var(--ink);
+    cursor: pointer;
+    font-weight: 760;
+    list-style: none;
+  }
+
+  .home-native-filter-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .home-native-filter-summary::after {
+    content: "";
+    width: 0.55rem;
+    height: 0.55rem;
+    flex: 0 0 auto;
+    grid-column: 2;
+    grid-row: 1 / 3;
+    border-right: 0.125rem solid currentColor;
+    border-bottom: 0.125rem solid currentColor;
+    transform: translateY(-0.12rem) rotate(45deg);
+    transition: transform 180ms ease;
+  }
+
+  .home-native-filter[open] .home-native-filter-summary::after {
+    transform: translateY(0.12rem) rotate(225deg);
+  }
+
+  .home-native-filter-title,
+  .home-native-filter-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .home-native-filter-title {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 820;
+    line-height: 1.15;
+  }
+
+  .home-native-filter-value {
+    color: var(--ink);
+    font-size: 0.92rem;
+    line-height: 1.2;
+  }
+
+  
+  
+  
+  .home-native-filter-value::after {
+    content: "Scegli";
+  }
+
+  
+  
+  $ms-option: ".form-check-input:checked";
+  $ms-chain: $ms-option;
+  @for $n from 1 through 10 {
+    .home-native-filter:has(#{$ms-chain}) .home-native-filter-value::after {
+      content: if($n == 1, "1 Selezione", "#{$n} Selezioni");
+    }
+    $ms-chain: "#{$ms-chain} ~ #{$ms-option}";
+  }
+
+  .search-filter-field:focus-within,
+  .search-filter-field:has(.home-native-filter[open]) {
+    z-index: tokens.$z-home-search-open;
+  }
+
+  .form-label {
+    width: 100%;
+    margin: 0 0 tokens.$space-2;
+    color: var(--ink);
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .home-native-filter-summary,
+  .home-search-submit {
+    min-height: 3.15rem;
+    border-radius: $home-control-radius;
+  }
+
+  .home-native-filter-options {
+    position: absolute;
+    top: calc(100% + tokens.$space-2);
+    left: 0;
+    bottom: auto;
+    display: grid;
+    
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: tokens.$space-2;
+    width: max-content;
+    min-width: min(22rem, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+    max-height: min(22rem, 58vh);
+    margin: 0;
+    overflow: auto;
+    padding: tokens.$space-3;
+    z-index: tokens.$z-home-dropdown;
+    background: var(--surface);
+    border: 0.0625rem solid var(--line);
+    border-radius: $home-radius;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .home-native-filter-options .form-check-input {
+    width: tokens.$checkbox-size;
+    height: tokens.$checkbox-size;
+    min-height: auto;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+    border: 0.0625rem solid rgba(31, 54, 88, 0.35);
+    background-color: var(--surface);
+    box-shadow: none;
+    accent-color: var(--button);
+    appearance: auto;
+    -webkit-appearance: checkbox;
+  }
+
+  .home-native-filter-options .form-check-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--ink);
+    line-height: 1.35;
+  }
+
+  .home-search-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+}
+
+.medri-home-section {
+  padding-inline: 0;
+  padding-block: $home-section-block;
+  border: 0.0625rem solid color-mix(in oklch, var(--muted), transparent 76%);
+  border-radius: $home-radius;
+
+  > .container-xxl {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: tokens.$space-3;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .section-heading h2,
+  h2 {
+    min-width: 0;
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.55rem;
+    font-weight: 780;
+    line-height: 1.18;
+    letter-spacing: 0;
+  }
+
+  .section-heading a {
+    flex: 0 0 auto;
+    color: $home-blue;
+    font-weight: 800;
+    text-decoration: none;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .medri-home-section .section-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    justify-content: start;
+  }
+}
+
+.featured-listings-section {
+  background: var(--surface);
+}
+
+.listing-grid {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.listing-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 84%);
+  border-radius: $home-radius;
+  background: var(--surface);
+  box-shadow: $home-card-shadow;
+
+  .featured-listing-link {
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .card-media {
+    min-height: 13.5rem;
+    border-radius: 0;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .card-body {
+    min-width: 0;
+    padding: 1.1rem 4rem 1.25rem 1.1rem;
+  }
+
+  .tag {
+    width: max-content;
+    max-width: 100%;
+    display: inline-flex;
+    margin-bottom: tokens.$space-2;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: tokens.$space-2 0 0;
+    color: $home-muted;
+    line-height: 1.45;
+  }
+
+  strong {
+    display: inline-flex;
+    margin-top: tokens.$space-3;
+    color: $home-blue-strong;
+    font-size: 1.25rem;
+  }
+
+  .featured-save-form {
+    position: absolute;
+    right: tokens.$space-4;
+    bottom: tokens.$space-4;
+    z-index: 2;
+  }
+
+  .save-ad-button {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999rem;
+    background: color-mix(in oklch, var(--surface), transparent 6%);
+    box-shadow: 0 0.55rem 1.3rem rgba(31, 54, 88, 0.12);
+  }
+}
+
+.featured-listing-primary {
+  .card-media {
+    min-height: 17rem;
+  }
+
+  h3 {
+    font-size: 1.45rem;
+  }
+}
+
+.featured-listing-stack > .listing-card {
+  
+  
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.home-services-section,
+.why-panel {
+  background: var(--surface-alt);
+}
+
+.home-services-section .intent-grid {
+  width: 100%;
+  max-width: none;
+  margin-inline: auto;
+}
+
+.home-intent-card {
+  position: relative;
+  min-width: 0;
+  min-height: 10.75rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: tokens.$space-3 tokens.$space-4;
+  align-content: start;
+  align-items: start;
+  padding: 1.2rem;
+  overflow: hidden;
+  border: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 84%);
+  border-radius: $home-radius;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 0.65rem 1.5rem rgba(31, 54, 88, 0.07);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    border-color: color-mix(in oklch, var(--button), var(--surface) 68%);
+    color: var(--ink);
+  }
+
+  
+  .intent-icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    grid-column: 1;
+    grid-row: 1;
+    display: grid;
+    place-items: center;
+    border: 0.0625rem solid color-mix(in oklch, var(--button), transparent 82%);
+    border-radius: $home-icon-radius;
+    background: color-mix(in oklch, var(--button), var(--surface) 90%);
+    color: $home-blue;
+    font-size: 1.6rem;
+  }
+
+  .card-action-button {
+    width: 2.65rem;
+    height: 2.65rem;
+    grid-column: 3;
+    grid-row: 1;
+    
+    
+    position: static;
+    display: grid;
+    place-items: center;
+    border-radius: $home-radius;
+    background: $home-blue;
+    color: var(--surface);
+    font-size: 1rem;
+  }
+
+  
+  > div {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$space-2;
+  }
+
+  strong {
+    font-size: 1.05rem;
+    line-height: 1.22;
+  }
+
+  p {
+    margin: 0;
+    color: $home-muted;
+    font-size: 0.92rem;
+    line-height: 1.48;
+  }
+}
+
+.neighborhood-section {
+  background: var(--surface);
+}
+
+.neighborhood-grid article {
+  min-height: 9.5rem;
+  padding: 1.2rem;
+  border: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 84%);
+  border-radius: $home-radius;
+  background:
+    linear-gradient(180deg, color-mix(in oklch, var(--surface), transparent 20%), var(--surface)),
+    url("/medri-reference/assets/properties/property-06.jpg") center / cover;
+  box-shadow: 0 0.5rem 1.25rem rgba(31, 54, 88, 0.06);
+
+  span {
+    display: block;
+    color: var(--ink);
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  p {
+    max-width: 16rem;
+    margin: tokens.$space-2 0 0;
+    color: $home-muted;
+    line-height: 1.48;
+  }
+}
+
+.intent-grid,
+.neighborhood-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.why-panel {
+  display: block;
+  grid-template-columns: none;
+  gap: 0;
+
+  .row {
+    max-width: 72rem;
+    margin-inline: auto;
+    justify-content: center;
+  }
+
+  h2 {
+    max-width: 22ch;
+  }
+
+  .col-12 > p {
+    max-width: 42ch;
+    margin: tokens.$space-4 0 0;
+    color: var(--ink);
+    line-height: 1.58;
+  }
+}
+
+.why-list {
+  display: grid;
+  gap: tokens.$space-3;
+}
+
+.why-card {
+  width: 100%;
+  min-height: 7rem;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: tokens.$space-2 tokens.$space-4;
+  margin: 0;
+  padding: 1.15rem;
+  overflow: hidden;
+  border: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 84%);
+  border-radius: $home-radius;
+  background: var(--surface);
+  box-shadow: 0 0.5rem 1.25rem rgba(31, 54, 88, 0.06);
+
+  .why-icon {
+    width: 3rem;
+    height: 3rem;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    display: grid;
+    place-items: center;
+    border-radius: $home-icon-radius;
+    background: color-mix(in oklch, var(--button), var(--surface) 90%);
+    color: $home-blue;
+    font-size: 1.45rem;
+  }
+
+  h3,
+  p {
+    grid-column: 2;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.05rem;
+  }
+
+  p {
+    margin: 0;
+    color: color-mix(in oklch, var(--ink), transparent 20%);
+    line-height: 1.45;
+  }
+}
+
+.reviews-carousel-section {
+  overflow: hidden;
+  background: var(--surface);
+  text-align: center;
+
+  .reviews-carousel {
+    min-width: 0;
+    overflow: hidden;
+    padding-block: tokens.$space-2;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
+
+  .reviews-track {
+    width: max-content;
+    display: flex;
+    gap: tokens.$space-3;
+    animation: reviews-scroll 42s linear infinite;
+    will-change: transform;
+  }
+
+  .local-review-card {
+    width: min(20rem, calc(100vw - 3rem));
+    min-height: 13rem;
+    flex: 0 0 min(20rem, calc(100vw - 3rem));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: tokens.$space-4;
+    padding: 1.15rem;
+    border: 0.0625rem solid color-mix(in oklch, var(--button), var(--surface) 78%);
+    border-radius: $home-radius;
+    background: color-mix(in oklch, var(--surface), transparent 3%);
+    box-shadow: 0 0.875rem 2rem rgba(31, 54, 88, 0.12);
+    text-align: center;
+  }
+
+  .local-review-card blockquote {
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.96rem;
+    font-weight: 650;
+    line-height: 1.45;
+    letter-spacing: 0;
+  }
+
+  .trust-copy {
+    align-self: stretch;
+    display: grid;
+    align-content: center;
+    gap: 0.75rem;
+  }
+
+  .trust-copy p {
+    max-width: 26rem;
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.58;
+  }
+
+  .review-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.18rem;
+    color: color-mix(in oklch, var(--role-valuation-strong), #fff 58%);
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .review-star.is-filled {
+    color: var(--role-valuation-strong);
+  }
+}
+
+@keyframes reviews-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (min-width: 48rem) {
+  .medri-home-header {
+    padding-inline: 1.5rem;
+  }
+
+  .medri-home-hero {
+    min-height: 42rem;
+  }
+
+  .medri-home-hero-copy h1 {
+    font-size: 4rem;
+  }
+
+  .medri-home-search {
+    > .search-filter-field {
+      flex: 0 1 14rem;
+      width: 14rem;
+    }
+
+    > .col:last-child {
+      flex-basis: 100%;
+      width: 100%;
+    }
+  }
+
+  .medri-home-section {
+    padding-block: 3.5rem;
+
+    .section-heading {
+      margin-bottom: 1.65rem;
+    }
+
+    .section-heading h2,
+    h2 {
+      font-size: 2rem;
+    }
+  }
+
+}
+
+@media (min-width: 62rem) {
+  .medri-home-header {
+    grid-template-columns: minmax(13rem, auto) minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: tokens.$space-3;
+    width: min($home-container-max, calc(100% - $home-shell-gutter));
+    border: 0.0625rem solid color-mix(in oklch, var(--muted), transparent 76%);
+    border-radius: 999rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+
+    .header-account-cta,
+    .menu-button,
+    .menu-state {
+      display: none;
+    }
+
+    .primary-nav {
+      grid-column: auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: tokens.$space-2;
+      padding-top: 0;
+    }
+
+    .nav-trigger,
+    .primary-nav > a {
+      width: auto;
+      min-height: 2.4rem;
+      border-color: transparent;
+      background: transparent;
+      white-space: nowrap;
+    }
+
+    .primary-nav > .login-link,
+    .primary-nav > .account-nav-trigger {
+      border-color: $home-blue;
+      background: $home-blue;
+      color: var(--surface);
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      
+      top: calc(100% + 0.2rem);
+      left: 0;
+      width: max-content;
+      min-width: 14rem;
+      margin-top: 0;
+      z-index: tokens.$z-home-header-dropdown;
+    }
+
+    .nav-dropdown-wide {
+      min-width: 16rem;
+    }
+
+    
+    
+    
+    
+    .nav-group:focus-within .nav-dropdown {
+      display: none;
+    }
+
+    .nav-group:hover .nav-dropdown,
+    .nav-group:has(:focus-visible) .nav-dropdown {
+      display: grid;
+    }
+
+    .header-contact {
+      min-width: 13rem;
+      display: grid;
+      justify-items: end;
+      gap: 0.1rem;
+      color: $home-muted;
+      font-size: 0.78rem;
+      line-height: 1.3;
+      text-align: right;
+    }
+
+    .header-contact a {
+      color: $home-blue-strong;
+      text-decoration: none;
+    }
+  }
+
+  .medri-home-hero {
+    width: min($home-container-max, calc(100% - $home-shell-gutter));
+    min-height: 43rem;
+    margin-inline: auto;
+    padding-block: 5rem;
+    border-radius: $home-radius;
+  }
+
+  .medri-home-hero-copy {
+    padding-bottom: 2.5rem;
+  }
+
+  .medri-home-hero-copy h1 {
+    font-size: 5.2rem;
+  }
+
+  .medri-home-search {
+    padding: 0.9rem;
+
+    > .search-filter-field {
+      flex: 0 1 12.5rem;
+      width: 12.5rem;
+    }
+
+    > .col:last-child {
+      flex: 0 0 6.25rem;
+      width: 6.25rem;
+    }
+
+    .home-native-filter-summary,
+    .home-search-submit {
+      min-height: 2.6rem;
+    }
+  }
+
+  .medri-home-section {
+    width: min($home-container-max, calc(100% - $home-shell-gutter));
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+    padding-block: $home-section-block-lg;
+  }
+
+  .featured-listing-primary {
+    .card-media {
+      min-height: 25rem;
+    }
+
+    .card-body {
+      padding: 1.75rem 4.5rem 1.75rem 1.75rem;
+    }
+
+    h3 {
+      max-width: 15ch;
+      font-size: 2rem;
+    }
+  }
+
+  .featured-listing-secondary {
+    .featured-listing-link {
+      display: grid;
+      grid-template-columns: minmax(9rem, 0.82fr) minmax(0, 1fr);
+      align-items: stretch;
+    }
+
+    .card-media {
+      min-height: 100%;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      padding: 1.2rem 3.7rem 1.2rem 1.2rem;
+    }
+
+    
+    
+    .card-body p:first-of-type {
+      margin-top: auto;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    strong {
+      font-size: 1.25rem;
+    }
+  }
+
+  .reviews-carousel-section .local-review-card {
+    width: 21rem;
+    flex-basis: 21rem;
+    min-height: 14rem;
+  }
+
+}
+
+
+
+
+
+
+.neighborhood-redirect-card {
+  display: grid;
+  gap: tokens.$space-2;
+  padding: 1.125rem 1rem;
+  border: 0.0625rem solid rgba(32, 63, 100, 0.08);
+  border-radius: $home-radius;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.88), rgba(255, 253, 248, 0.94)),
+    url("/medri-reference/assets/properties/property-04.jpg") center / cover no-repeat;
+  box-shadow: var(--shadow-sm);
+  color: var(--ink);
+  text-decoration: none;
+
+  .neighborhood-redirect-kicker {
+    color: $home-muted;
+    font-size: 0.72rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    font-size: 1.18rem;
+    font-weight: 800;
+    line-height: 1.12;
+  }
+
+  p {
+    max-width: 28ch;
+    margin: 0;
+    color: $home-muted;
+    font-size: 0.84rem;
+    line-height: 1.38;
+  }
+}
+
+@media (max-width: tokens.$public-mobile-max) {
+  
+  
+  
+  
+  
+  .featured-listings-section .listing-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: tokens.$space-3;
+    margin: 0;
+    padding: 0.125rem 0 0.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    > [class*="col"],
+    .featured-listing-stack {
+      display: contents;
+    }
+
+    .listing-card {
+      flex: 0 0 78%;
+      min-width: 15.25rem;
+      scroll-snap-align: start;
+    }
+  }
+
+  .featured-listings-section {
+    
+    .section-heading {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: tokens.$space-3;
+    }
+
+    .section-heading h2 {
+      font-size: 1.2rem;
+    }
+
+    
+    .listing-card .card-media,
+    .featured-listing-primary .card-media {
+      min-height: 10.5rem;
+    }
+
+    
+    
+    .listing-card .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      
+      padding: 0.8rem;
+    }
+
+    .listing-card h3,
+    .featured-listing-primary h3 {
+      font-size: 1.02rem;
+    }
+
+    .listing-card p {
+      margin-top: 0.1rem;
+      font-size: 0.8rem;
+    }
+
+    .listing-card strong {
+      margin-top: auto;
+      padding-top: tokens.$space-2;
+      padding-right: 3rem;
+      font-size: 1.1rem;
+    }
+
+    .listing-card .featured-save-form {
+      right: 0.7rem;
+      bottom: 0.7rem;
+    }
+
+    .listing-card .save-ad-button {
+      width: 2.4rem;
+      height: 2.4rem;
+    }
+  }
+
+  
+  .home-services-section .home-intent-card {
+    min-height: 7.75rem;
+    display: grid;
+    align-content: end;
+    padding: 0.875rem;
+    background-position: center;
+    background-size: cover;
+    box-shadow: inset 0 -5.625rem 5.625rem rgba(13, 26, 40, 0.36);
+
+    
+    
+    .intent-icon {
+      display: none !important;
+    }
+
+    .card-action-button,
+    p {
+      display: none;
+    }
+
+    > div {
+      display: contents;
+    }
+
+    strong {
+      justify-self: start;
+      min-height: 2.125rem;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 0.75rem;
+      border-radius: $home-control-radius;
+      background: rgba(255, 253, 247, 0.9);
+      color: $home-blue-strong;
+      font-size: 0.8rem;
+      font-weight: 820;
+      box-shadow: 0 0.5rem 1.125rem rgba(20, 43, 69, 0.14);
+    }
+  }
+
+  .intent-grid > .col:nth-child(1) .home-intent-card {
+    background-image: linear-gradient(180deg, rgba(15, 27, 41, 0.04), rgba(15, 27, 41, 0.48)), url("/medri-reference/assets/properties/property-03.jpg");
+  }
+
+  .intent-grid > .col:nth-child(2) .home-intent-card {
+    background-image: linear-gradient(180deg, rgba(15, 27, 41, 0.04), rgba(15, 27, 41, 0.48)), url("/medri-reference/assets/properties/property-05.jpg");
+  }
+
+  .intent-grid > .col:nth-child(3) .home-intent-card {
+    background-image: linear-gradient(180deg, rgba(15, 27, 41, 0.04), rgba(15, 27, 41, 0.48)), url("/medri-reference/assets/properties/property-08.jpg");
+  }
+
+  .intent-grid > .col:nth-child(4) .home-intent-card {
+    background-image: linear-gradient(180deg, rgba(15, 27, 41, 0.04), rgba(15, 27, 41, 0.48)), url("/medri-reference/assets/properties/property-06.jpg");
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reviews-carousel-section .reviews-track {
+    animation: none;
+  }
+}

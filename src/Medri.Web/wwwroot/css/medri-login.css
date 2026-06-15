@@ -1,0 +1,233 @@
+.medri-login-body,
+.medri-login-shell {
+  background: var(--surface);
+}
+
+.medri-login-shell {
+  min-height: 100dvh;
+}
+
+.medri-login-page {
+  color: var(--ink);
+  padding-block: 1.25rem 3rem;
+}
+.medri-login-page__container {
+  display: grid;
+  gap: 1.25rem;
+}
+.medri-login-page__row {
+  justify-content: center;
+}
+.medri-login-page__primary {
+  min-width: 0;
+}
+.medri-login-page__stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.medri-login-panel {
+  display: grid;
+  align-content: start;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.medri-login-panel__heading {
+  display: grid;
+  gap: 0.75rem;
+}
+.medri-login-panel__heading > span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-login-panel__heading h1 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--button-strong);
+  font-size: clamp(2.15rem, 9vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-wrap: balance;
+}
+.medri-login-panel__heading p {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.medri-auth-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: thin solid var(--line);
+  border-radius: 999rem;
+  background: var(--surface-alt);
+}
+.medri-auth-toggle__link {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+.medri-auth-toggle__link:hover, .medri-auth-toggle__link:focus-visible {
+  color: var(--button-strong);
+}
+.medri-auth-toggle__link:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-auth-toggle__link.is-active {
+  background: var(--button-strong);
+  color: var(--surface);
+  box-shadow: 0 0.75rem 1.5rem rgba(32, 35, 39, 0.12);
+}
+
+.medri-login-form {
+  display: grid;
+  gap: 1rem;
+}
+.medri-login-form__summary {
+  margin: 0;
+}
+.medri-login-form__field {
+  display: grid;
+  gap: 0.45rem;
+}
+.medri-login-form .form-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-login-form .form-control {
+  min-height: 3rem;
+  border-color: var(--line);
+  border-radius: 0.75rem;
+  background-color: var(--surface-alt);
+  color: var(--ink);
+  font: inherit;
+}
+.medri-login-form .form-control:focus {
+  border-color: var(--button);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-login-form__validation {
+  min-height: 1.1em;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+.medri-login-form__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.medri-login-form__meta a {
+  color: var(--button);
+  font-weight: 800;
+  text-decoration: none;
+}
+.medri-login-form__meta a:hover, .medri-login-form__meta a:focus-visible {
+  color: var(--button-strong);
+  text-decoration: underline;
+}
+.medri-login-form__meta a:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-login-form .form-check {
+  min-height: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+.medri-login-form .form-check-input {
+  flex: 0 0 auto;
+  margin: 0;
+  border-color: var(--line);
+  cursor: pointer;
+}
+.medri-login-form .form-check-input:checked {
+  border-color: var(--button);
+  background-color: var(--button);
+}
+.medri-login-form .form-check-input:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-login-form .form-check-label {
+  color: var(--muted);
+  font-weight: 750;
+  cursor: pointer;
+}
+.medri-login-form__submit {
+  width: max-content;
+  min-width: min(100%, 9.75rem);
+  min-height: 3rem;
+  justify-self: start;
+  border: 0;
+  border-radius: 999rem;
+  background: var(--button-strong);
+  color: var(--surface);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 0 0.75rem 1.5rem rgba(32, 35, 39, 0.16);
+  transition: background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.medri-login-form__submit:hover, .medri-login-form__submit:focus-visible {
+  background: var(--button);
+  color: var(--surface);
+  transform: translateY(-0.08rem);
+  box-shadow: 0 1rem 2rem rgba(32, 35, 39, 0.2);
+}
+.medri-login-form__submit:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+
+@media (min-width: 48rem) {
+  .medri-login-page {
+    padding-block: 1.75rem 4rem;
+  }
+  .medri-login-panel {
+    padding: 1.75rem;
+  }
+}
+@media (min-width: 62rem) {
+  .medri-login-page {
+    padding-block: 2rem 4.5rem;
+  }
+  .medri-login-panel {
+    min-height: 31rem;
+    align-content: center;
+  }
+}

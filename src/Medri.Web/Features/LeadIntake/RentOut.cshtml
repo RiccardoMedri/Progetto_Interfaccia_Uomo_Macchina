@@ -1,0 +1,158 @@
+@model Medri.Web.Features.LeadIntake.RentOutLeadRequestViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "funnels";
+    ViewData["Title"] = "Mettere in affitto - Dati richiesta";
+    ViewData["BodyClass"] = "medri-lead-body";
+    ViewData["RenderMedriFooter"] = false;
+    ViewData["MedriShellClass"] = "medri-public-shell medri-lead-shell";
+    ViewData["NavSection"] = "Owner";
+}
+
+<main id="contenuto" class="medri-lead-funnel medri-lead-funnel--rent-out">
+    <section class="container-xxl medri-lead-funnel__shell">
+        <nav class="detail-breadcrumb breadcrumb medri-lead-funnel__breadcrumb" aria-label="Percorso">
+            <a class="breadcrumb-item" asp-controller="Home" asp-action="Index">Home</a>
+            <span class="breadcrumb-item active" aria-current="page">Mettere in affitto</span>
+        </nav>
+
+        <a class="back-to-search secondary-cta btn btn-outline-secondary medri-lead-funnel__back" asp-controller="Home" asp-action="Index">Torna alla home</a>
+
+        <form class="medri-lead-funnel__form row g-4 align-items-start" method="post" data-lead-form>
+            @Html.AntiForgeryToken()
+
+            <div class="medri-lead-funnel__main col-12">
+                <div class="visit-heading-row medri-lead-funnel__heading-row">
+                    <div class="visit-heading medri-lead-funnel__heading">
+                        <span>Richiesta guidata</span>
+                        <h1>Vuoi mettere in affitto?</h1>
+                        <p>Prima di pubblicare serve capire immobile, canone sostenibile, profilo dell'inquilino e gestione del contratto.</p>
+                    </div>
+                    <ol class="visit-stepper medri-lead-funnel__stepper" aria-label="Avanzamento richiesta">
+                        <li class="is-active"><span>1</span>Dati</li>
+                        <li><span>2</span>Conferma</li>
+                    </ol>
+                </div>
+
+                <partial name="_LeadContactPreferences" model="Model.ContactPreferences" />
+                <partial name="_LeadTimePreferences" model="Model.TimePreferences" />
+
+                <section class="visit-section medri-lead-funnel__section">
+                    <div class="section-inline-heading medri-lead-funnel__section-heading">
+                        <div>
+                            <h2>Dati personali</h2>
+                            <p>Servono per ricontattarti e preparare il primo confronto.</p>
+                        </div>
+                        <span class="selected-intent-pill badge rounded-pill text-bg-light">Locazione proprietario</span>
+                    </div>
+                    <div class="visit-form-grid row g-3">
+                        <div class="col-12 col-md-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Nome e cognome</span>
+                                <input class="form-control" asp-for="FullName" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Telefono</span>
+                                <input class="form-control" asp-for="Phone" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Email</span>
+                                <input class="form-control" asp-for="Email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="visit-section medri-lead-funnel__section">
+                    <h2>Immobile e obiettivo di locazione</h2>
+                    <div class="visit-form-grid row g-3">
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Tipologia immobile</span>
+                                <select class="form-select" asp-for="PropertyType">
+                                    <option>Appartamento</option>
+                                    <option>Casa indipendente</option>
+                                    <option>Monolocale</option>
+                                </select>
+                                <span asp-validation-for="PropertyType" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Zona o indirizzo indicativo</span>
+                                <input class="form-control" asp-for="DesiredLocation" />
+                                <span asp-validation-for="DesiredLocation" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Stato e arredo</span>
+                                <select class="form-select" asp-for="PropertyCondition">
+                                    <option>Arredato e pronto</option>
+                                    <option>Parzialmente arredato</option>
+                                    <option>Da preparare</option>
+                                </select>
+                                <span asp-validation-for="PropertyCondition" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Canone atteso</span>
+                                <input class="form-control" asp-for="ExpectedPriceOrMainQuestion" />
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Tipo di contratto desiderato</span>
+                                <select class="form-select" asp-for="DesiredContractType">
+                                    <option>Da valutare</option>
+                                    <option>Transitorio</option>
+                                    <option>4+4</option>
+                                </select>
+                                <span asp-validation-for="DesiredContractType" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Disponibilita</span>
+                                <select class="form-select" asp-for="Availability">
+                                    <option>Entro 1 mese</option>
+                                    <option>Subito</option>
+                                    <option>Da concordare</option>
+                                </select>
+                                <span asp-validation-for="Availability" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Priorita nella gestione</span>
+                                <textarea class="form-control" asp-for="PreferencesAndCompromises"></textarea>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="visit-actions medri-lead-funnel__actions d-flex flex-column flex-sm-row justify-content-sm-end gap-2">
+                    <a class="secondary-cta btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Indietro</a>
+                    <button class="primary-cta btn btn-primary" type="submit">Invia richiesta</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</main>
+
+@section scripts {
+    <environment include="Development">
+        <script src="/js/bundle-medri-lead-forms.js" defer asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/bundle-medri-lead-forms.min.js" defer asp-append-version="true"></script>
+    </environment>
+}

@@ -1,0 +1,437 @@
+@model Medri.Web.Areas.Admin.Requests.AdminRequestDetailViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = Model.IsCreateMode
+        ? "Nuova richiesta - Area riservata Medri"
+        : $"{Model.Reference} - Modifica richiesta - Area riservata Medri";
+    var requestFormAction = Model.IsCreateMode
+        ? Url.Action("Create", "Requests", new { area = "Admin" })
+        : Url.Action("Update", "Requests", new { area = "Admin", reference = Model.Reference });
+    var requestHeadingReference = Model.IsCreateMode
+        ? "Nuova richiesta"
+        : $"{Model.Reference} - {Model.StatusLabel}";
+    var requestHeadingTitle = Model.IsCreateMode ? "Nuova richiesta" : Model.DisplayName;
+}
+
+<div class="container-fluid px-0">
+    <section class="admin-page-heading lead-detail-heading request-detail-heading card">
+        <div class="row g-3 align-items-center">
+            <div class="col-12 col-md-7">
+                <span class="lead-detail-reference">@requestHeadingReference</span>
+                <h1>@requestHeadingTitle</h1>
+            </div>
+            <div class="col-12 col-md-5">
+                <div class="lead-detail-heading-actions d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                    <button class="btn admin-btn-save" form="requestDetailForm" type="submit">
+                        <i class="ph ph-floppy-disk" aria-hidden="true"></i>
+                        <span>@(Model.IsCreateMode ? "Crea richiesta" : "Salva modifiche")</span>
+                    </button>
+                    <a class="admin-public-site-link btn" href="/">Sito pubblico</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="lead-detail-summary row row-cols-1 row-cols-md-4 g-3 mb-3" aria-label="Sintesi richiesta">
+        @foreach (var card in Model.SummaryCards)
+        {
+            <div class="col">
+                <article class="lead-summary-card card h-100">
+                    <span>@card.Label</span>
+                    <strong>@card.Value</strong>
+                    <p>@card.Description</p>
+                </article>
+            </div>
+        }
+    </div>
+
+    <div class="row g-3 align-items-start">
+        <div class="col-12 @(Model.IsCreateMode ? "col-md-9" : "col-md-8")">
+            <form id="requestDetailForm" class="d-grid gap-3" action="@requestFormAction" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <section class="admin-panel lead-detail-section request-detail-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Profilo cliente</h2>
+                            <p>Dati essenziali per mantenere continuita tra sito, telefono, WhatsApp e appuntamenti.</p>
+                        </div>
+                    </div>
+                    <div class="lead-detail-section-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="FirstName">Nome</label>
+                                <input class="form-control" asp-for="FirstName" />
+                                <span class="text-danger" asp-validation-for="FirstName"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="LastName">Cognome</label>
+                                <input class="form-control" asp-for="LastName" />
+                                <span class="text-danger" asp-validation-for="LastName"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Phone">Telefono</label>
+                                <input class="form-control" asp-for="Phone" />
+                                <span class="text-danger" asp-validation-for="Phone"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Email">Email</label>
+                                <input class="form-control" asp-for="Email" />
+                                <span class="text-danger" asp-validation-for="Email"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="SourceChannel">Fonte</label>
+                                <select class="form-select" asp-for="SourceChannel">
+                                    @foreach (var option in Model.SourceOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="SourceChannel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Status">Stato richiesta</label>
+                                <select class="form-select" asp-for="Status">
+                                    @foreach (var option in Model.StatusOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="Status"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="AssignedAgencyUserId">Referente</label>
+                                <select class="form-select" asp-for="AssignedAgencyUserId">
+                                    @foreach (var option in Model.AdvisorOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="AssignedAgencyUserId"></span>
+                            </div>
+                            @if (!Model.IsCreateMode)
+                            {
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="LinkedLeadReference">Lead collegato</label>
+                                    <input class="form-control" id="LinkedLeadReference" type="text" value="@Model.LinkedLeadReference" readonly />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-panel lead-detail-section request-detail-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Richiesta strutturata</h2>
+                            <p>I dati sono leggibili come filtri, ma restano modificabili quando il cliente cambia priorita.</p>
+                        </div>
+                    </div>
+                    <div class="lead-detail-section-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="RequestType">Tipo richiesta</label>
+                                <select class="form-select" asp-for="RequestType">
+                                    @foreach (var option in Model.RequestTypeOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="RequestType"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="PreferredBudgetLabel">Budget preferito</label>
+                                <input class="form-control" asp-for="PreferredBudgetLabel" />
+                                <span class="text-danger" asp-validation-for="PreferredBudgetLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="AcceptableLocations">Zone valutabili</label>
+                                <input class="form-control" asp-for="AcceptableLocations" />
+                                <span class="text-danger" asp-validation-for="AcceptableLocations"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="TimeFrame">Tempistiche</label>
+                                <select class="form-select" asp-for="TimeFrame">
+                                    @foreach (var option in Model.TimeFrameOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="FinancingStatus">Mutuo / banca</label>
+                                <select class="form-select" asp-for="FinancingStatus">
+                                    @foreach (var option in Model.FinancingOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="PropertyToSellStatus">Immobile da vendere prima</label>
+                                <select class="form-select" asp-for="PropertyToSellStatus">
+                                    @foreach (var option in Model.PropertyToSellOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-panel lead-detail-section request-chip-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Vincoli rigidi</h2>
+                            <p>Condizioni non negoziabili: guidano il matching e impediscono proposte fuori contesto.</p>
+                        </div>
+                    </div>
+                    <div class="lead-detail-section-body">
+                        <div class="request-chip-grid row row-cols-1 row-cols-md-2 g-3">
+                            <div class="col">
+                                <article class="request-info-card request-edit-card h-100">
+                                    <span>Budget</span>
+                                    <label class="form-label" asp-for="MaximumBudgetLabel">Budget massimo</label>
+                                    <input class="form-control" asp-for="MaximumBudgetLabel" />
+                                    <span class="text-danger" asp-validation-for="MaximumBudgetLabel"></span>
+                                </article>
+                            </div>
+                            <div class="col">
+                                <article class="request-info-card request-edit-card h-100">
+                                    <span>Zona</span>
+                                    <label class="form-label" asp-for="DesiredLocation">Zona ideale</label>
+                                    <input class="form-control" asp-for="DesiredLocation" />
+                                    <span class="text-danger" asp-validation-for="DesiredLocation"></span>
+                                </article>
+                            </div>
+                            <div class="col">
+                                <article class="request-info-card request-edit-card h-100">
+                                    <span>Locali</span>
+                                    <label class="form-label" asp-for="MinimumRooms">Camere minime</label>
+                                    <input class="form-control" asp-for="MinimumRooms" type="number" min="0" max="100" />
+                                    <span class="text-danger" asp-validation-for="MinimumRooms"></span>
+                                </article>
+                            </div>
+                            <div class="col">
+                                <article class="request-info-card request-edit-card h-100">
+                                    <span>Accessibilita</span>
+                                    <label class="form-label" asp-for="AccessibilityConstraint">Vincolo logistico</label>
+                                    <input class="form-control" asp-for="AccessibilityConstraint" />
+                                    <span class="text-danger" asp-validation-for="AccessibilityConstraint"></span>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-panel lead-detail-section request-chip-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Preferenze e compromessi</h2>
+                            <p>Le preferenze orientano le proposte; i compromessi permettono alternative motivate.</p>
+                        </div>
+                    </div>
+                    <div class="lead-detail-section-body">
+                        <div class="request-preference-grid row g-3">
+                            <div class="col-12 col-md-6">
+                                <section class="request-preference-panel h-100">
+                                    <label class="form-label" asp-for="DesiredPreferenceTagsText">Preferenze desiderate</label>
+                                    <textarea class="form-control request-tags-editor" asp-for="DesiredPreferenceTagsText" rows="5"></textarea>
+                                    <span class="text-danger" asp-validation-for="DesiredPreferenceTagsText"></span>
+                                </section>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <section class="request-preference-panel h-100">
+                                    <label class="form-label" asp-for="NegotiablePreferenceTagsText">Elementi negoziabili</label>
+                                    <textarea class="form-control request-tags-editor" asp-for="NegotiablePreferenceTagsText" rows="5"></textarea>
+                                    <span class="text-danger" asp-validation-for="NegotiablePreferenceTagsText"></span>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-panel lead-detail-section request-detail-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Note operative</h2>
+                            <p>Spazio per conservare sfumature emerse nella relazione, senza perderle dentro campi troppo rigidi.</p>
+                        </div>
+                    </div>
+                    <div class="lead-detail-section-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" asp-for="SummaryNotes">Riassunto richiesta</label>
+                                <textarea class="form-control" asp-for="SummaryNotes" rows="5"></textarea>
+                                <span class="text-danger" asp-validation-for="SummaryNotes"></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" asp-for="NeedsAfterContact">Bisogni emersi dopo il contatto</label>
+                                <textarea class="form-control" asp-for="NeedsAfterContact" rows="5"></textarea>
+                                <span class="text-danger" asp-validation-for="NeedsAfterContact"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </form>
+
+            <section class="admin-panel lead-detail-section request-detail-section card mt-3">
+                <div class="admin-panel-heading">
+                    <div>
+                        <h2>Storico aggiornamenti</h2>
+                        <p>La richiesta resta versionabile: ogni cambiamento utile viene mantenuto nello storico.</p>
+                    </div>
+                </div>
+                <div class="lead-detail-section-body">
+                    @if (Model.Interactions.Count > 0)
+                    {
+                        <ol class="lead-timeline list-unstyled mb-0">
+                            @foreach (var interaction in Model.Interactions)
+                            {
+                                <li>
+                                    <span>@interaction.TimeLabel</span>
+                                    <strong>@interaction.Title</strong>
+                                    <p>@interaction.Notes</p>
+                                </li>
+                            }
+                        </ol>
+                    }
+                    else
+                    {
+                        <div class="admin-empty-state">
+                            <strong>Nessun aggiornamento registrato</strong>
+                            <p>Le modifiche salvate dall'area Admin compariranno qui.</p>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+
+        @if (!Model.IsCreateMode)
+        {
+            <div class="col-12 col-md-4">
+                <div class="lead-detail-aside d-grid gap-3">
+                    <aside class="admin-panel lead-conversion-panel request-qualification-panel card">
+                        <div class="admin-panel-heading">
+                            <div>
+                                <h2>Qualificazione</h2>
+                                <p>Controlli minimi prima di proporre immobili o fissare appuntamenti.</p>
+                            </div>
+                        </div>
+                        <div class="lead-side-panel-body">
+                            <ul class="lead-conversion-checklist list-unstyled">
+                                @foreach (var item in Model.QualificationChecklist)
+                                {
+                                    <li class="@(item.IsDone ? "is-done" : null)">
+                                        <i class="ph @(item.IsDone ? "ph-check-circle" : "ph-circle")" aria-hidden="true"></i>
+                                        <span>@item.Label</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </aside>
+
+                    <aside class="admin-panel lead-actions-panel request-actions-panel card">
+                        <div class="admin-panel-heading">
+                            <div>
+                                <h2>Azioni</h2>
+                            </div>
+                        </div>
+                        <div class="lead-side-panel-body">
+                            <div class="lead-side-actions d-grid gap-2">
+                                @if (!string.IsNullOrWhiteSpace(Model.PhoneHref))
+                                {
+                                    <a class="btn btn-outline-secondary text-start" href="@Model.PhoneHref">
+                                        <i class="ph ph-phone" aria-hidden="true"></i>
+                                        <span>Chiama ora</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary text-start" type="button" disabled>
+                                        <i class="ph ph-phone" aria-hidden="true"></i>
+                                        <span>Chiama ora</span>
+                                    </button>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(Model.WhatsAppHref))
+                                {
+                                    <a class="btn btn-outline-secondary text-start" href="@Model.WhatsAppHref">
+                                        <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+                                        <span>Invia WhatsApp</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary text-start" type="button" disabled>
+                                        <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+                                        <span>Invia WhatsApp</span>
+                                    </button>
+                                }
+
+                                <form asp-area="Admin" asp-controller="Requests" asp-action="Archive" asp-route-reference="@Model.Reference" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn admin-btn-danger text-start w-100" type="submit" disabled="@(!Model.CanArchive)">
+                                        <i class="ph ph-archive" aria-hidden="true"></i>
+                                        <span>Archivia richiesta</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        }
+    </div>
+</div>

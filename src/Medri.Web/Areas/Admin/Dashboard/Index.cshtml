@@ -1,0 +1,214 @@
+@model Medri.Web.Areas.Admin.Dashboard.AdminDashboardViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dashboard - Area riservata Medri";
+}
+
+<div class="admin-page admin-dashboard-page container-fluid px-0">
+    <section class="admin-page-heading admin-dashboard-heading card">
+        <div class="row g-3 align-items-stretch">
+            <div class="col-12 col-md-3 d-flex align-items-center">
+                <div>
+                    <div class="dashboard-title-line">
+                        <h1>Dashboard</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-7">
+                <div class="admin-kpi-grid row row-cols-1 row-cols-md-3 g-3 h-100" aria-label="Sintesi operativa">
+                    <div class="col">
+                        <article class="card h-100">
+                            <span>Lead da lavorare</span>
+                            <strong>@Model.LeadWorkCount</strong>
+                        </article>
+                    </div>
+                    <div class="col">
+                        <article class="card h-100">
+                            <span>Richieste attive</span>
+                            <strong>@Model.ActiveRequestCount</strong>
+                        </article>
+                    </div>
+                    <div class="col">
+                        <article class="card h-100">
+                            <span>Annunci da completare</span>
+                            <strong>@Model.IncompleteListingCount</strong>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-heading-actions col-12 col-md-2">
+                <a class="admin-public-site-link btn" asp-area="" asp-controller="Home" asp-action="Index">Sito pubblico</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="admin-main-grid row g-3 align-items-start admin-dashboard-grid">
+        <div class="admin-main-column col-12 col-md">
+            <div class="admin-dashboard-table-stack">
+                <section class="admin-panel admin-table-panel card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Lead recenti</h2>
+                        </div>
+                        <a class="admin-panel-link" asp-area="Admin" asp-controller="Leads" asp-action="Index">Apri lead</a>
+                    </div>
+                    <div class="admin-table-scroll table-responsive">
+                        <table class="table admin-table dashboard-table align-middle mb-0">
+                            <colgroup>
+                                <col class="dashboard-table-code" />
+                                <col class="dashboard-table-main" />
+                                <col class="dashboard-table-context" />
+                                <col class="dashboard-table-advisor" />
+                                <col class="dashboard-table-action" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Codice</th>
+                                    <th scope="col">Contatto</th>
+                                    <th scope="col">Esigenza</th>
+                                    <th scope="col">Referente</th>
+                                    <th class="text-end" scope="col">Azione</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var lead in Model.RecentLeads)
+                                {
+                                    <tr>
+                                        <td><strong>@lead.Reference</strong></td>
+                                        <td>@lead.ContactName</td>
+                                        <td>@lead.IntentLabel</td>
+                                        <td>@lead.AdvisorLabel</td>
+                                        <td class="text-end">
+                                            <a class="dashboard-action-button btn" asp-area="Admin" asp-controller="Leads" asp-action="Detail" asp-route-reference="@lead.Reference" aria-label="Apri lead @lead.Reference">
+                                                <i class="ph ph-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="admin-panel admin-table-panel card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Richieste attive</h2>
+                        </div>
+                        <a class="admin-panel-link" asp-area="Admin" asp-controller="Requests" asp-action="Index">Apri richieste</a>
+                    </div>
+                    <div class="admin-table-scroll table-responsive">
+                        <table class="table admin-table dashboard-table align-middle mb-0">
+                            <colgroup>
+                                <col class="dashboard-table-code" />
+                                <col class="dashboard-table-main" />
+                                <col class="dashboard-table-context" />
+                                <col class="dashboard-table-advisor" />
+                                <col class="dashboard-table-action" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Codice</th>
+                                    <th scope="col">Cliente</th>
+                                    <th scope="col">Stato</th>
+                                    <th scope="col">Referente</th>
+                                    <th class="text-end" scope="col">Azione</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var request in Model.ActiveRequests)
+                                {
+                                    <tr>
+                                        <td><strong>@request.Reference</strong></td>
+                                        <td>@request.CustomerName</td>
+                                        <td><span class="admin-status-pill badge rounded-pill @request.StatusClass">@request.StatusLabel</span></td>
+                                        <td>@request.AdvisorLabel</td>
+                                        <td class="text-end">
+                                            <a class="dashboard-action-button btn" asp-area="Admin" asp-controller="Requests" asp-action="Edit" asp-route-reference="@request.Reference" aria-label="Apri richiesta @request.Reference">
+                                                <i class="ph ph-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="admin-panel admin-table-panel card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Annunci</h2>
+                        </div>
+                        <a class="admin-panel-link" asp-area="Admin" asp-controller="Properties" asp-action="Index">Apri annunci</a>
+                    </div>
+                    <div class="admin-table-scroll table-responsive">
+                        <table class="table admin-table dashboard-table align-middle mb-0">
+                            <colgroup>
+                                <col class="dashboard-table-code" />
+                                <col class="dashboard-table-main" />
+                                <col class="dashboard-table-context" />
+                                <col class="dashboard-table-advisor" />
+                                <col class="dashboard-table-action" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Codice</th>
+                                    <th scope="col">Immobile</th>
+                                    <th scope="col">Stato</th>
+                                    <th scope="col">Referente</th>
+                                    <th class="text-end" scope="col">Azione</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var listing in Model.Listings)
+                                {
+                                    <tr>
+                                        <td><strong>@listing.Reference</strong></td>
+                                        <td>@listing.Title</td>
+                                        <td><span class="admin-status-pill badge rounded-pill @listing.StatusClass">@listing.StatusLabel</span></td>
+                                        <td>@listing.AdvisorLabel</td>
+                                        <td class="text-end">
+                                            <a class="dashboard-action-button btn"
+                                               asp-area="Admin"
+                                               asp-controller="Properties"
+                                               asp-action="Edit"
+                                               asp-route-reference="@listing.Reference"
+                                               aria-label="Apri immobile @listing.Reference">
+                                                <i class="ph ph-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="admin-side-column admin-dashboard-quick-col col-12 col-md-auto">
+            <aside class="admin-panel admin-quick-panel card">
+                <div class="admin-panel-heading">
+                    <div>
+                        <h2>Azioni rapide</h2>
+                    </div>
+                </div>
+                <div class="d-grid gap-2" aria-label="Creazione rapida">
+                    <a class="admin-quick-create-action btn" asp-area="Admin" asp-controller="Leads" asp-action="Create">
+                        <i class="ph ph-user-plus" aria-hidden="true"></i>
+                        <span>Nuovo lead</span>
+                    </a>
+                    <a class="admin-quick-create-action btn" asp-area="Admin" asp-controller="Requests" asp-action="Create">
+                        <i class="ph ph-list-plus" aria-hidden="true"></i>
+                        <span>Nuova richiesta</span>
+                    </a>
+                    <a class="admin-quick-create-action btn" asp-area="Admin" asp-controller="Properties" asp-action="Create">
+                        <i class="ph ph-house-line" aria-hidden="true"></i>
+                        <span>Nuovo immobile</span>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>

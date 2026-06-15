@@ -1,0 +1,280 @@
+@use "mixins";
+
+$login-breakpoint-md: 48rem;
+$login-breakpoint-lg: 62rem;
+$login-panel-radius: 0.5rem;
+$login-pill-radius: 999rem;
+$login-stack-gap: 1.5rem;
+$login-toggle-gap: 0.35rem;
+
+.medri-login-body,
+.medri-login-shell {
+  background: var(--surface);
+}
+
+.medri-login-shell {
+  min-height: 100dvh;
+}
+
+.medri-login-page {
+  color: var(--ink);
+  padding-block: 1.25rem 3rem;
+
+  &__container {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  &__row {
+    justify-content: center;
+  }
+
+  &__primary {
+    min-width: 0;
+  }
+
+  &__stack {
+    display: grid;
+    gap: $login-stack-gap;
+  }
+}
+
+.medri-login-panel {
+  display: grid;
+  align-content: start;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: thin solid var(--line);
+  border-radius: $login-panel-radius;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.medri-login-panel {
+  &__heading {
+    display: grid;
+    gap: 0.75rem;
+
+    > span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 12ch;
+      margin: 0;
+      color: var(--button-strong);
+      font-size: clamp(2.15rem, 9vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    p {
+      max-width: 48ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+      text-wrap: pretty;
+    }
+  }
+}
+
+.medri-auth-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $login-toggle-gap;
+  padding: $login-toggle-gap;
+  border: thin solid var(--line);
+  border-radius: $login-pill-radius;
+  background: var(--surface-alt);
+
+  &__link {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $login-pill-radius;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 900;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      box-shadow 180ms ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--button-strong);
+    }
+
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+
+    &.is-active {
+      background: var(--button-strong);
+      color: var(--surface);
+      box-shadow: 0 0.75rem 1.5rem rgba(32, 35, 39, 0.12);
+    }
+  }
+}
+
+.medri-login-form {
+  display: grid;
+  gap: 1rem;
+
+  &__summary {
+    margin: 0;
+  }
+
+  &__field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .form-label {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .form-control {
+    min-height: 3rem;
+    border-color: var(--line);
+    border-radius: 0.75rem;
+    background-color: var(--surface-alt);
+    color: var(--ink);
+    font: inherit;
+
+    &:focus {
+      border-color: var(--button);
+      @include mixins.focus-ring;
+    }
+  }
+
+  &__validation {
+    min-height: 1.1em;
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 0.9rem;
+
+    a {
+      color: var(--button);
+      font-weight: 800;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--button-strong);
+        text-decoration: underline;
+      }
+
+      &:focus-visible {
+        @include mixins.focus-ring;
+      }
+    }
+  }
+
+  .form-check {
+    min-height: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .form-check-input {
+    flex: 0 0 auto;
+    margin: 0;
+    border-color: var(--line);
+    cursor: pointer;
+
+    &:checked {
+      border-color: var(--button);
+      background-color: var(--button);
+    }
+
+    &:focus {
+      @include mixins.focus-ring;
+    }
+  }
+
+  .form-check-label {
+    color: var(--muted);
+    font-weight: 750;
+    cursor: pointer;
+  }
+
+  &__submit {
+    width: max-content;
+    min-width: min(100%, 9.75rem);
+    min-height: 3rem;
+    justify-self: start;
+    border: 0;
+    border-radius: $login-pill-radius;
+    background: var(--button-strong);
+    color: var(--surface);
+    font-size: 0.82rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    box-shadow: 0 0.75rem 1.5rem rgba(32, 35, 39, 0.16);
+    transition:
+      background-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--button);
+      color: var(--surface);
+      transform: translateY(-0.08rem);
+      box-shadow: 0 1rem 2rem rgba(32, 35, 39, 0.2);
+    }
+
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+  }
+}
+
+@include mixins.desktop-up($login-breakpoint-md) {
+  .medri-login-page {
+    padding-block: 1.75rem 4rem;
+  }
+
+  .medri-login-panel {
+    padding: 1.75rem;
+  }
+}
+
+@include mixins.desktop-up($login-breakpoint-lg) {
+  .medri-login-page {
+    padding-block: 2rem 4.5rem;
+  }
+
+  .medri-login-panel {
+    min-height: 31rem;
+    align-content: center;
+  }
+}

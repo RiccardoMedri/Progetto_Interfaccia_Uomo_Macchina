@@ -1,0 +1,401 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using Medri.Services.Medri.Application;
+using Medri.Web.Infrastructure;
+
+namespace Medri.Web.Areas.Admin.Properties
+{
+    [Area("Admin")]
+    public partial class PropertiesController : AdminAreaController
+    {
+        private readonly AdminPropertyListQuery adminPropertyListQuery;
+        private readonly AdminPropertyDetailQuery adminPropertyDetailQuery;
+        private readonly AdminCreatePropertyCommand adminCreatePropertyCommand;
+        private readonly UpdateAdminPropertyDetailCommand updateAdminPropertyDetailCommand;
+        private readonly MarkAdminPropertyReadyCommand markAdminPropertyReadyCommand;
+        private readonly PublishAdminPropertyCommand publishAdminPropertyCommand;
+        private readonly ArchiveAdminPropertyCommand archiveAdminPropertyCommand;
+        private readonly BulkAssignAdminPropertiesCommand bulkAssignAdminPropertiesCommand;
+        private readonly FeatureAdminPropertyCommand featureAdminPropertyCommand;
+        private readonly MoveFeaturedAdminPropertyCommand moveFeaturedAdminPropertyCommand;
+        private readonly RemoveFeaturedAdminPropertyCommand removeFeaturedAdminPropertyCommand;
+        private readonly AddAdminPropertyMediaCommand addAdminPropertyMediaCommand;
+        private readonly IAdminPropertyMediaStorage propertyMediaStorage;
+
+        public PropertiesController(
+            AdminPropertyListQuery adminPropertyListQuery,
+            AdminPropertyDetailQuery adminPropertyDetailQuery,
+            AdminCreatePropertyCommand adminCreatePropertyCommand,
+            UpdateAdminPropertyDetailCommand updateAdminPropertyDetailCommand,
+            MarkAdminPropertyReadyCommand markAdminPropertyReadyCommand,
+            PublishAdminPropertyCommand publishAdminPropertyCommand,
+            ArchiveAdminPropertyCommand archiveAdminPropertyCommand,
+            BulkAssignAdminPropertiesCommand bulkAssignAdminPropertiesCommand,
+            FeatureAdminPropertyCommand featureAdminPropertyCommand,
+            MoveFeaturedAdminPropertyCommand moveFeaturedAdminPropertyCommand,
+            RemoveFeaturedAdminPropertyCommand removeFeaturedAdminPropertyCommand,
+            AddAdminPropertyMediaCommand addAdminPropertyMediaCommand,
+            IAdminPropertyMediaStorage propertyMediaStorage)
+        {
+            this.adminPropertyListQuery = adminPropertyListQuery;
+            this.adminPropertyDetailQuery = adminPropertyDetailQuery;
+            this.adminCreatePropertyCommand = adminCreatePropertyCommand;
+            this.updateAdminPropertyDetailCommand = updateAdminPropertyDetailCommand;
+            this.markAdminPropertyReadyCommand = markAdminPropertyReadyCommand;
+            this.publishAdminPropertyCommand = publishAdminPropertyCommand;
+            this.archiveAdminPropertyCommand = archiveAdminPropertyCommand;
+            this.bulkAssignAdminPropertiesCommand = bulkAssignAdminPropertiesCommand;
+            this.featureAdminPropertyCommand = featureAdminPropertyCommand;
+            this.moveFeaturedAdminPropertyCommand = moveFeaturedAdminPropertyCommand;
+            this.removeFeaturedAdminPropertyCommand = removeFeaturedAdminPropertyCommand;
+            this.addAdminPropertyMediaCommand = addAdminPropertyMediaCommand;
+            this.propertyMediaStorage = propertyMediaStorage;
+        }
+
+        [HttpGet]
+        public virtual async Task<IActionResult> Index(AdminPropertyListInputModel input)
+        {
+            input ??= new AdminPropertyListInputModel();
+
+            var result = await adminPropertyListQuery.ExecuteAsync(
+                input.ToQueryFilter(),
+                HttpContext.RequestAborted);
+
+            return View(AdminPropertyListViewModelMapper.Create(result, input, User));
+        }
+
+        [HttpGet]
+        public virtual async Task<IActionResult> Create()
+        {
+            var result = await adminPropertyDetailQuery.CreateNewAsync(
+                HttpContext.RequestAborted);
+
+            return View("Edit", AdminPropertyDetailViewModelMapper.CreateEdit(result, null, User));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> Create(AdminPropertyDetailInputModel input)
+        {
+            var isMediaUploadAction = IsMediaUploadAction();
+            if (!ModelState.IsValid)
+            {
+                var result = await adminPropertyDetailQuery.CreateNewAsync(
+                    HttpContext.RequestAborted);
+
+                return View("Edit", AdminPropertyDetailViewModelMapper.CreateEdit(result, input, User));
+            }
+
+            var commandResult = await adminCreatePropertyCommand.ExecuteAsync(
+                input.ToUpdateDto(),
+                HttpContext.RequestAborted);
+
+            await SaveUploadedMediaAsync(commandResult.Reference, input);
+
+            if (!isMediaUploadAction)
+            {
+                Alerts.AddSuccess(this, $"Immobile {commandResult.Reference} creato.");
+            }
+
+            return RedirectToAction(nameof(Edit), new { reference = commandResult.Reference });
+        }
+
+        [HttpGet]
+        public virtual async Task<IActionResult> Edit(string reference)
+        {
+            var result = await adminPropertyDetailQuery.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return View(AdminPropertyDetailViewModelMapper.CreateEdit(result, null, User));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> Update(
+            string reference,
+            AdminPropertyDetailInputModel input)
+        {
+            var isMediaUploadAction = IsMediaUploadAction();
+            var result = await adminPropertyDetailQuery.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid && isMediaUploadAction && HasUploadedMedia(input))
+            {
+                await SaveUploadedMediaAsync(result.Reference, input);
+                return RedirectToAction(nameof(Edit), new { reference = result.Reference });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Edit", AdminPropertyDetailViewModelMapper.CreateEdit(result, input, User));
+            }
+
+            var commandResult = await updateAdminPropertyDetailCommand.ExecuteAsync(
+                reference,
+                input.ToUpdateDto(),
+                HttpContext.RequestAborted);
+
+            if (!commandResult.Succeeded)
+            {
+                return NotFound();
+            }
+
+            await SaveUploadedMediaAsync(commandResult.Reference, input);
+
+            if (!isMediaUploadAction)
+            {
+                Alerts.AddSuccess(this, $"Immobile {commandResult.Reference} aggiornato.");
+            }
+
+            return RedirectToAction(nameof(Edit), new { reference = commandResult.Reference });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> MarkReady(string reference)
+        {
+            var commandResult = await markAdminPropertyReadyCommand.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (commandResult.IsBlocked)
+            {
+                Alerts.AddWarning(this, $"Immobile {commandResult.Reference} non pronto: {commandResult.Message}.");
+                return RedirectToAction(nameof(Edit), new { reference = commandResult.Reference });
+            }
+
+            if (!commandResult.Succeeded)
+            {
+                return NotFound();
+            }
+
+            Alerts.AddSuccess(this, $"Immobile {commandResult.Reference} segnato come pronto.");
+            return RedirectToAction(nameof(Preview), new { reference = commandResult.Reference });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> Publish(
+            string reference,
+            AdminPropertyListInputModel input)
+        {
+            var commandResult = await publishAdminPropertyCommand.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (!commandResult.Succeeded && !commandResult.IsBlocked)
+            {
+                return NotFound();
+            }
+
+            if (commandResult.IsBlocked)
+            {
+                Alerts.AddWarning(this, $"Immobile {commandResult.Reference} non pubblicato: {commandResult.Message}.");
+            }
+            else
+            {
+                Alerts.AddSuccess(this, $"Immobile {commandResult.Reference} pubblicato.");
+            }
+
+            return RedirectAfterListAction(commandResult.Reference, input);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> Archive(
+            string reference,
+            AdminPropertyListInputModel input)
+        {
+            var commandResult = await archiveAdminPropertyCommand.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (!commandResult.Succeeded)
+            {
+                return NotFound();
+            }
+
+            Alerts.AddSuccess(this, $"Immobile {commandResult.Reference} archiviato.");
+            return RedirectAfterListAction(commandResult.Reference, input);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> BulkAssign(AdminPropertyBulkActionInputModel input)
+        {
+            input ??= new AdminPropertyBulkActionInputModel();
+
+            var result = await bulkAssignAdminPropertiesCommand.ExecuteAsync(
+                input.SelectedPropertyReferences,
+                input.BulkAssignedAgencyUserId,
+                HttpContext.RequestAborted);
+
+            if (result.HasUpdates)
+            {
+                Alerts.AddSuccess(this, $"{result.UpdatedCount} immobili assegnati.");
+            }
+            else
+            {
+                Alerts.AddWarning(this, "Nessun immobile aggiornato: controlla selezione e referente.");
+            }
+
+            return RedirectToAction(nameof(Index), input.ToRouteValues());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> Feature(
+            string reference,
+            AdminPropertyListInputModel input)
+        {
+            var commandResult = await featureAdminPropertyCommand.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (!commandResult.Succeeded && !commandResult.IsBlocked)
+            {
+                return NotFound();
+            }
+
+            if (commandResult.IsBlocked)
+            {
+                Alerts.AddWarning(this, $"Immobile {commandResult.Reference} non inserito in homepage: {commandResult.Message}.");
+            }
+            return RedirectToAction(nameof(Index), input?.ToRouteValues());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> MoveFeature(
+            string reference,
+            int direction)
+        {
+            var commandResult = await moveFeaturedAdminPropertyCommand.ExecuteAsync(
+                reference,
+                direction,
+                HttpContext.RequestAborted);
+
+            if (!commandResult.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> RemoveFeature(string reference)
+        {
+            var commandResult = await removeFeaturedAdminPropertyCommand.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (!commandResult.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public virtual async Task<IActionResult> Preview(
+            string reference,
+            string mode = "desktop")
+        {
+            var result = await adminPropertyDetailQuery.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return View(AdminPropertyDetailViewModelMapper.CreatePreview(result, mode, User));
+        }
+
+        private IActionResult RedirectAfterListAction(
+            string reference,
+            AdminPropertyListInputModel input)
+        {
+            if (HasListState(input))
+            {
+                return RedirectToAction(nameof(Index), input.ToRouteValues());
+            }
+
+            return RedirectToAction(nameof(Edit), new { reference });
+        }
+
+        private async Task SaveUploadedMediaAsync(
+            string reference,
+            AdminPropertyDetailInputModel input)
+        {
+            var result = await propertyMediaStorage.SaveAsync(
+                reference,
+                input?.UploadedMedia,
+                HttpContext.RequestAborted);
+            foreach (var url in result.SavedUrls)
+            {
+                await addAdminPropertyMediaCommand.ExecuteAsync(
+                    reference,
+                    url,
+                    null,
+                    HttpContext.RequestAborted);
+            }
+
+            if (result.RejectedCount > 0)
+            {
+                Alerts.AddWarning(
+                    this,
+                    result.RejectedCount == 1
+                        ? "Un file non e stato caricato: usa JPG, PNG o WebP entro 8 MB."
+                        : $"{result.RejectedCount.ToString(CultureInfo.InvariantCulture)} file non caricati: usa JPG, PNG o WebP entro 8 MB.");
+            }
+        }
+
+        private bool IsMediaUploadAction()
+        {
+            return Request.HasFormContentType &&
+                string.Equals(
+                    Request.Form["SubmitAction"].ToString(),
+                    "UploadMedia",
+                    StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool HasUploadedMedia(AdminPropertyDetailInputModel input)
+        {
+            return input?.UploadedMedia?.Any(file => file != null && file.Length > 0) == true;
+        }
+
+        private static bool HasListState(AdminPropertyListInputModel input)
+        {
+            return input != null &&
+                (input.ReturnTo == "Index" ||
+                 !string.IsNullOrWhiteSpace(input.SearchTerm) ||
+                 !string.IsNullOrWhiteSpace(input.Status) ||
+                 !string.IsNullOrWhiteSpace(input.Contract) ||
+                 !string.IsNullOrWhiteSpace(input.Advisor) ||
+                 input.Page > 1 ||
+                 input.PageSize != 15);
+        }
+
+    }
+}

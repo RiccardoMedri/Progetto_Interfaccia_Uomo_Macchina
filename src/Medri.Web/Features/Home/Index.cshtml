@@ -1,0 +1,181 @@
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["Title"] = "Agenzia Immobiliare Medri";
+    ViewData["BodyClass"] = "medri-home-body";
+    ViewData["MedriShellClass"] = "medri-public-shell medri-home-shell";
+}
+@model Medri.Web.Features.Home.HomeIndexViewModel
+
+    <main id="contenuto" class="medri-home">
+        <section class="medri-home-hero" aria-labelledby="home-hero-title">
+            <div class="container-xxl">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-xl-10">
+                        <div class="medri-home-hero-copy">
+                            <h1 id="home-hero-title">La tua casa.<br />Il nostro impegno.</h1>
+                            <p class="medri-home-hero-text">
+                                Dal 1974 accompagniamo persone e famiglie nelle scelte immobiliari piu importanti.
+                            </p>
+                        </div>
+
+                        <form class="medri-home-search search-panel row row-cols-1 row-cols-md-3 row-cols-xl-4 g-3 align-items-end" aria-label="Ricerca immobili" method="get" action="/immobili">
+                            @foreach (var filter in Model.SearchFilterGroups)
+                            {
+                                <div class="search-filter-field col">
+                                    <details class="home-native-filter" name="home-search-filter">
+                                        <summary class="home-native-filter-summary">
+                                            <span class="home-native-filter-title" id="@(filter.Id)-label">@filter.Label</span>
+                                            <span class="home-native-filter-value"></span>
+                                        </summary>
+                                        <fieldset class="home-native-filter-options" aria-labelledby="@(filter.Id)-label">
+                                            <legend class="visually-hidden">@filter.Label</legend>
+                                            @for (var optionIndex = 0; optionIndex < filter.Options.Count; optionIndex++)
+                                            {
+                                                var option = filter.Options[optionIndex];
+                                                var optionId = filter.Id + "-option-" + optionIndex;
+                                                <input class="form-check-input" id="@optionId" type="checkbox" name="@filter.Name" value="@option.Value" />
+                                                <label class="form-check-label" for="@optionId">@option.Label</label>
+                                            }
+                                        </fieldset>
+                                    </details>
+                                </div>
+                            }
+                            <div class="col">
+                                <button class="home-search-submit btn btn-primary w-100" type="submit">Cerca</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="medri-home-section featured-listings-section" aria-labelledby="home-featured-title">
+            <div class="container-xxl">
+                <div class="section-heading">
+                    <h2 id="home-featured-title">Immobili in evidenza</h2>
+                    <a href="/immobili">Vedi tutti</a>
+                </div>
+
+                <div class="listing-grid row g-4">
+                    @if (Model.FeaturedListings.Count > 0)
+                    {
+                        <div class="col-12 col-lg-7">
+                            <partial name="_FeaturedListingCard" model="Model.FeaturedListings[0]" />
+                        </div>
+                    }
+                    @if (Model.FeaturedListings.Count > 1)
+                    {
+                        <div class="col-12 col-lg-5">
+                            <div class="featured-listing-stack d-md-flex flex-column gap-4 h-100">
+                                @for (var propertyIndex = 1; propertyIndex < Model.FeaturedListings.Count; propertyIndex++)
+                                {
+                                    <partial name="_FeaturedListingCard" model="Model.FeaturedListings[propertyIndex]" />
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="medri-home-section home-services-section" aria-labelledby="home-services-title">
+            <div class="container-xxl">
+                <div class="section-heading">
+                    <h2 id="home-services-title">Scopri i nostri servizi</h2>
+                </div>
+
+                <div class="intent-grid row row-cols-1 row-cols-md-2 g-3">
+                    @foreach (var intent in Model.ServiceIntents)
+                    {
+                        <div class="col">
+                            <a class="intent-card home-intent-card h-100" href="@intent.Href">
+                                <span class="card-action-button" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
+                                <span class="intent-icon" aria-hidden="true"><i class="ph @intent.Icon"></i></span>
+                                <div>
+                                    <strong>@intent.Title</strong>
+                                    <p>@intent.Text</p>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="medri-home-section neighborhood-section" aria-labelledby="home-neighborhoods-title">
+            <div class="container-xxl">
+                <div class="section-heading d-none d-md-flex">
+                    <h2 id="home-neighborhoods-title">Zone e quartieri</h2>
+                    <a href="/immobili?view=map">Esplora le zone</a>
+                </div>
+
+                <a class="neighborhood-redirect-card d-md-none" href="/immobili?view=map">
+                    <span class="neighborhood-redirect-kicker">Territorio</span>
+                    <strong>Esplora Quartieri</strong>
+                    <p>Apri la mappa e scopri le zone piu adatte al tuo stile di vita.</p>
+                </a>
+
+                <div class="neighborhood-grid row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 d-none d-md-flex">
+                    @foreach (var zone in Model.Neighborhoods)
+                    {
+                        <div class="col">
+                            <article class="h-100">
+                                <span>@zone.Name</span>
+                                <p>@zone.Text</p>
+                            </article>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="medri-home-section why-panel" aria-labelledby="home-why-title">
+            <div class="container-xxl">
+                <div class="row align-items-center g-4">
+                    <div class="col-12 col-lg-5">
+                        <h2 id="home-why-title">Consulenza chiara dal primo incontro al rogito.</h2>
+                        <p>
+                            Un team locale segue compratori, venditori e proprietari in ogni fase, con valutazioni realistiche e comunicazione trasparente.
+                        </p>
+                    </div>
+                    <div class="why-list col-12 col-lg-7">
+                        @foreach (var why in Model.WhyCards)
+                        {
+                            <article class="why-card card">
+                                <span class="why-icon" aria-hidden="true"><i class="ph @why.Icon"></i></span>
+                                <h3>@why.Title</h3>
+                                <p>@why.Text</p>
+                            </article>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="medri-home-section trust-panel reviews-carousel-section" aria-labelledby="home-reviews-title">
+            <div class="container-xxl">
+                <div class="row g-4">
+                    <div class="trust-copy col-12 text-center">
+                        <h2 id="home-reviews-title">La fiducia nasce dal territorio</h2>
+                    </div>
+                    <div class="reviews-carousel col-12" aria-label="Recensioni dei clienti Medri">
+                        <div class="reviews-track">
+                            @for (var reviewIndex = 0; reviewIndex < Model.Reviews.CarouselReviews.Count; reviewIndex++)
+                            {
+                                var review = Model.Reviews.CarouselReviews[reviewIndex];
+                                <article class="local-review-card" aria-hidden="@(reviewIndex >= 5 ? "true" : null)">
+                                    <div class="review-rating" aria-label="@review.RatingLabel">
+                                        @for (var star = 1; star <= 5; star++)
+                                        {
+                                            <span class="review-star @(star <= review.Rating ? "is-filled" : null)" aria-hidden="true">&#9733;</span>
+                                        }
+                                    </div>
+                                    <blockquote>"@review.Text"</blockquote>
+                                </article>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>

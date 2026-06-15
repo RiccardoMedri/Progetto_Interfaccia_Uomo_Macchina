@@ -1,0 +1,169 @@
+
+:root {
+  --bs-body-color: var(--ink);
+  --bs-body-bg: var(--surface);
+  --bs-body-font-family: Geist, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bs-primary: var(--button);
+  --bs-primary-rgb: 42, 66, 102;
+  --bs-secondary-color: var(--muted);
+  --bs-border-color: var(--line);
+  --bs-border-radius: var(--radius-sm);
+  --bs-border-radius-sm: 8px;
+  --bs-border-radius-lg: var(--radius-md);
+  --bs-link-color: var(--button);
+  --bs-link-hover-color: var(--button-strong);
+}
+
+.btn {
+  --bs-btn-font-family: inherit;
+  --bs-btn-font-weight: 800;
+  --bs-btn-border-radius: 999px;
+  --bs-btn-padding-x: 18px;
+  --bs-btn-padding-y: 10px;
+  --bs-btn-focus-box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.18);
+}
+
+.btn-sm {
+  --bs-btn-border-radius: 999px;
+  --bs-btn-padding-x: 12px;
+  --bs-btn-padding-y: 6px;
+}
+
+.btn-primary {
+  --bs-btn-color: var(--surface);
+  --bs-btn-bg: var(--button);
+  --bs-btn-border-color: var(--button);
+  --bs-btn-hover-color: var(--surface);
+  --bs-btn-hover-bg: var(--button-strong);
+  --bs-btn-hover-border-color: var(--button-strong);
+  --bs-btn-active-color: var(--surface);
+  --bs-btn-active-bg: var(--button-strong);
+  --bs-btn-active-border-color: var(--button-strong);
+  --bs-btn-disabled-color: rgba(255, 253, 247, 0.8);
+  --bs-btn-disabled-bg: #7d8794;
+  --bs-btn-disabled-border-color: #7d8794;
+}
+
+.btn-outline-secondary,
+.btn-outline-primary {
+  --bs-btn-color: var(--button-strong);
+  --bs-btn-border-color: var(--line);
+  --bs-btn-hover-color: var(--button-strong);
+  --bs-btn-hover-bg: var(--surface-alt);
+  --bs-btn-hover-border-color: var(--button);
+  --bs-btn-active-color: var(--surface);
+  --bs-btn-active-bg: var(--button);
+  --bs-btn-active-border-color: var(--button);
+}
+
+.btn-link {
+  --bs-btn-color: var(--button);
+  --bs-btn-hover-color: var(--button-strong);
+  --bs-btn-text-decoration: none;
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-active-bg: transparent;
+}
+
+.form-label {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.form-control,
+.form-select {
+  border-color: var(--line);
+  background-color: var(--surface);
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--button);
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.16);
+}
+
+.dropdown-menu.nav-dropdown {
+  --bs-dropdown-bg: var(--surface);
+  --bs-dropdown-border-color: var(--line);
+  --bs-dropdown-link-color: var(--ink);
+  --bs-dropdown-link-hover-color: var(--button-strong);
+  --bs-dropdown-link-hover-bg: var(--surface-alt);
+  --bs-dropdown-link-active-color: var(--surface);
+  --bs-dropdown-link-active-bg: var(--button);
+  border-radius: var(--radius-sm);
+}
+
+.nav-dropdown.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--button);
+  color: var(--surface);
+}
+
+.nav-pills {
+  --bs-nav-pills-border-radius: 999px;
+  --bs-nav-pills-link-active-bg: var(--button);
+  --bs-nav-pills-link-active-color: var(--surface);
+}
+
+.nav-link {
+  --bs-nav-link-color: var(--button-strong);
+  --bs-nav-link-hover-color: var(--button);
+}
+
+.breadcrumb {
+  --bs-breadcrumb-divider-color: #a8adb2;
+  --bs-breadcrumb-item-active-color: var(--muted);
+  margin-bottom: 0;
+}
+
+.detail-breadcrumb.breadcrumb span::before {
+  content: none;
+  margin-right: 0;
+}
+
+.detail-breadcrumb.breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  content: "/" !important;
+  float: none;
+  margin-right: 10px;
+  padding-right: 0;
+  color: #a8adb2;
+}
+
+.card {
+  --bs-card-bg: transparent;
+  --bs-card-color: var(--ink);
+  --bs-card-border-color: var(--line);
+  --bs-card-border-radius: var(--radius-md);
+}
+
+.badge {
+  --bs-badge-font-weight: 800;
+  letter-spacing: 0;
+}
+
+.text-bg-light {
+  color: var(--button-strong) !important;
+  background-color: var(--surface-alt) !important;
+}
+
+.accordion {
+  --bs-accordion-bg: transparent;
+  --bs-accordion-border-color: var(--line);
+  --bs-accordion-active-bg: var(--surface-alt);
+  --bs-accordion-active-color: var(--ink);
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.16);
+}
+
+.progress {
+  --bs-progress-bg: var(--surface-strong);
+  --bs-progress-bar-bg: var(--button);
+  --bs-progress-border-radius: 999px;
+}

@@ -1,0 +1,81 @@
+@use "tokens";
+@use "mixins";
+
+
+.search-filter-field,
+.search-multiselect {
+  min-width: 0;
+}
+
+.search-multiselect {
+  .search-multiselect-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+
+    &::after {
+      display: none;
+    }
+
+    &:focus {
+      @include mixins.focus-ring;
+    }
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .search-multiselect-menu {
+    max-height: tokens.$dropdown-menu-max-height;
+    min-width: min(tokens.$dropdown-menu-min-width, calc(100vw - tokens.$dropdown-viewport-gutter));
+    overflow-y: auto;
+    padding: tokens.$space-2;
+  }
+
+  .search-multiselect-option {
+    display: flex;
+    align-items: center;
+    gap: tokens.$space-2;
+    min-height: tokens.$dropdown-option-min-height;
+    margin: 0;
+    padding: tokens.$space-2;
+    white-space: normal;
+  }
+
+  .form-check-input {
+    position: static;
+    flex: 0 0 auto;
+    float: none;
+    width: tokens.$checkbox-size;
+    height: tokens.$checkbox-size;
+    margin: 0;
+  }
+
+  .form-check-label {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    line-height: 1.35;
+    cursor: pointer;
+  }
+}
+
+.search-panel .search-multiselect .form-check-input {
+  min-height: auto;
+  padding: 0;
+  border: 0.0625rem solid rgba(31, 54, 88, 0.35);
+  background-color: var(--surface);
+  box-shadow: none;
+  accent-color: var(--button);
+  appearance: auto;
+  -webkit-appearance: checkbox;
+}
+

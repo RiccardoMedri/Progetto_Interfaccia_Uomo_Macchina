@@ -1,0 +1,135 @@
+@model Medri.Web.Features.Visit.VisitConfirmationViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "funnels";
+    ViewData["Title"] = "Richiesta inviata";
+    ViewData["BodyClass"] = "medri-request-body";
+    ViewData["RenderMedriFooter"] = false;
+    ViewData["MedriShellClass"] = "medri-public-shell medri-request-shell";
+    ViewData["NavSection"] = Model.Property.NavSection;
+}
+
+<main id="contenuto" class="medri-request-funnel medri-request-funnel--confirmation">
+    <section class="container-xxl medri-request-funnel__shell">
+        <section class="confirmation-hero medri-request-funnel__confirmation-hero" aria-labelledby="request-confirmation-title">
+            <div class="confirmation-mark" aria-hidden="true"></div>
+            <div>
+                <span>Conferma</span>
+                <h1 id="request-confirmation-title">Richiesta inviata correttamente</h1>
+                <p>Abbiamo ricevuto la tua richiesta. Un agente Medri ti ricontattera usando i dati indicati.</p>
+            </div>
+        </section>
+
+        <section class="confirmation-property-summary" aria-label="Sintesi immobile">
+            <div class="confirmation-property-media" aria-hidden="true">
+                <img class="confirmation-property-media-image" src="@Model.Property.ImageUrl" alt="" loading="lazy" />
+            </div>
+            <div class="confirmation-property-copy">
+                <span class="confirmation-kicker">Immobile collegato alla richiesta</span>
+                <span class="tag badge text-bg-light">@Model.Property.Tag</span>
+                <strong>@Model.Property.PriceLabel</strong>
+                <h2>@Model.Property.Title</h2>
+                <p>@Model.Property.DisplayLocation</p>
+                <div class="confirmation-property-facts">
+                    @if (!string.IsNullOrWhiteSpace(Model.Property.RoomsLabel))
+                    {
+                        <span>@Model.Property.RoomsLabel</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.Property.SurfaceLabel))
+                    {
+                        <span>@Model.Property.SurfaceLabel</span>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="confirmation-progress-section" aria-label="Prossimi passaggi">
+            <h2>Da qui in avanti</h2>
+            <ol class="post-send-timeline">
+                <li class="is-active">
+                    <span class="timeline-icon receipt-icon" aria-hidden="true"></span>
+                    <div>
+                        <strong>Richiesta presa in carico</strong>
+                        <p>L'agenzia riceve la richiesta collegata all'annuncio e la collega alla scheda immobile.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="timeline-icon phone-option-icon" aria-hidden="true"></span>
+                    <div>
+                        <strong>Ti ricontattiamo</strong>
+                        <p>Un agente verifica interesse, dati e informazioni necessarie.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="timeline-icon remote-option-icon" aria-hidden="true"></span>
+                    <div>
+                        <strong>Valutiamo alternative coerenti</strong>
+                        <p>Approfondiamo dubbi, priorita e immobili simili prima di fissare il passo successivo.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="timeline-icon office-option-icon" aria-hidden="true"></span>
+                    <div>
+                        <strong>Prossimo passo guidato</strong>
+                        <p>Solo dopo il primo confronto si valuta un eventuale appuntamento o una visita.</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section class="confirmation-similar-section">
+            <div class="section-heading">
+                <h2>Immobili simili</h2>
+                <a asp-controller="Search" asp-action="Index">Vedi altri</a>
+            </div>
+            <div class="confirmation-similar-grid row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+                @foreach (var property in Model.SimilarProperties)
+                {
+                    <div class="col">
+                        <a class="search-card card h-100" asp-controller="Property" asp-action="Detail" asp-route-slug="@property.Slug">
+                            <span class="search-card-media" aria-hidden="true">
+                                <img class="search-card-media-image" src="@property.ImageUrl" alt="" loading="lazy" />
+                            </span>
+                            <span class="search-card-body card-body">
+                                <span class="tag badge text-bg-light">@property.Tag</span>
+                                <strong>@property.PriceLabel</strong>
+                                <h2>@property.Title</h2>
+                                <span>@property.DisplayLocation</span>
+                            </span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="assistance-panel" aria-label="Assistenza">
+            <article>
+                <span class="support-icon headset-icon" aria-hidden="true"></span>
+                <div>
+                    <h2>Hai bisogno di assistenza?</h2>
+                    <p>Siamo a tua disposizione per qualsiasi esigenza</p>
+                </div>
+            </article>
+            <article>
+                <span class="support-icon phone-support-icon" aria-hidden="true"></span>
+                <div>
+                    <strong><a href="tel:0547123456">0547 123456</a></strong>
+                    <p>Lun-Ven 9:00-12:30 / 15:00-19:00</p>
+                </div>
+            </article>
+            <article>
+                <span class="support-icon mail-icon" aria-hidden="true"></span>
+                <div>
+                    <strong><a href="mailto:info@agenziamedri.it">info@agenziamedri.it</a></strong>
+                    <p>Risposta entro il giorno lavorativo</p>
+                </div>
+            </article>
+        </section>
+
+        <div class="confirmation-actions medri-request-funnel__actions d-flex flex-column flex-sm-row justify-content-sm-end gap-2">
+            <a class="secondary-cta btn btn-outline-secondary" asp-controller="Property" asp-action="Detail" asp-route-slug="@Model.Property.Slug">Rivedi annuncio</a>
+            <a class="secondary-cta btn btn-outline-secondary" asp-controller="Search" asp-action="Index">Torna agli annunci</a>
+            <a class="primary-cta btn btn-primary" asp-area="Client" asp-controller="Requests" asp-action="Index">Vedi la richiesta nell'Area cliente</a>
+        </div>
+    </section>
+</main>

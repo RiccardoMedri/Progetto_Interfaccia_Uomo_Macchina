@@ -1,0 +1,69 @@
+@model Medri.Web.Features.Visit.VisitOptionViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "funnels";
+    ViewData["Title"] = "Richiedi informazioni";
+    ViewData["BodyClass"] = "medri-request-body";
+    ViewData["RenderMedriFooter"] = false;
+    ViewData["MedriShellClass"] = "medri-public-shell medri-request-shell";
+    ViewData["NavSection"] = Model.Property.NavSection;
+}
+
+<main id="contenuto" class="medri-request-funnel medri-request-funnel--option">
+    <section class="container-xxl medri-request-funnel__shell">
+        <nav class="detail-breadcrumb breadcrumb medri-request-funnel__breadcrumb" aria-label="Percorso">
+            <a class="breadcrumb-item" asp-controller="Home" asp-action="Index">Home</a>
+            <a class="breadcrumb-item" asp-controller="Search" asp-action="Index">Immobili</a>
+            <a class="breadcrumb-item" asp-controller="Property" asp-action="Detail" asp-route-slug="@Model.Property.Slug">@Model.Property.Title</a>
+            <span class="breadcrumb-item active" aria-current="page">Richiedi info</span>
+        </nav>
+
+        <a class="back-to-search secondary-cta btn btn-outline-secondary medri-request-funnel__back" asp-controller="Property" asp-action="Detail" asp-route-slug="@Model.Property.Slug">Torna alla scheda immobile</a>
+
+        <form class="visit-shell medri-request-funnel__form row g-4 align-items-start" method="post" asp-controller="Visit" asp-action="Option" asp-route-slug="@Model.Property.Slug" data-lead-form>
+            @Html.AntiForgeryToken()
+            <input asp-for="AppointmentId" type="hidden" />
+            <input asp-for="FullName" type="hidden" />
+            <input asp-for="Phone" type="hidden" />
+            <input asp-for="Email" type="hidden" />
+            <input asp-for="Message" type="hidden" />
+
+            <div class="col-12">
+                <div class="visit-heading-row medri-request-funnel__heading-row">
+                    <div class="visit-heading medri-request-funnel__heading">
+                        <span>Richiedi informazioni</span>
+                        <h1>Scegli come preferisci parlare con l'agenzia</h1>
+                        <p>I dati sono gia collegati all'annuncio: ora indica il canale piu comodo per il primo confronto.</p>
+                    </div>
+                    <ol class="visit-stepper medri-request-funnel__stepper" aria-label="Avanzamento richiesta">
+                        <li class="is-active"><span>1</span>Opzione</li>
+                        <li><span>2</span>Riepilogo</li>
+                        <li><span>3</span>Invio</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="visit-main medri-request-funnel__main col-12 col-lg-8">
+                <partial name="_VisitContactPreferences" model="Model" />
+
+                <div class="visit-actions medri-request-funnel__actions d-flex flex-column flex-sm-row justify-content-sm-end gap-2">
+                    <a class="secondary-cta btn btn-outline-secondary" asp-controller="Property" asp-action="Detail" asp-route-slug="@Model.Property.Slug">Annulla</a>
+                    <button class="primary-cta btn btn-primary" type="submit">Continua</button>
+                </div>
+            </div>
+
+            <aside class="medri-request-funnel__aside col-12 col-lg-4" aria-label="Immobile collegato">
+                <partial name="_VisitPropertySummary" model="Model.Property" />
+            </aside>
+        </form>
+    </section>
+</main>
+
+@section scripts {
+    <environment include="Development">
+        <script src="/js/bundle-medri-lead-forms.js" defer asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/bundle-medri-lead-forms.min.js" defer asp-append-version="true"></script>
+    </environment>
+}

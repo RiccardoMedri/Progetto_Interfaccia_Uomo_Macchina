@@ -1,0 +1,62 @@
+@model Medri.Web.Areas.Client.Saved.ClientSavedViewModel
+@{
+    ViewData["Title"] = "Area cliente - Annunci salvati";
+}
+
+<main id="contenuto" class="medri-client-area medri-client-area--saved">
+    <div class="container-xxl medri-client-area__container">
+        <partial name="~/Areas/Client/Views/Shared/_ClientAreaHeader.cshtml" model="Model.Navigation" />
+
+        <section class="medri-client-content" aria-label="Annunci salvati">
+            @if (Model.HasProperties)
+            {
+                <div class="row g-3 g-lg-4 medri-client-card-list">
+                    @foreach (var property in Model.Properties)
+                    {
+                        <div class="col-12">
+                            <article class="medri-client-property-card">
+                                <form class="medri-client-save-form" asp-area="" asp-controller="Favorites" asp-action="Remove" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="propertyId" value="@property.Id" />
+                                    <button class="medri-client-save-button" type="submit" aria-label="Rimuovi @property.Title dai salvati"></button>
+                                </form>
+
+                                <a class="medri-client-property-card__link"
+                                   asp-area=""
+                                   asp-controller="Property"
+                                   asp-action="Detail"
+                                   asp-route-slug="@property.Slug"
+                                   aria-label="Apri @property.Title">
+                                    <span class="medri-client-property-card__media">
+                                        <img src="@property.ImageUrl" alt="Foto di @property.Title" loading="lazy" />
+                                    </span>
+                                    <span class="medri-client-property-card__body">
+                                        <span class="tag badge text-bg-light">@property.Contract</span>
+                                        <span class="medri-client-property-card__title">@property.Title</span>
+                                        <span class="medri-client-property-card__location">@property.DisplayLocation</span>
+                                        <strong>@property.PriceLabel</strong>
+                                        <span class="medri-client-facts" aria-label="Caratteristiche immobile">
+                                            <span>@property.BedroomsLabel</span>
+                                            <span>@property.BathroomsLabel</span>
+                                            <span>@property.SurfaceLabel</span>
+                                            <span>@property.FourthFactLabel</span>
+                                        </span>
+                                        <span class="medri-client-property-card__note">@property.SavedNote</span>
+                                    </span>
+                                </a>
+                            </article>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <section class="medri-client-empty-state" aria-label="Nessun annuncio salvato">
+                    <h2>Nessun annuncio salvato</h2>
+                    <p>Gli annunci salvati compariranno qui dopo la selezione dai risultati.</p>
+                    <a class="btn btn-primary" asp-area="" asp-controller="Search" asp-action="Index">Cerca annuncio</a>
+                </section>
+            }
+        </section>
+    </div>
+</main>

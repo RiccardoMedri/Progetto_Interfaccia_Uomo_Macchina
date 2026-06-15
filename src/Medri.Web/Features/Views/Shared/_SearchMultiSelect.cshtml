@@ -1,0 +1,16 @@
+@model Medri.Web.Features.Search.SearchMultiSelectViewModel
+
+<div class="search-multiselect dropdown" data-search-multiselect data-search-multiselect-placeholder="@Model.Placeholder">
+    <button class="form-select dropdown-toggle search-multiselect-toggle" id="@Model.Id" type="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
+        <span data-search-multiselect-label>@Model.SelectedLabel</span>
+    </button>
+    <div class="dropdown-menu search-multiselect-menu" aria-labelledby="@Model.Id">
+        @foreach (var item in Model.Items)
+        {
+            <div class="form-check search-multiselect-option">
+                <input class="form-check-input" id="@item.Id" type="checkbox" name="@item.Name" value="@item.Value" checked="@item.IsSelected" data-search-multiselect-input data-search-multiselect-option-label="@item.Label" />
+                <label class="form-check-label" for="@item.Id">@item.Label</label>
+            </div>
+        }
+    </div>
+</div>

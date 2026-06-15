@@ -1,0 +1,24 @@
+@model Medri.Web.Features.Visit.VisitPropertySummaryViewModel
+
+<a class="visit-context-card" asp-controller="Property" asp-action="Detail" asp-route-slug="@Model.Slug" aria-label="Apri la scheda di @Model.Title">
+    <span class="visit-property-media" aria-hidden="true">
+        <img class="visit-property-media-image" src="@Model.ImageUrl" alt="" loading="lazy" />
+    </span>
+    <span class="visit-property-copy">
+        <span class="tag badge text-bg-light">@Model.Tag</span>
+        <strong>@Model.PriceLabel</strong>
+        <span class="visit-property-title">@Model.Title</span>
+        <span class="visit-property-location">@Model.DisplayLocation</span>
+        <span class="visit-property-facts">
+            @if (!string.IsNullOrWhiteSpace(Model.SurfaceLabel))
+            {
+                <span>@Model.SurfaceLabel</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.RoomsLabel))
+            {
+                <span>@Model.RoomsLabel</span>
+            }
+        </span>
+        <span class="visit-context-link">Torna alla scheda immobile</span>
+    </span>
+</a>

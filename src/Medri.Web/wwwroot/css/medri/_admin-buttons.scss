@@ -1,0 +1,45 @@
+
+
+
+
+
+
+
+
+
+.admin-btn-create,
+.admin-btn-save,
+.admin-btn-danger {
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+.admin-btn-create {
+  background: var(--button) !important;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--button-strong) !important;
+    color: #fff !important;
+  }
+}
+
+.admin-btn-save {
+  background: var(--role-match) !important;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--role-match-strong) !important;
+    color: #fff !important;
+  }
+}
+
+.admin-btn-danger {
+  background: var(--role-risk) !important;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--role-risk-strong) !important;
+    color: #fff !important;
+  }
+}

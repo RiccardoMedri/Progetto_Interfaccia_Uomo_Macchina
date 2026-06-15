@@ -1,0 +1,1747 @@
+@use "sass:map";
+@use "tokens";
+@use "mixins";
+
+$request-breakpoints: ("md": 48rem, "lg": 62rem, "xl": 75rem);
+$request-space: (
+  "xs": 0.5rem,
+  "sm": 0.75rem,
+  "md": 1rem,
+  "lg": 1.5rem,
+  "xl": 2rem,
+  "page": 4.5rem
+);
+$request-radius: 0.5rem;
+$request-pill: 999rem;
+$request-shadow: 0 1rem 2.5rem rgba(37, 63, 99, 0.1);
+$request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
+
+@mixin request-up($breakpoint) {
+  @media (min-width: map.get($request-breakpoints, $breakpoint)) {
+    @content;
+  }
+}
+
+.visit-shell {
+  width: min(80rem, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.visit-shell {
+  padding: map.get($request-space, "sm");
+  border-radius: 2rem;
+  background: linear-gradient(145deg, rgba(33, 59, 95, 0.08), rgba(200, 164, 91, 0.12));
+  box-shadow: var(--ds-shadow-lg);
+}
+
+@include request-up("lg") {
+  .visit-shell {
+    width: min(80rem, calc(100% - 5rem));
+  }
+}
+
+.medri-request-body,
+.medri-request-shell,
+.medri-lead-body,
+.medri-lead-shell {
+  background: var(--surface);
+}
+
+.medri-request-funnel {
+  color: var(--ink);
+  padding-block: map.get($request-space, "lg") map.get($request-space, "page");
+
+  &__shell {
+    display: grid;
+    gap: map.get($request-space, "lg");
+  }
+
+  &__breadcrumb {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    justify-content: flex-start;
+    color: var(--muted);
+
+    .breadcrumb-item {
+      color: inherit;
+      font-size: 0.9rem;
+      text-decoration: none;
+
+      &.active {
+        color: var(--ink);
+        font-weight: 800;
+      }
+
+      &:hover,
+      &:focus-visible {
+        color: var(--button);
+      }
+
+      &:focus-visible {
+        @include mixins.focus-ring;
+        border-radius: $request-pill;
+      }
+    }
+  }
+
+  &__back {
+    width: fit-content;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: map.get($request-space, "xs");
+    padding-inline: map.get($request-space, "md");
+    border-radius: $request-pill;
+    font-weight: 800;
+    text-decoration: none;
+
+    &::before {
+      content: "\2190";
+    }
+
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+  }
+
+  &__form.visit-shell {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: map.get($request-space, "sm");
+  }
+
+  
+  
+  &__main,
+  &__aside {
+    min-width: 0;
+    display: grid;
+    align-content: start;
+    gap: map.get($request-space, "lg");
+  }
+
+  &__heading-row {
+    display: grid;
+    gap: map.get($request-space, "lg");
+    align-items: center;
+    margin: 0;
+    padding: map.get($request-space, "lg");
+    border: thin solid rgba(33, 59, 95, 0.08);
+    border-radius: $request-radius;
+    background: linear-gradient(135deg, rgba(255, 253, 247, 0.98), rgba(241, 236, 227, 0.92));
+    box-shadow:
+      inset 0 0 0 0.0625rem rgba(33, 59, 95, 0.08),
+      0 0.875rem 1.875rem rgba(33, 59, 95, 0.06);
+  }
+
+  &__heading {
+    display: grid;
+    gap: map.get($request-space, "sm");
+
+    > span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 12ch;
+      margin: 0;
+      color: var(--button-strong);
+      font-size: 2.4rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    p {
+      max-width: 52ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.55;
+      text-wrap: pretty;
+    }
+  }
+
+  &__stepper {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: map.get($request-space, "xs");
+    margin: 0;
+    padding: map.get($request-space, "xs");
+    
+    border-radius: $request-pill;
+    background: rgba(33, 59, 95, 0.08);
+    list-style: none;
+
+    li {
+      min-width: 0;
+      min-height: 3.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: map.get($request-space, "xs");
+      padding-inline: map.get($request-space, "md");
+      border-radius: $request-pill;
+      color: var(--ds-muted);
+      font-size: 0.9rem;
+      font-weight: 850;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    span {
+      width: 1.7rem;
+      height: 1.7rem;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: $request-pill;
+      background: rgba(33, 59, 95, 0.12);
+      color: var(--ds-blue-2);
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .is-active,
+    .is-complete {
+      background: var(--ds-blue-2);
+      color: var(--surface);
+
+      span {
+        background: var(--ds-gold);
+        color: var(--button-strong);
+      }
+    }
+  }
+
+  &__section {
+    display: grid;
+    gap: map.get($request-space, "md");
+    padding: map.get($request-space, "lg");
+    border: thin solid var(--line);
+    border-radius: $request-radius;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+
+    h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 1.35rem;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+  }
+
+  .choice-card,
+  .review-grid article,
+  .time-choice-button,
+  .visit-context-card,
+  .confirmation-hero,
+  .confirmation-property-summary,
+  .confirmation-progress-section,
+  .confirmation-similar-section,
+  .assistance-panel {
+    border-radius: $request-radius;
+  }
+
+  .choice-card,
+  .review-grid article,
+  .time-choice-button {
+    border: thin solid var(--line);
+    background: var(--surface-alt);
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  .choice-card {
+    min-height: 8.25rem;
+    padding: map.get($request-space, "md");
+    cursor: pointer;
+
+    &:hover,
+    &:focus-within {
+      border-color: rgba(31, 54, 88, 0.28);
+      transform: translateY(-0.08rem);
+    }
+
+    &.is-selected {
+      border-color: var(--button);
+      background: var(--surface);
+      box-shadow: inset 0 0 0 0.0625rem var(--button);
+    }
+
+    h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 1.08rem;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.45;
+    }
+  }
+
+  .contact-option-card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: map.get($request-space, "xs");
+    padding-right: 3.25rem;
+  }
+
+  .contact-option-icon {
+    width: 2.625rem;
+    height: 2.625rem;
+    display: block;
+    border: thin solid var(--line);
+    border-radius: $request-radius;
+    background: var(--surface);
+  }
+
+  .selection-dot {
+    position: absolute;
+    top: map.get($request-space, "md");
+    right: map.get($request-space, "md");
+    width: 1.125rem;
+    height: 1.125rem;
+    display: block;
+    border: 0.125rem solid #8f9499;
+    border-radius: $request-pill;
+    background: var(--surface);
+  }
+
+  .contact-option-card.is-selected .selection-dot {
+    border-color: var(--button);
+    background:
+      radial-gradient(circle at center, var(--button) 0 45%, transparent 47% 100%),
+      var(--surface);
+  }
+
+  .time-choice-button {
+    min-height: 4.5rem;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: map.get($request-space, "xs");
+    padding: map.get($request-space, "sm");
+    color: var(--ink);
+
+    strong,
+    span {
+      display: block;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    strong {
+      font-size: 0.98rem;
+      font-weight: 900;
+    }
+
+    span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    &:hover,
+    &:focus-visible {
+      border-color: rgba(31, 54, 88, 0.28);
+      transform: translateY(-0.08rem);
+    }
+
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+
+    &.is-selected {
+      border-color: var(--button);
+      background: var(--button);
+      color: var(--surface);
+
+      span {
+        color: rgba(255, 253, 247, 0.78);
+      }
+    }
+  }
+
+  .custom-time-panel {
+    padding-top: map.get($request-space, "xs");
+
+    &.is-collapsed {
+      display: none;
+    }
+
+    label {
+      display: grid;
+      gap: map.get($request-space, "xs");
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    input {
+      min-height: 2.75rem;
+      border: thin solid var(--line);
+      background: var(--surface-alt);
+      color: var(--ink);
+      font: inherit;
+    }
+  }
+
+  .review-grid article {
+    height: 100%;
+    display: grid;
+    align-content: start;
+    gap: map.get($request-space, "xs");
+    padding: map.get($request-space, "md");
+
+    span {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    strong {
+      color: var(--ink);
+      font-size: 1.02rem;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .visit-context-card {
+    display: grid;
+    grid-template-columns: minmax(6rem, 34%) minmax(0, 1fr);
+    gap: map.get($request-space, "md");
+    align-content: start;
+    padding: map.get($request-space, "md");
+    border: thin solid var(--line);
+    background: linear-gradient(180deg, rgba(255, 253, 247, 0.96), rgba(240, 226, 197, 0.58));
+    color: inherit;
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+    transition:
+      box-shadow 180ms ease,
+      transform 180ms ease;
+
+    &:hover,
+    &:focus-visible {
+      color: inherit;
+      text-decoration: none;
+      transform: translateY(-0.08rem);
+      box-shadow: $request-panel-shadow;
+    }
+
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+
+    .tag {
+      width: fit-content;
+      max-width: 100%;
+      display: inline-flex;
+      justify-self: start;
+      margin: 0;
+    }
+  }
+
+  .visit-property-media {
+    position: relative;
+    overflow: hidden;
+    min-height: 7rem;
+    display: block;
+    border-radius: $request-radius;
+    background-color: var(--surface-strong);
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(23, 40, 64, 0.36), transparent 58%);
+      pointer-events: none;
+    }
+  }
+
+  .visit-property-media-image {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    display: block;
+    object-fit: cover;
+  }
+
+  .visit-property-copy,
+  .visit-property-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: map.get($request-space, "xs");
+  }
+
+  .visit-property-copy {
+    min-width: 0;
+    align-content: start;
+  }
+
+  .visit-property-copy > strong,
+  .visit-property-title,
+  .visit-property-location,
+  .visit-context-link {
+    width: 100%;
+  }
+
+  .visit-property-copy > strong {
+    color: var(--button-strong);
+    font-size: 1.25rem;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .visit-property-title {
+    color: var(--ink);
+    font-size: 1.08rem;
+    font-weight: 900;
+    line-height: 1.18;
+    text-wrap: balance;
+  }
+
+  .visit-property-location {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+
+  .visit-property-facts span {
+    min-height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: map.get($request-space, "sm");
+    border: thin solid var(--line);
+    border-radius: $request-pill;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 850;
+  }
+
+  .visit-context-link {
+    color: var(--button);
+    font-weight: 900;
+  }
+
+  &__actions {
+    .btn {
+      min-height: 2.75rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding-inline: map.get($request-space, "lg");
+      border-radius: $request-pill;
+      font-weight: 850;
+    }
+  }
+
+  &__confirmation-hero,
+  .confirmation-property-summary,
+  .confirmation-progress-section,
+  .confirmation-similar-section,
+  .assistance-panel {
+    padding: map.get($request-space, "lg");
+    border: thin solid var(--line);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__confirmation-hero {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: map.get($request-space, "md");
+    align-items: center;
+
+    h1 {
+      margin: 0 0 map.get($request-space, "xs");
+      color: var(--button-strong);
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    p {
+      max-width: 42rem;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+  }
+
+  .confirmation-mark {
+    width: 4rem;
+    height: 4rem;
+    border-radius: $request-pill;
+    background: var(--button);
+  }
+
+  .confirmation-property-summary {
+    display: grid;
+    gap: map.get($request-space, "md");
+  }
+
+  .confirmation-property-media {
+    position: relative;
+    overflow: hidden;
+    min-height: 12rem;
+    border-radius: $request-radius;
+    background: var(--surface-strong);
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(23, 40, 64, 0.38), transparent 60%);
+      pointer-events: none;
+    }
+  }
+
+  .confirmation-property-media-image {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    display: block;
+    object-fit: cover;
+  }
+
+  .confirmation-property-copy {
+    display: grid;
+    gap: map.get($request-space, "xs");
+    align-content: center;
+
+    .tag {
+      width: fit-content;
+    }
+
+    strong {
+      color: var(--button-strong);
+      font-size: 1.8rem;
+      font-weight: 900;
+      line-height: 1.05;
+    }
+
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2 {
+      color: var(--ink);
+      font-size: 1.3rem;
+      font-weight: 900;
+      line-height: 1.12;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  }
+
+  .confirmation-kicker {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .confirmation-property-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: map.get($request-space, "xs");
+
+    span {
+      min-height: 2rem;
+      display: inline-flex;
+      align-items: center;
+      padding-inline: map.get($request-space, "sm");
+      border: thin solid var(--line);
+      border-radius: $request-pill;
+      background: var(--surface-alt);
+      color: var(--ink);
+      font-size: 0.82rem;
+      font-weight: 850;
+    }
+  }
+
+  .confirmation-progress-section h2,
+  .confirmation-similar-section h2 {
+    margin: 0 0 map.get($request-space, "md");
+    color: var(--ink);
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 0;
+  }
+
+  .post-send-timeline {
+    display: grid;
+    gap: map.get($request-space, "md");
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: map.get($request-space, "md");
+      color: var(--muted);
+    }
+
+    .timeline-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      display: grid;
+      place-items: center;
+      border: thin solid var(--line);
+      border-radius: $request-pill;
+      background: var(--surface-alt);
+    }
+
+    .is-active .timeline-icon {
+      border-color: var(--button);
+      background: var(--button);
+    }
+
+    strong {
+      color: var(--ink);
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+
+    p {
+      margin: map.get($request-space, "xs") 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  }
+
+  .section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: map.get($request-space, "sm");
+    margin-bottom: map.get($request-space, "md");
+
+    h2 {
+      margin: 0;
+    }
+
+    a {
+      color: var(--button);
+      font-weight: 900;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--button-strong);
+        text-decoration: underline;
+      }
+
+      &:focus-visible {
+        @include mixins.focus-ring;
+      }
+    }
+  }
+
+  .confirmation-similar-grid {
+    .search-card {
+      border-radius: $request-radius;
+      overflow: hidden;
+    }
+
+    .search-card-media {
+      position: relative;
+      overflow: hidden;
+      min-height: 10rem;
+    }
+
+    .search-card-media-image {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      display: block;
+      object-fit: cover;
+    }
+
+    .search-card-body {
+      display: grid;
+      gap: map.get($request-space, "xs");
+    }
+  }
+
+  .assistance-panel {
+    display: grid;
+    gap: map.get($request-space, "md");
+
+    article {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: map.get($request-space, "sm");
+      align-items: center;
+      padding: map.get($request-space, "md");
+      border: thin solid var(--line);
+      border-radius: $request-radius;
+      background: var(--surface-alt);
+    }
+
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2,
+    strong {
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--button);
+        text-decoration: underline;
+      }
+    }
+  }
+
+  @include request-up("lg") {
+    padding-block: map.get($request-space, "xl") map.get($request-space, "page");
+
+    &__heading-row {
+      grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.46fr);
+      padding: map.get($request-space, "xl");
+    }
+
+    &__heading h1 {
+      font-size: 3rem;
+    }
+
+    
+    .confirmation-property-summary {
+      justify-self: start;
+      width: fit-content;
+      max-width: 100%;
+      grid-template-columns: 14rem auto;
+      align-items: center;
+    }
+
+    .confirmation-property-media {
+      align-self: stretch;
+    }
+
+    .assistance-panel {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @include request-up("lg") {
+    .visit-context-card {
+      position: sticky;
+      top: 6.5rem;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .visit-property-media {
+      min-height: 12rem;
+    }
+  }
+}
+
+.medri-lead-funnel,
+.medri-lead-confirmation {
+  color: var(--ink);
+  padding-block: map.get($request-space, "lg") map.get($request-space, "page");
+
+  &__shell {
+    display: grid;
+    gap: map.get($request-space, "lg");
+  }
+}
+
+.medri-lead-funnel {
+  &__breadcrumb {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    justify-content: flex-start;
+    color: var(--muted);
+
+    .breadcrumb-item {
+      color: inherit;
+      font-size: 0.9rem;
+      text-decoration: none;
+
+      &.active {
+        color: var(--ink);
+        font-weight: 850;
+      }
+
+      &:hover,
+      &:focus-visible {
+        color: var(--button);
+      }
+
+      &:focus-visible {
+        @include mixins.focus-ring;
+        border-radius: $request-pill;
+      }
+    }
+  }
+
+  &__back {
+    width: fit-content;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: map.get($request-space, "xs");
+    padding-inline: map.get($request-space, "md");
+    border-radius: $request-pill;
+    font-weight: 850;
+    text-decoration: none;
+
+    &::before {
+      content: "\2190";
+    }
+
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+  }
+
+  &__form {
+    margin: 0;
+    padding: map.get($request-space, "sm");
+    border: thin solid rgba(33, 59, 95, 0.08);
+    border-radius: $request-radius;
+    background: linear-gradient(145deg, rgba(33, 59, 95, 0.07), rgba(200, 164, 91, 0.1));
+    box-shadow: var(--shadow-md);
+  }
+
+  &__main {
+    min-width: 0;
+    display: grid;
+    gap: map.get($request-space, "lg");
+  }
+
+  &__heading-row {
+    display: grid;
+    gap: map.get($request-space, "lg");
+    align-items: center;
+    margin: 0;
+    padding: map.get($request-space, "lg");
+    border: thin solid rgba(33, 59, 95, 0.08);
+    border-radius: $request-radius;
+    background: linear-gradient(135deg, rgba(255, 253, 247, 0.98), rgba(241, 236, 227, 0.92));
+    box-shadow:
+      inset 0 0 0 0.0625rem rgba(33, 59, 95, 0.08),
+      0 0.875rem 1.875rem rgba(33, 59, 95, 0.06);
+  }
+
+  &__heading {
+    display: grid;
+    gap: map.get($request-space, "sm");
+
+    > span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 15ch;
+      margin: 0;
+      color: var(--button-strong);
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    p {
+      max-width: 54ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
+      text-wrap: pretty;
+    }
+  }
+
+  &__stepper {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: map.get($request-space, "xs");
+    margin: 0;
+    padding: map.get($request-space, "xs");
+    border-radius: $request-pill;
+    background: rgba(33, 59, 95, 0.08);
+    list-style: none;
+
+    li {
+      min-height: 3.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: map.get($request-space, "xs");
+      padding-inline: map.get($request-space, "md");
+      border-radius: $request-pill;
+      color: var(--ds-muted);
+      font-size: 0.9rem;
+      font-weight: 850;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    span {
+      width: 1.7rem;
+      height: 1.7rem;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: $request-pill;
+      background: rgba(33, 59, 95, 0.12);
+      color: var(--ds-blue-2);
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .is-active {
+      background: var(--ds-blue-2);
+      color: var(--surface);
+
+      span {
+        background: var(--ds-gold);
+        color: var(--button-strong);
+      }
+    }
+  }
+
+  &__section {
+    display: grid;
+    gap: map.get($request-space, "md");
+    padding: map.get($request-space, "lg");
+    border: thin solid var(--line);
+    border-radius: $request-radius;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+
+    h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 1.3rem;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+  }
+
+  &__section-heading {
+    display: grid;
+    gap: map.get($request-space, "md");
+
+    h2,
+    p {
+      margin: 0;
+    }
+
+    p {
+      margin-top: map.get($request-space, "xs");
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  }
+
+  .selected-intent-pill {
+    width: fit-content;
+    min-height: 2rem;
+    align-items: center;
+    justify-content: center;
+    padding-inline: map.get($request-space, "sm");
+    border: thin solid var(--line);
+    background: var(--surface-alt);
+    color: var(--ink);
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .choice-card,
+  .time-choice-button {
+    border: thin solid var(--line);
+    border-radius: $request-radius;
+    background: var(--surface-alt);
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  .choice-card {
+    min-height: 8.25rem;
+    padding: map.get($request-space, "md");
+    cursor: pointer;
+
+    &:hover,
+    &:focus-within {
+      border-color: rgba(31, 54, 88, 0.28);
+      transform: translateY(-0.08rem);
+    }
+
+    &.is-selected {
+      border-color: var(--button);
+      background: var(--surface);
+      box-shadow: inset 0 0 0 0.0625rem var(--button);
+    }
+
+    h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 1.08rem;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.45;
+    }
+  }
+
+  .contact-option-card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: map.get($request-space, "xs");
+    padding-right: 3.25rem;
+  }
+
+  .contact-option-icon {
+    width: 2.625rem;
+    height: 2.625rem;
+    display: block;
+    border: thin solid var(--line);
+    border-radius: $request-radius;
+    background: var(--surface);
+  }
+
+  .selection-dot {
+    position: absolute;
+    top: map.get($request-space, "md");
+    right: map.get($request-space, "md");
+    width: 1.125rem;
+    height: 1.125rem;
+    display: block;
+    border: 0.125rem solid #8f9499;
+    border-radius: $request-pill;
+    background: var(--surface);
+  }
+
+  .contact-option-card.is-selected .selection-dot {
+    border-color: var(--button);
+    background:
+      radial-gradient(circle at center, var(--button) 0 45%, transparent 47% 100%),
+      var(--surface);
+  }
+
+  .time-choice-button {
+    min-height: 4.5rem;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: map.get($request-space, "xs");
+    padding: map.get($request-space, "sm");
+    color: var(--ink);
+
+    strong,
+    span {
+      display: block;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    strong {
+      font-size: 0.98rem;
+      font-weight: 900;
+    }
+
+    span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    &:hover,
+    &:focus-visible {
+      border-color: rgba(31, 54, 88, 0.28);
+      transform: translateY(-0.08rem);
+    }
+
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+
+    &.is-selected {
+      border-color: var(--button);
+      background: var(--button);
+      color: var(--surface);
+
+      span {
+        color: rgba(255, 253, 247, 0.78);
+      }
+    }
+  }
+
+  .custom-time-panel {
+    padding-top: map.get($request-space, "xs");
+
+    &.is-collapsed {
+      display: none;
+    }
+
+    label {
+      display: grid;
+      gap: map.get($request-space, "xs");
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+  }
+
+  &__field {
+    width: 100%;
+    display: grid;
+    gap: map.get($request-space, "xs");
+
+    .form-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+  }
+
+  .form-control,
+  .form-select {
+    min-height: 2.875rem;
+    border: thin solid var(--line);
+    border-radius: $request-radius;
+    background-color: var(--surface-alt);
+    color: var(--ink);
+    font: inherit;
+  }
+
+  textarea.form-control {
+    min-height: 8rem;
+    resize: vertical;
+  }
+
+  &__actions {
+    .btn {
+      min-height: 2.75rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding-inline: map.get($request-space, "lg");
+      border-radius: $request-pill;
+      font-weight: 850;
+    }
+  }
+
+  @include request-up("md") {
+    &__section-heading {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+    }
+  }
+
+  @include request-up("lg") {
+    padding-block: map.get($request-space, "xl") map.get($request-space, "page");
+
+    &__heading-row {
+      grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.46fr);
+      padding: map.get($request-space, "xl");
+    }
+
+    &__heading h1 {
+      font-size: 3rem;
+    }
+  }
+}
+
+.medri-lead-confirmation {
+  &__hero,
+  &__summary,
+  &__progress,
+  &__properties,
+  &__support {
+    padding: map.get($request-space, "lg");
+    border: thin solid var(--line);
+    border-radius: $request-radius;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__hero {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: map.get($request-space, "md");
+    align-items: center;
+
+    span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: map.get($request-space, "xs") 0;
+      color: var(--button-strong);
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    p {
+      max-width: 44rem;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+  }
+
+  &__mark {
+    width: 4rem;
+    height: 4rem;
+    border-radius: $request-pill;
+    background: var(--button);
+  }
+
+  &__summary {
+    align-items: stretch;
+  }
+
+  
+  
+  &__summary-copy {
+    display: grid;
+    align-content: center;
+    gap: map.get($request-space, "sm");
+    padding: map.get($request-space, "lg");
+    border: thin solid color-mix(in oklch, var(--button), var(--surface) 82%);
+    border-radius: $request-radius;
+    background:
+      radial-gradient(circle at 0% 0%, color-mix(in oklch, var(--accent), transparent 84%), transparent 14rem),
+      linear-gradient(150deg, color-mix(in oklch, var(--button), var(--surface) 90%), var(--surface));
+
+    .tag {
+      width: fit-content;
+    }
+
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2 {
+      color: var(--button-strong);
+      font-size: 1.4rem;
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+  }
+
+  &__facts {
+    align-self: stretch;
+
+    article {
+      display: grid;
+      align-content: space-between;
+      gap: map.get($request-space, "sm");
+      min-height: 7rem;
+      padding: map.get($request-space, "md");
+      border: thin solid color-mix(in oklch, var(--button), var(--surface) 86%);
+      border-left: 0.2rem solid var(--accent);
+      border-radius: $request-radius;
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    span {
+      color: var(--button);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    strong {
+      color: var(--ink);
+      font-size: 1.1rem;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+  }
+
+  &__progress,
+  &__properties {
+    h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1.15;
+    }
+  }
+
+  &__timeline {
+    display: grid;
+    gap: map.get($request-space, "md");
+    margin: map.get($request-space, "md") 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: map.get($request-space, "md");
+      padding: map.get($request-space, "md");
+      border: thin solid var(--line);
+      border-radius: $request-radius;
+      background: var(--surface-alt);
+      color: var(--muted);
+    }
+
+    .timeline-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      display: grid;
+      place-items: center;
+      border: thin solid var(--line);
+      border-radius: $request-pill;
+      background: var(--surface);
+    }
+
+    .is-active {
+      border-color: rgba(33, 59, 95, 0.22);
+      background: rgba(33, 59, 95, 0.08);
+
+      .timeline-icon {
+        border-color: var(--button);
+        background: var(--button);
+      }
+    }
+
+    strong {
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    p {
+      margin: map.get($request-space, "xs") 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  }
+
+  &__section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: map.get($request-space, "sm");
+    margin-bottom: map.get($request-space, "md");
+
+    a {
+      color: var(--button);
+      font-weight: 900;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--button-strong);
+        text-decoration: underline;
+      }
+
+      &:focus-visible {
+        @include mixins.focus-ring;
+      }
+    }
+  }
+
+  &__property-card {
+    display: grid;
+    overflow: hidden;
+    border: thin solid var(--line);
+    border-radius: $request-radius;
+    background: var(--surface-alt);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+
+    &:hover,
+    &:focus-visible {
+      border-color: rgba(31, 54, 88, 0.28);
+      color: inherit;
+      text-decoration: none;
+      transform: translateY(-0.08rem);
+      box-shadow: $request-shadow;
+    }
+
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+  }
+
+  &__property-media {
+    aspect-ratio: 16 / 10;
+    display: block;
+    background-color: var(--surface-strong);
+    background-position: center;
+    background-size: cover;
+  }
+
+  &__property-copy {
+    display: grid;
+    gap: map.get($request-space, "xs");
+    padding: map.get($request-space, "md");
+
+    strong {
+      color: var(--button-strong);
+      font-size: 1.15rem;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    span:not(.tag) {
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    small {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .tag {
+      width: fit-content;
+    }
+  }
+
+  &__support {
+    display: grid;
+    gap: map.get($request-space, "md");
+
+    article {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: map.get($request-space, "sm");
+      align-items: center;
+      padding: map.get($request-space, "md");
+      border: thin solid var(--line);
+      border-radius: $request-radius;
+      background: var(--surface-alt);
+    }
+
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2,
+    strong {
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--button);
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: map.get($request-space, "sm");
+
+    .btn {
+      min-height: 2.75rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding-inline: map.get($request-space, "lg");
+      border-radius: $request-pill;
+      font-weight: 850;
+    }
+  }
+
+  @include request-up("lg") {
+    padding-block: map.get($request-space, "xl") map.get($request-space, "page");
+
+    &__timeline {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+
+      li {
+        grid-template-columns: minmax(0, 1fr);
+        align-content: start;
+        min-height: 13rem;
+      }
+    }
+
+    &__support {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    &__hero h1 {
+      font-size: 3rem;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+@media (max-width: 61.99rem) {
+  
+  
+  .visit-heading-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  
+  .medri-request-funnel__form.visit-shell,
+  .medri-lead-funnel__form {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  
+  .medri-request-funnel__heading-row,
+  .medri-lead-funnel__heading-row {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  
+  .medri-request-funnel__main {
+    order: 1;
+  }
+}

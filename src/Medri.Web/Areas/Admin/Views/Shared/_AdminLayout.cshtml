@@ -1,0 +1,66 @@
+@using Medri.Web.Areas.Admin
+@using Medri.Web.Infrastructure
+@{
+    var page = Model as IAdminPageViewModel;
+    if (page == null)
+    {
+        throw new InvalidOperationException("Le view Admin devono implementare IAdminPageViewModel.");
+    }
+
+    var title = ViewData["Title"] as string ?? "Area riservata";
+    var alerts = ViewData[Alerts.ALERTS_KEY] as AlertsDto;
+    string alertClass(AlertsDto.AlertLevelEnum level)
+    {
+        return level switch
+        {
+            AlertsDto.AlertLevelEnum.success => "alert-success",
+            AlertsDto.AlertLevelEnum.warning => "alert-warning",
+            AlertsDto.AlertLevelEnum.error => "alert-danger",
+            _ => "alert-info"
+        };
+    }
+}
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="/css/bundle-global.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/css/bundle-admin.css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/bundle-global.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/css/bundle-admin.min.css" asp-append-version="true" />
+    </environment>
+    @RenderSection("styles", required: false)
+</head>
+<body class="admin-body">
+    <main class="admin-shell">
+        <input class="admin-sidebar-state" type="checkbox" id="admin-sidebar-state" aria-label="Comprimi menu area riservata" />
+        <partial name="_AdminSidebar" model="page.Navigation" />
+        <section class="admin-workspace">
+            @if (alerts?.HasAlerts == true)
+            {
+                <div class="admin-alerts" role="status" aria-live="polite">
+                    @foreach (var alert in alerts.List)
+                    {
+                        <div class="alert @alertClass(alert.Level)" role="alert">
+                            @alert.Value
+                        </div>
+                    }
+                </div>
+            }
+            @RenderBody()
+        </section>
+    </main>
+    <environment include="Development">
+        <script src="/js/bundle-global.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/bundle-global.min.js" asp-append-version="true"></script>
+    </environment>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

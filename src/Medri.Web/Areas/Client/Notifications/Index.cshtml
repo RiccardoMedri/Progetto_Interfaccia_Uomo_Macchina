@@ -1,0 +1,79 @@
+@model Medri.Web.Areas.Client.Notifications.ClientNotificationsViewModel
+@{
+    ViewData["Title"] = "Area cliente - Notifiche";
+}
+
+<main id="contenuto" class="medri-client-area medri-client-area--notifications">
+    <div class="container-xxl medri-client-area__container">
+        <partial name="~/Areas/Client/Views/Shared/_ClientAreaHeader.cshtml" model="Model.Navigation" />
+
+        <section class="medri-client-content" aria-label="Preferenze aggiornamenti">
+            <section class="medri-client-notifications">
+                <div class="medri-client-section-heading">
+                    <span>Notifiche</span>
+                    <h2>Scegli cosa seguire e quando ricevere gli avvisi</h2>
+                </div>
+
+                @if (Model.HasPreferences)
+                {
+                    <div class="row g-3 g-lg-4 medri-client-notification-grid">
+                        @foreach (var preference in Model.Preferences)
+                        {
+                            <div class="col-12 col-md-6 col-xl-4">
+                                <form class="medri-client-notification-card"
+                                      asp-area="Client"
+                                      asp-controller="Notifications"
+                                      asp-action="Update"
+                                      method="post"
+                                      data-notification-preference-form>
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Category" value="@preference.Category" />
+
+                                    <div class="medri-client-notification-card__head">
+                                        <span>@preference.Label</span>
+                                        <h3>@preference.Title</h3>
+                                    </div>
+                                    <p>@preference.Description</p>
+
+                                    <fieldset class="medri-client-control-group">
+                                        <legend>Stato</legend>
+                                        <label>
+                                            <input type="checkbox" name="IsActive" value="true" checked="@preference.IsActive" data-notification-state-toggle />
+                                            <span data-notification-state-label>@(preference.IsActive ? "Attivo" : "Non attivo")</span>
+                                        </label>
+                                    </fieldset>
+
+                                    <fieldset class="medri-client-control-group @(!preference.IsActive ? "is-disabled" : null)" data-notification-frequency-group disabled="@(!preference.IsActive)">
+                                        <legend>Frequenza</legend>
+                                        <label>
+                                            <input type="checkbox" name="IsDaily" value="true" checked="@preference.IsDaily" />
+                                            <input type="hidden" name="IsDaily" value="false" />
+                                            <span>Giornaliero</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="IsWeekly" value="true" checked="@preference.IsWeekly" />
+                                            <input type="hidden" name="IsWeekly" value="false" />
+                                            <span>Settimanale</span>
+                                        </label>
+                                    </fieldset>
+
+                                    <button class="visually-hidden" type="submit">Salva preferenza</button>
+                                    <noscript>
+                                        <button class="btn btn-outline-secondary btn-sm" type="submit">Salva preferenza</button>
+                                    </noscript>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <section class="medri-client-empty-state" aria-label="Nessuna preferenza di notifica">
+                        <h2>Nessuna preferenza di notifica configurata</h2>
+                        <p>Le preferenze disponibili compariranno qui.</p>
+                    </section>
+                }
+            </section>
+        </section>
+    </div>
+</main>

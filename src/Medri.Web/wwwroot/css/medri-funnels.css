@@ -1,0 +1,1444 @@
+@charset "UTF-8";
+.visit-shell {
+  width: min(80rem, 100% - 2rem);
+  margin-inline: auto;
+}
+
+.visit-shell {
+  padding: 0.75rem;
+  border-radius: 2rem;
+  background: linear-gradient(145deg, rgba(33, 59, 95, 0.08), rgba(200, 164, 91, 0.12));
+  box-shadow: var(--ds-shadow-lg);
+}
+
+@media (min-width: 62rem) {
+  .visit-shell {
+    width: min(80rem, 100% - 5rem);
+  }
+}
+.medri-request-body,
+.medri-request-shell,
+.medri-lead-body,
+.medri-lead-shell {
+  background: var(--surface);
+}
+
+.medri-request-funnel {
+  color: var(--ink);
+  padding-block: 1.5rem 4.5rem;
+}
+.medri-request-funnel__shell {
+  display: grid;
+  gap: 1.5rem;
+}
+.medri-request-funnel__breadcrumb {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-start;
+  color: var(--muted);
+}
+.medri-request-funnel__breadcrumb .breadcrumb-item {
+  color: inherit;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.medri-request-funnel__breadcrumb .breadcrumb-item.active {
+  color: var(--ink);
+  font-weight: 800;
+}
+.medri-request-funnel__breadcrumb .breadcrumb-item:hover, .medri-request-funnel__breadcrumb .breadcrumb-item:focus-visible {
+  color: var(--button);
+}
+.medri-request-funnel__breadcrumb .breadcrumb-item:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+  border-radius: 999rem;
+}
+.medri-request-funnel__back {
+  width: fit-content;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 1rem;
+  border-radius: 999rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.medri-request-funnel__back::before {
+  content: "←";
+}
+.medri-request-funnel__back:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-request-funnel__form.visit-shell {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0.75rem;
+}
+.medri-request-funnel__main, .medri-request-funnel__aside {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 1.5rem;
+}
+.medri-request-funnel__heading-row {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 0;
+  padding: 1.5rem;
+  border: thin solid rgba(33, 59, 95, 0.08);
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, rgba(255, 253, 247, 0.98), rgba(241, 236, 227, 0.92));
+  box-shadow: inset 0 0 0 0.0625rem rgba(33, 59, 95, 0.08), 0 0.875rem 1.875rem rgba(33, 59, 95, 0.06);
+}
+.medri-request-funnel__heading {
+  display: grid;
+  gap: 0.75rem;
+}
+.medri-request-funnel__heading > span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-request-funnel__heading h1 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--button-strong);
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-wrap: balance;
+}
+.medri-request-funnel__heading p {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.medri-request-funnel__stepper {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 999rem;
+  background: rgba(33, 59, 95, 0.08);
+  list-style: none;
+}
+.medri-request-funnel__stepper li {
+  min-width: 0;
+  min-height: 3.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-inline: 1rem;
+  border-radius: 999rem;
+  color: var(--ds-muted);
+  font-size: 0.9rem;
+  font-weight: 850;
+  line-height: 1.15;
+  text-align: center;
+}
+.medri-request-funnel__stepper span {
+  width: 1.7rem;
+  height: 1.7rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 999rem;
+  background: rgba(33, 59, 95, 0.12);
+  color: var(--ds-blue-2);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+.medri-request-funnel__stepper .is-active,
+.medri-request-funnel__stepper .is-complete {
+  background: var(--ds-blue-2);
+  color: var(--surface);
+}
+.medri-request-funnel__stepper .is-active span,
+.medri-request-funnel__stepper .is-complete span {
+  background: var(--ds-gold);
+  color: var(--button-strong);
+}
+.medri-request-funnel__section {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.medri-request-funnel__section h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+.medri-request-funnel .choice-card,
+.medri-request-funnel .review-grid article,
+.medri-request-funnel .time-choice-button,
+.medri-request-funnel .visit-context-card,
+.medri-request-funnel .confirmation-hero,
+.medri-request-funnel .confirmation-property-summary,
+.medri-request-funnel .confirmation-progress-section,
+.medri-request-funnel .confirmation-similar-section,
+.medri-request-funnel .assistance-panel {
+  border-radius: 0.5rem;
+}
+.medri-request-funnel .choice-card,
+.medri-request-funnel .review-grid article,
+.medri-request-funnel .time-choice-button {
+  border: thin solid var(--line);
+  background: var(--surface-alt);
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.medri-request-funnel .choice-card {
+  min-height: 8.25rem;
+  padding: 1rem;
+  cursor: pointer;
+}
+.medri-request-funnel .choice-card:hover, .medri-request-funnel .choice-card:focus-within {
+  border-color: rgba(31, 54, 88, 0.28);
+  transform: translateY(-0.08rem);
+}
+.medri-request-funnel .choice-card.is-selected {
+  border-color: var(--button);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 0.0625rem var(--button);
+}
+.medri-request-funnel .choice-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+.medri-request-funnel .choice-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+.medri-request-funnel .contact-option-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding-right: 3.25rem;
+}
+.medri-request-funnel .contact-option-icon {
+  width: 2.625rem;
+  height: 2.625rem;
+  display: block;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+.medri-request-funnel .selection-dot {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  display: block;
+  border: 0.125rem solid #8f9499;
+  border-radius: 999rem;
+  background: var(--surface);
+}
+.medri-request-funnel .contact-option-card.is-selected .selection-dot {
+  border-color: var(--button);
+  background: radial-gradient(circle at center, var(--button) 0 45%, transparent 47% 100%), var(--surface);
+}
+.medri-request-funnel .time-choice-button {
+  min-height: 4.5rem;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  color: var(--ink);
+}
+.medri-request-funnel .time-choice-button strong,
+.medri-request-funnel .time-choice-button span {
+  display: block;
+  margin: 0;
+  line-height: 1.2;
+}
+.medri-request-funnel .time-choice-button strong {
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+.medri-request-funnel .time-choice-button span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+.medri-request-funnel .time-choice-button:hover, .medri-request-funnel .time-choice-button:focus-visible {
+  border-color: rgba(31, 54, 88, 0.28);
+  transform: translateY(-0.08rem);
+}
+.medri-request-funnel .time-choice-button:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-request-funnel .time-choice-button.is-selected {
+  border-color: var(--button);
+  background: var(--button);
+  color: var(--surface);
+}
+.medri-request-funnel .time-choice-button.is-selected span {
+  color: rgba(255, 253, 247, 0.78);
+}
+.medri-request-funnel .custom-time-panel {
+  padding-top: 0.5rem;
+}
+.medri-request-funnel .custom-time-panel.is-collapsed {
+  display: none;
+}
+.medri-request-funnel .custom-time-panel label {
+  display: grid;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-request-funnel .custom-time-panel input {
+  min-height: 2.75rem;
+  border: thin solid var(--line);
+  background: var(--surface-alt);
+  color: var(--ink);
+  font: inherit;
+}
+.medri-request-funnel .review-grid article {
+  height: 100%;
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+.medri-request-funnel .review-grid article span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-request-funnel .review-grid article strong {
+  color: var(--ink);
+  font-size: 1.02rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.medri-request-funnel .review-grid article p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.medri-request-funnel .visit-context-card {
+  display: grid;
+  grid-template-columns: minmax(6rem, 34%) minmax(0, 1fr);
+  gap: 1rem;
+  align-content: start;
+  padding: 1rem;
+  border: thin solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 253, 247, 0.96), rgba(240, 226, 197, 0.58));
+  color: inherit;
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+.medri-request-funnel .visit-context-card:hover, .medri-request-funnel .visit-context-card:focus-visible {
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-0.08rem);
+  box-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
+}
+.medri-request-funnel .visit-context-card:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-request-funnel .visit-context-card .tag {
+  width: fit-content;
+  max-width: 100%;
+  display: inline-flex;
+  justify-self: start;
+  margin: 0;
+}
+.medri-request-funnel .visit-property-media {
+  position: relative;
+  overflow: hidden;
+  min-height: 7rem;
+  display: block;
+  border-radius: 0.5rem;
+  background-color: var(--surface-strong);
+}
+.medri-request-funnel .visit-property-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(23, 40, 64, 0.36), transparent 58%);
+  pointer-events: none;
+}
+.medri-request-funnel .visit-property-media-image {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  display: block;
+  object-fit: cover;
+}
+.medri-request-funnel .visit-property-copy,
+.medri-request-funnel .visit-property-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.medri-request-funnel .visit-property-copy {
+  min-width: 0;
+  align-content: start;
+}
+.medri-request-funnel .visit-property-copy > strong,
+.medri-request-funnel .visit-property-title,
+.medri-request-funnel .visit-property-location,
+.medri-request-funnel .visit-context-link {
+  width: 100%;
+}
+.medri-request-funnel .visit-property-copy > strong {
+  color: var(--button-strong);
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+.medri-request-funnel .visit-property-title {
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 900;
+  line-height: 1.18;
+  text-wrap: balance;
+}
+.medri-request-funnel .visit-property-location {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+.medri-request-funnel .visit-property-facts span {
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0.75rem;
+  border: thin solid var(--line);
+  border-radius: 999rem;
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+.medri-request-funnel .visit-context-link {
+  color: var(--button);
+  font-weight: 900;
+}
+.medri-request-funnel__actions .btn {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1.5rem;
+  border-radius: 999rem;
+  font-weight: 850;
+}
+.medri-request-funnel__confirmation-hero,
+.medri-request-funnel .confirmation-property-summary,
+.medri-request-funnel .confirmation-progress-section,
+.medri-request-funnel .confirmation-similar-section,
+.medri-request-funnel .assistance-panel {
+  padding: 1.5rem;
+  border: thin solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.medri-request-funnel__confirmation-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+.medri-request-funnel__confirmation-hero h1 {
+  margin: 0 0 0.5rem;
+  color: var(--button-strong);
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-wrap: balance;
+}
+.medri-request-funnel__confirmation-hero p {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.medri-request-funnel__confirmation-hero span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-request-funnel .confirmation-mark {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 999rem;
+  background: var(--button);
+}
+.medri-request-funnel .confirmation-property-summary {
+  display: grid;
+  gap: 1rem;
+}
+.medri-request-funnel .confirmation-property-media {
+  position: relative;
+  overflow: hidden;
+  min-height: 12rem;
+  border-radius: 0.5rem;
+  background: var(--surface-strong);
+}
+.medri-request-funnel .confirmation-property-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(23, 40, 64, 0.38), transparent 60%);
+  pointer-events: none;
+}
+.medri-request-funnel .confirmation-property-media-image {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  display: block;
+  object-fit: cover;
+}
+.medri-request-funnel .confirmation-property-copy {
+  display: grid;
+  gap: 0.5rem;
+  align-content: center;
+}
+.medri-request-funnel .confirmation-property-copy .tag {
+  width: fit-content;
+}
+.medri-request-funnel .confirmation-property-copy strong {
+  color: var(--button-strong);
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1.05;
+}
+.medri-request-funnel .confirmation-property-copy h2,
+.medri-request-funnel .confirmation-property-copy p {
+  margin: 0;
+}
+.medri-request-funnel .confirmation-property-copy h2 {
+  color: var(--ink);
+  font-size: 1.3rem;
+  font-weight: 900;
+  line-height: 1.12;
+}
+.medri-request-funnel .confirmation-property-copy p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+.medri-request-funnel .confirmation-kicker {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-request-funnel .confirmation-property-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.medri-request-funnel .confirmation-property-facts span {
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0.75rem;
+  border: thin solid var(--line);
+  border-radius: 999rem;
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+.medri-request-funnel .confirmation-progress-section h2,
+.medri-request-funnel .confirmation-similar-section h2 {
+  margin: 0 0 1rem;
+  color: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+.medri-request-funnel .post-send-timeline {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.medri-request-funnel .post-send-timeline li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  color: var(--muted);
+}
+.medri-request-funnel .post-send-timeline .timeline-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border: thin solid var(--line);
+  border-radius: 999rem;
+  background: var(--surface-alt);
+}
+.medri-request-funnel .post-send-timeline .is-active .timeline-icon {
+  border-color: var(--button);
+  background: var(--button);
+}
+.medri-request-funnel .post-send-timeline strong {
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.25;
+}
+.medri-request-funnel .post-send-timeline p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.medri-request-funnel .section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.medri-request-funnel .section-heading h2 {
+  margin: 0;
+}
+.medri-request-funnel .section-heading a {
+  color: var(--button);
+  font-weight: 900;
+  text-decoration: none;
+}
+.medri-request-funnel .section-heading a:hover, .medri-request-funnel .section-heading a:focus-visible {
+  color: var(--button-strong);
+  text-decoration: underline;
+}
+.medri-request-funnel .section-heading a:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-request-funnel .confirmation-similar-grid .search-card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.medri-request-funnel .confirmation-similar-grid .search-card-media {
+  position: relative;
+  overflow: hidden;
+  min-height: 10rem;
+}
+.medri-request-funnel .confirmation-similar-grid .search-card-media-image {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  display: block;
+  object-fit: cover;
+}
+.medri-request-funnel .confirmation-similar-grid .search-card-body {
+  display: grid;
+  gap: 0.5rem;
+}
+.medri-request-funnel .assistance-panel {
+  display: grid;
+  gap: 1rem;
+}
+.medri-request-funnel .assistance-panel article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1rem;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface-alt);
+}
+.medri-request-funnel .assistance-panel h2,
+.medri-request-funnel .assistance-panel p {
+  margin: 0;
+}
+.medri-request-funnel .assistance-panel h2,
+.medri-request-funnel .assistance-panel strong {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+.medri-request-funnel .assistance-panel p {
+  color: var(--muted);
+  line-height: 1.4;
+}
+.medri-request-funnel .assistance-panel a {
+  color: inherit;
+  text-decoration: none;
+}
+.medri-request-funnel .assistance-panel a:hover, .medri-request-funnel .assistance-panel a:focus-visible {
+  color: var(--button);
+  text-decoration: underline;
+}
+@media (min-width: 62rem) {
+  .medri-request-funnel {
+    padding-block: 2rem 4.5rem;
+  }
+  .medri-request-funnel__heading-row {
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.46fr);
+    padding: 2rem;
+  }
+  .medri-request-funnel__heading h1 {
+    font-size: 3rem;
+  }
+  .medri-request-funnel .confirmation-property-summary {
+    justify-self: start;
+    width: fit-content;
+    max-width: 100%;
+    grid-template-columns: 14rem auto;
+    align-items: center;
+  }
+  .medri-request-funnel .confirmation-property-media {
+    align-self: stretch;
+  }
+  .medri-request-funnel .assistance-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 62rem) {
+  .medri-request-funnel .visit-context-card {
+    position: sticky;
+    top: 6.5rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .medri-request-funnel .visit-property-media {
+    min-height: 12rem;
+  }
+}
+
+.medri-lead-funnel,
+.medri-lead-confirmation {
+  color: var(--ink);
+  padding-block: 1.5rem 4.5rem;
+}
+.medri-lead-funnel__shell,
+.medri-lead-confirmation__shell {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.medri-lead-funnel__breadcrumb {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-start;
+  color: var(--muted);
+}
+.medri-lead-funnel__breadcrumb .breadcrumb-item {
+  color: inherit;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.medri-lead-funnel__breadcrumb .breadcrumb-item.active {
+  color: var(--ink);
+  font-weight: 850;
+}
+.medri-lead-funnel__breadcrumb .breadcrumb-item:hover, .medri-lead-funnel__breadcrumb .breadcrumb-item:focus-visible {
+  color: var(--button);
+}
+.medri-lead-funnel__breadcrumb .breadcrumb-item:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+  border-radius: 999rem;
+}
+.medri-lead-funnel__back {
+  width: fit-content;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 1rem;
+  border-radius: 999rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+.medri-lead-funnel__back::before {
+  content: "←";
+}
+.medri-lead-funnel__back:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-lead-funnel__form {
+  margin: 0;
+  padding: 0.75rem;
+  border: thin solid rgba(33, 59, 95, 0.08);
+  border-radius: 0.5rem;
+  background: linear-gradient(145deg, rgba(33, 59, 95, 0.07), rgba(200, 164, 91, 0.1));
+  box-shadow: var(--shadow-md);
+}
+.medri-lead-funnel__main {
+  min-width: 0;
+  display: grid;
+  gap: 1.5rem;
+}
+.medri-lead-funnel__heading-row {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 0;
+  padding: 1.5rem;
+  border: thin solid rgba(33, 59, 95, 0.08);
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, rgba(255, 253, 247, 0.98), rgba(241, 236, 227, 0.92));
+  box-shadow: inset 0 0 0 0.0625rem rgba(33, 59, 95, 0.08), 0 0.875rem 1.875rem rgba(33, 59, 95, 0.06);
+}
+.medri-lead-funnel__heading {
+  display: grid;
+  gap: 0.75rem;
+}
+.medri-lead-funnel__heading > span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-lead-funnel__heading h1 {
+  max-width: 15ch;
+  margin: 0;
+  color: var(--button-strong);
+  font-size: 2.1rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-wrap: balance;
+}
+.medri-lead-funnel__heading p {
+  max-width: 54ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.medri-lead-funnel__stepper {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 999rem;
+  background: rgba(33, 59, 95, 0.08);
+  list-style: none;
+}
+.medri-lead-funnel__stepper li {
+  min-height: 3.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-inline: 1rem;
+  border-radius: 999rem;
+  color: var(--ds-muted);
+  font-size: 0.9rem;
+  font-weight: 850;
+  line-height: 1.15;
+  text-align: center;
+}
+.medri-lead-funnel__stepper span {
+  width: 1.7rem;
+  height: 1.7rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 999rem;
+  background: rgba(33, 59, 95, 0.12);
+  color: var(--ds-blue-2);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+.medri-lead-funnel__stepper .is-active {
+  background: var(--ds-blue-2);
+  color: var(--surface);
+}
+.medri-lead-funnel__stepper .is-active span {
+  background: var(--ds-gold);
+  color: var(--button-strong);
+}
+.medri-lead-funnel__section {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.medri-lead-funnel__section h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.3rem;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+.medri-lead-funnel__section-heading {
+  display: grid;
+  gap: 1rem;
+}
+.medri-lead-funnel__section-heading h2,
+.medri-lead-funnel__section-heading p {
+  margin: 0;
+}
+.medri-lead-funnel__section-heading p {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.medri-lead-funnel .selected-intent-pill {
+  width: fit-content;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 0.75rem;
+  border: thin solid var(--line);
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-lead-funnel .choice-card,
+.medri-lead-funnel .time-choice-button {
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface-alt);
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.medri-lead-funnel .choice-card {
+  min-height: 8.25rem;
+  padding: 1rem;
+  cursor: pointer;
+}
+.medri-lead-funnel .choice-card:hover, .medri-lead-funnel .choice-card:focus-within {
+  border-color: rgba(31, 54, 88, 0.28);
+  transform: translateY(-0.08rem);
+}
+.medri-lead-funnel .choice-card.is-selected {
+  border-color: var(--button);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 0.0625rem var(--button);
+}
+.medri-lead-funnel .choice-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+.medri-lead-funnel .choice-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+.medri-lead-funnel .contact-option-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding-right: 3.25rem;
+}
+.medri-lead-funnel .contact-option-icon {
+  width: 2.625rem;
+  height: 2.625rem;
+  display: block;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+.medri-lead-funnel .selection-dot {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  display: block;
+  border: 0.125rem solid #8f9499;
+  border-radius: 999rem;
+  background: var(--surface);
+}
+.medri-lead-funnel .contact-option-card.is-selected .selection-dot {
+  border-color: var(--button);
+  background: radial-gradient(circle at center, var(--button) 0 45%, transparent 47% 100%), var(--surface);
+}
+.medri-lead-funnel .time-choice-button {
+  min-height: 4.5rem;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  color: var(--ink);
+}
+.medri-lead-funnel .time-choice-button strong,
+.medri-lead-funnel .time-choice-button span {
+  display: block;
+  margin: 0;
+  line-height: 1.2;
+}
+.medri-lead-funnel .time-choice-button strong {
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+.medri-lead-funnel .time-choice-button span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+.medri-lead-funnel .time-choice-button:hover, .medri-lead-funnel .time-choice-button:focus-visible {
+  border-color: rgba(31, 54, 88, 0.28);
+  transform: translateY(-0.08rem);
+}
+.medri-lead-funnel .time-choice-button:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-lead-funnel .time-choice-button.is-selected {
+  border-color: var(--button);
+  background: var(--button);
+  color: var(--surface);
+}
+.medri-lead-funnel .time-choice-button.is-selected span {
+  color: rgba(255, 253, 247, 0.78);
+}
+.medri-lead-funnel .custom-time-panel {
+  padding-top: 0.5rem;
+}
+.medri-lead-funnel .custom-time-panel.is-collapsed {
+  display: none;
+}
+.medri-lead-funnel .custom-time-panel label {
+  display: grid;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-lead-funnel__field {
+  width: 100%;
+  display: grid;
+  gap: 0.5rem;
+}
+.medri-lead-funnel__field .form-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-lead-funnel .form-control,
+.medri-lead-funnel .form-select {
+  min-height: 2.875rem;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background-color: var(--surface-alt);
+  color: var(--ink);
+  font: inherit;
+}
+.medri-lead-funnel textarea.form-control {
+  min-height: 8rem;
+  resize: vertical;
+}
+.medri-lead-funnel__actions .btn {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1.5rem;
+  border-radius: 999rem;
+  font-weight: 850;
+}
+@media (min-width: 48rem) {
+  .medri-lead-funnel__section-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+}
+@media (min-width: 62rem) {
+  .medri-lead-funnel {
+    padding-block: 2rem 4.5rem;
+  }
+  .medri-lead-funnel__heading-row {
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.46fr);
+    padding: 2rem;
+  }
+  .medri-lead-funnel__heading h1 {
+    font-size: 3rem;
+  }
+}
+
+.medri-lead-confirmation__hero, .medri-lead-confirmation__summary, .medri-lead-confirmation__progress, .medri-lead-confirmation__properties, .medri-lead-confirmation__support {
+  padding: 1.5rem;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.medri-lead-confirmation__hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+.medri-lead-confirmation__hero span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.medri-lead-confirmation__hero h1 {
+  margin: 0.5rem 0;
+  color: var(--button-strong);
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-wrap: balance;
+}
+.medri-lead-confirmation__hero p {
+  max-width: 44rem;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.medri-lead-confirmation__mark {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 999rem;
+  background: var(--button);
+}
+.medri-lead-confirmation__summary {
+  align-items: stretch;
+}
+.medri-lead-confirmation__summary-copy {
+  display: grid;
+  align-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: thin solid color-mix(in oklch, var(--button), var(--surface) 82%);
+  border-radius: 0.5rem;
+  background: radial-gradient(circle at 0% 0%, color-mix(in oklch, var(--accent), transparent 84%), transparent 14rem), linear-gradient(150deg, color-mix(in oklch, var(--button), var(--surface) 90%), var(--surface));
+}
+.medri-lead-confirmation__summary-copy .tag {
+  width: fit-content;
+}
+.medri-lead-confirmation__summary-copy h2,
+.medri-lead-confirmation__summary-copy p {
+  margin: 0;
+}
+.medri-lead-confirmation__summary-copy h2 {
+  color: var(--button-strong);
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+.medri-lead-confirmation__summary-copy p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+.medri-lead-confirmation__facts {
+  align-self: stretch;
+}
+.medri-lead-confirmation__facts article {
+  display: grid;
+  align-content: space-between;
+  gap: 0.75rem;
+  min-height: 7rem;
+  padding: 1rem;
+  border: thin solid color-mix(in oklch, var(--button), var(--surface) 86%);
+  border-left: 0.2rem solid var(--accent);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.medri-lead-confirmation__facts span {
+  color: var(--button);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.medri-lead-confirmation__facts strong {
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+.medri-lead-confirmation__progress h2, .medri-lead-confirmation__properties h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+.medri-lead-confirmation__timeline {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.medri-lead-confirmation__timeline li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface-alt);
+  color: var(--muted);
+}
+.medri-lead-confirmation__timeline .timeline-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border: thin solid var(--line);
+  border-radius: 999rem;
+  background: var(--surface);
+}
+.medri-lead-confirmation__timeline .is-active {
+  border-color: rgba(33, 59, 95, 0.22);
+  background: rgba(33, 59, 95, 0.08);
+}
+.medri-lead-confirmation__timeline .is-active .timeline-icon {
+  border-color: var(--button);
+  background: var(--button);
+}
+.medri-lead-confirmation__timeline strong {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+.medri-lead-confirmation__timeline p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.medri-lead-confirmation__section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.medri-lead-confirmation__section-heading a {
+  color: var(--button);
+  font-weight: 900;
+  text-decoration: none;
+}
+.medri-lead-confirmation__section-heading a:hover, .medri-lead-confirmation__section-heading a:focus-visible {
+  color: var(--button-strong);
+  text-decoration: underline;
+}
+.medri-lead-confirmation__section-heading a:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-lead-confirmation__property-card {
+  display: grid;
+  overflow: hidden;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface-alt);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.medri-lead-confirmation__property-card:hover, .medri-lead-confirmation__property-card:focus-visible {
+  border-color: rgba(31, 54, 88, 0.28);
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-0.08rem);
+  box-shadow: 0 1rem 2.5rem rgba(37, 63, 99, 0.1);
+}
+.medri-lead-confirmation__property-card:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(42, 66, 102, 0.2);
+}
+.medri-lead-confirmation__property-media {
+  aspect-ratio: 16/10;
+  display: block;
+  background-color: var(--surface-strong);
+  background-position: center;
+  background-size: cover;
+}
+.medri-lead-confirmation__property-copy {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+.medri-lead-confirmation__property-copy strong {
+  color: var(--button-strong);
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+.medri-lead-confirmation__property-copy span:not(.tag) {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+.medri-lead-confirmation__property-copy small {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+.medri-lead-confirmation__property-copy .tag {
+  width: fit-content;
+}
+.medri-lead-confirmation__support {
+  display: grid;
+  gap: 1rem;
+}
+.medri-lead-confirmation__support article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1rem;
+  border: thin solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface-alt);
+}
+.medri-lead-confirmation__support h2,
+.medri-lead-confirmation__support p {
+  margin: 0;
+}
+.medri-lead-confirmation__support h2,
+.medri-lead-confirmation__support strong {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+.medri-lead-confirmation__support p {
+  color: var(--muted);
+  line-height: 1.4;
+}
+.medri-lead-confirmation__support a {
+  color: inherit;
+  text-decoration: none;
+}
+.medri-lead-confirmation__support a:hover, .medri-lead-confirmation__support a:focus-visible {
+  color: var(--button);
+  text-decoration: underline;
+}
+.medri-lead-confirmation__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+.medri-lead-confirmation__actions .btn {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1.5rem;
+  border-radius: 999rem;
+  font-weight: 850;
+}
+@media (min-width: 62rem) {
+  .medri-lead-confirmation {
+    padding-block: 2rem 4.5rem;
+  }
+  .medri-lead-confirmation__timeline {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .medri-lead-confirmation__timeline li {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    min-height: 13rem;
+  }
+  .medri-lead-confirmation__support {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .medri-lead-confirmation__hero h1 {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 61.99rem) {
+  .visit-heading-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .medri-request-funnel__form.visit-shell,
+  .medri-lead-funnel__form {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .medri-request-funnel__heading-row,
+  .medri-lead-funnel__heading-row {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .medri-request-funnel__main {
+    order: 1;
+  }
+}

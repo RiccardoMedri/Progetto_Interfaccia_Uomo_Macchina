@@ -1,0 +1,212 @@
+@model Medri.Web.Features.Property.PropertyDetailViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "detail";
+    ViewData["Title"] = $"{Model.Title} - Agenzia Immobiliare Medri";
+    ViewData["BodyClass"] = "medri-detail-body";
+    ViewData["MedriShellClass"] = "medri-public-shell medri-detail-shell";
+    ViewData["NavSection"] = Model.Tag == "Affitto" ? "Rent" : "Buy";
+
+    var favoriteAction = Model.IsSaved ? "/preferiti/rimuovi" : "/preferiti/aggiungi";
+    var favoriteReturnUrl = Context.Request.Path.Value + Context.Request.QueryString.Value;
+    var galleryItems = Model.Media;
+}
+
+<div class="medri-property-detail">
+    <nav class="detail-breadcrumb breadcrumb" aria-label="Percorso">
+        <a class="breadcrumb-item" href="/">Home</a>
+        <a class="breadcrumb-item" href="/immobili">Immobili</a>
+        <span class="breadcrumb-item active" aria-current="page">@Model.Title</span>
+    </nav>
+
+    <main id="contenuto" class="property-detail-page" aria-label="Dettaglio immobile">
+        <div class="container-xxl">
+            <a class="back-to-search btn btn-link" href="@Model.SearchReturnUrl" aria-label="Torna alla ricerca" title="Torna alla ricerca"></a>
+            @if (Model.HasMedia)
+            {
+                <section class="detail-gallery-section" aria-label="Gallery immobile">
+                    <div class="detail-gallery-grid">
+                        @for (var index = 0; index < galleryItems.Count && index < 4; index++)
+                        {
+                            var media = galleryItems[index];
+                            <button class="detail-gallery-tile @(index == 0 ? "detail-gallery-main" : "detail-gallery-thumb") btn" type="button" data-bs-toggle="modal" data-bs-target="#galleryModal" aria-label="Apri @media.AltText">
+                                <img class="detail-gallery-image" src="@media.Url" alt="" loading="@(index == 0 ? "eager" : "lazy")" decoding="async" fetchpriority="@(index == 0 ? "high" : "auto")" />
+                                <span>@media.Label</span>
+                            </button>
+                        }
+                        <button class="detail-gallery-open-button btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#galleryModal">Vedi tutte le foto</button>
+                    </div>
+                </section>
+            }
+
+            <section class="detail-decision-section row g-3 align-items-stretch" aria-label="Sintesi decisionale annuncio">
+                <div class="col-12 col-xl-7">
+                    <section class="property-title-band h-100">
+                        <div class="detail-status-row">
+                            <span class="tag badge text-bg-light">@Model.Tag</span>
+                            <form action="@favoriteAction" method="post" data-favorite-form data-property-id="@Model.Id">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="propertyId" value="@Model.Id" />
+                                <input type="hidden" name="returnUrl" value="@favoriteReturnUrl" />
+                                <button class="save-ad-button detail-save-button @(Model.IsSaved ? "is-selected" : null) btn btn-sm btn-outline-secondary" type="submit" aria-label="@(Model.IsSaved ? $"Rimuovi {Model.Title} dai preferiti" : $"Salva {Model.Title} nei preferiti")" aria-pressed="@(Model.IsSaved ? "true" : "false")" data-favorite-button data-property-id="@Model.Id" data-property-title="@Model.Title"></button>
+                            </form>
+                        </div>
+                        <strong class="detail-price title-band-price">@Model.PriceLabel</strong>
+                        <p class="detail-location">@Model.Address</p>
+                        <nav class="detail-inline-actions" aria-label="Azioni rapide annuncio">
+                            <a class="detail-map-link btn btn-outline-secondary" href="@Model.MapUrl">Apri mappa</a>
+                            <a class="detail-contact-link btn btn-primary" href="#detail-contact">Contattaci</a>
+                        </nav>
+                    </section>
+                </div>
+
+                <div class="col-12 col-xl-5">
+                    <section class="detail-map-section compact-map-section h-100" aria-label="Posizione sintetica">
+                        <a class="compact-map-button btn btn-outline-secondary" href="@Model.MapUrl">Apri mappa</a>
+                        <a class="detail-address-map" href="@Model.MapUrl" aria-label="Apri la posizione di @Model.Title sulla mappa"></a>
+                    </section>
+                </div>
+            </section>
+
+            <section class="quick-facts row row-cols-2 row-cols-md-3 row-cols-xl-6 g-2" aria-label="Informazioni principali">
+                <div class="col"><article><span>Locali</span><strong>@Model.RoomsLabel</strong></article></div>
+                <div class="col"><article><span>Superficie</span><strong>@Model.SurfaceLabel</strong></article></div>
+                <div class="col"><article><span>Stato</span><strong>@Model.StatusLabel</strong></article></div>
+                <div class="col"><article><span>Spazi esterni</span><strong>@Model.OutdoorSpaceLabel</strong></article></div>
+                <div class="col"><article><span>Classe energetica</span><strong>@Model.EnergyClass</strong></article></div>
+                <div class="col"><article><span>Disponibilita</span><strong>@Model.AvailabilityLabel</strong></article></div>
+            </section>
+
+            <div class="detail-content-grid row g-4 align-items-start">
+                <div class="detail-main-column col-12 col-xl-8">
+                    <section class="detail-section detail-summary-section">
+                        <h1>@Model.SummaryTitle</h1>
+                        <p>@Model.SummaryParagraph1</p>
+                        <p>@Model.SummaryParagraph2</p>
+                    </section>
+
+                    <section class="detail-section">
+                        <h2>Da sapere subito</h2>
+                        <div class="know-grid row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
+                            <div class="col"><article><span>Prontezza d'uso</span><p>@Model.ReadinessNote</p></article></div>
+                            <div class="col"><article><span>Costi prevedibili</span><p>@Model.CostsNote</p></article></div>
+                            <div class="col"><article><span>Contesto</span><p>@Model.ContextNote</p></article></div>
+                            <div class="col"><article><span>Margine decisionale</span><p>@Model.DecisionMarginNote</p></article></div>
+                        </div>
+                    </section>
+
+                    <section class="detail-section technical-details-section">
+                        <h2>Caratteristiche e dati tecnici</h2>
+                        <div class="accordion" id="technicalDetailsAccordion">
+                            @foreach (var tech in Model.TechnicalSections)
+                            {
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header">
+                                        <button class="accordion-button @(tech.IsExpanded ? null : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#@tech.Id" aria-expanded="@(tech.IsExpanded ? "true" : "false")" aria-controls="@tech.Id">@tech.Title</button>
+                                    </h3>
+                                    <div id="@tech.Id" class="accordion-collapse collapse @(tech.IsExpanded ? "show" : null)">
+                                        <div class="accordion-body">
+                                            <div class="technical-grid row row-cols-1 row-cols-md-3 g-3">
+                                                @foreach (var fact in tech.Items)
+                                                {
+                                                    <div class="col"><article><span>@fact.Label</span><strong>@fact.Value</strong></article></div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </section>
+
+                    <section class="detail-section human-fit-section">
+                        <h2>Potrebbe essere adatta se...</h2>
+                        <p>@Model.HumanFitNote</p>
+                    </section>
+                </div>
+
+                <aside class="detail-side-column col-12 col-xl-4">
+                    <section class="side-card contact-card decision-summary-card" id="detail-contact">
+                        @if (Model.HasAdvisor)
+                        {
+                            <div class="mobile-agent-strip" aria-label="Referente annuncio"><span aria-hidden="true"></span><div><strong>@Model.AdvisorDisplayName</strong><p>@Model.AdvisorRole</p></div></div>
+                        }
+                        <h2>Ti interessa questo immobile?</h2>
+                        <p class="contact-note">Lascia i dati essenziali: un agente ti ricontatta prima di proporre visite o appuntamenti.</p>
+                        <form method="post" action="@Model.RequestInfoUrl/inizia">
+                            @Html.AntiForgeryToken()
+                            <div class="detail-contact-form" aria-label="Richiesta informazioni">
+                                <label><span class="form-label">Nome e cognome</span><input class="form-control" name="FullName" type="text" autocomplete="name" required /></label>
+                                <label><span class="form-label">Telefono</span><input class="form-control" name="Phone" type="tel" autocomplete="tel" required /></label>
+                                <label><span class="form-label">Email</span><input class="form-control" name="Email" type="email" autocomplete="email" required /></label>
+                                <label><span class="form-label">Messaggio</span><textarea class="form-control" name="Message"></textarea></label>
+                            </div>
+                            <div class="decision-actions side-decision-actions">
+                                <button class="primary-cta btn btn-primary" type="submit">Richiedi informazioni</button>
+                                @if (Model.HasAgencyPhone)
+                                {
+                                    <a class="secondary-cta btn btn-outline-secondary" href="@Model.AgencyPhoneHref">Chiama ora</a>
+                                }
+                            </div>
+                        </form>
+                    </section>
+                </aside>
+            </div>
+
+            <section class="detail-section similar-properties-section">
+                <div class="section-heading">
+                    <div>
+                        <h2>Immobili Simili</h2>
+                        <p>Soluzioni vicine per prezzo, spazi e contesto.</p>
+                    </div>
+                    <a href="/immobili">Vedi altri</a>
+                </div>
+                <div class="similar-properties-grid row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+                    @foreach (var property in Model.SimilarProperties)
+                    {
+                        <div class="col">
+                            <a class="detail-similar-card" href="@property.DetailUrl">
+                                <div class="detail-similar-media" style="background-image: url('@property.ImageUrl')"></div>
+                                <div class="detail-similar-body">
+                                    <span class="tag badge text-bg-light">@property.Tag</span>
+                                    <strong>@property.PriceLabel</strong>
+                                    <h3>@property.Title</h3>
+                                    <p>@property.DisplayLocation</p>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+    </main>
+
+    @if (Model.HasMedia)
+    {
+        <div class="modal fade gallery-modal" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="galleryModalLabel">Gallery immobile</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="detailGalleryCarousel" class="carousel slide h-100" data-bs-ride="false">
+                            <div class="carousel-inner h-100">
+                                @for (var index = 0; index < galleryItems.Count; index++)
+                                {
+                                    var media = galleryItems[index];
+                                    <div class="carousel-item @(index == 0 ? "active" : null) h-100">
+                                        <img class="gallery-carousel-image" src="@media.Url" alt="@media.AltText" loading="lazy" decoding="async" />
+                                    </div>
+                                }
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#detailGalleryCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Precedente</span></button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#detailGalleryCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Successiva</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

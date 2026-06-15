@@ -1,0 +1,86 @@
+@model Medri.Web.Areas.Admin.Properties.AdminPropertyPreviewViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = $"{Model.Reference} - Anteprima immobile - Area riservata Medri";
+}
+
+<div class="container-fluid px-0">
+    <section class="admin-page-heading property-editor-heading card">
+        <div class="row g-3 align-items-center">
+            <div class="col-12 col-md-7">
+                <span class="lead-detail-reference">@Model.Reference - Anteprima annuncio</span>
+                <h1>@Model.Title</h1>
+            </div>
+            <div class="col-12 col-md-5">
+                <div class="property-editor-actions d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                    <a class="btn btn-primary" asp-area="Admin" asp-controller="Properties" asp-action="Edit" asp-route-reference="@Model.Reference">
+                        <i class="ph ph-pencil-simple" aria-hidden="true"></i>
+                        <span>Modifica dati</span>
+                    </a>
+                    <form class="property-inline-form" asp-area="Admin" asp-controller="Properties" asp-action="Publish" asp-route-reference="@Model.Reference" method="post">
+                        @Html.AntiForgeryToken()
+                        <button class="btn admin-btn-save w-100" type="submit">
+                            <i class="ph ph-upload-simple" aria-hidden="true"></i>
+                            <span>Pubblica</span>
+                        </button>
+                    </form>
+                    <a class="admin-public-site-link btn" href="/">Sito pubblico</a>
+                </div>
+            </div>
+        </div>
+        <div class="property-editor-progress mt-3">
+            <div class="d-flex justify-content-between gap-3">
+                <span>Completezza scheda</span>
+                <strong>@Model.CompletionPercent%</strong>
+            </div>
+            <div class="progress" role="progressbar" aria-valuenow="@Model.CompletionPercent" aria-valuemin="0" aria-valuemax="100">
+                <i class="progress-bar" style="width: @Model.CompletionPercent%"></i>
+            </div>
+        </div>
+    </section>
+
+    <nav class="property-view-switcher nav nav-pills mb-3" aria-label="Vista scheda immobile">
+        <a class="nav-link" asp-area="Admin" asp-controller="Properties" asp-action="Edit" asp-route-reference="@Model.Reference">Dati</a>
+        <a class="nav-link active" asp-area="Admin" asp-controller="Properties" asp-action="Preview" asp-route-reference="@Model.Reference" aria-current="page">Anteprima</a>
+    </nav>
+
+    <section class="admin-panel admin-preview-panel card">
+        <div class="admin-preview-toolbar">
+            <div>
+                <span>Anteprima cliente</span>
+                <p>La pagina usa gli stessi dati salvati nella scheda immobile.</p>
+            </div>
+            <div class="btn-group" role="group" aria-label="Formato anteprima">
+                <a class="btn btn-outline-secondary @(Model.IsMobilePreview ? null : "active")"
+                   asp-area="Admin"
+                   asp-controller="Properties"
+                   asp-action="Preview"
+                   asp-route-reference="@Model.Reference"
+                   asp-route-mode="desktop">Desktop</a>
+                <a class="btn btn-outline-secondary @(Model.IsMobilePreview ? "active" : null)"
+                   asp-area="Admin"
+                   asp-controller="Properties"
+                   asp-action="Preview"
+                   asp-route-reference="@Model.Reference"
+                   asp-route-mode="mobile">Mobile</a>
+            </div>
+        </div>
+
+        <div class="admin-preview-browser @(Model.IsMobilePreview ? "is-mobile" : "is-desktop")">
+            @if (!string.IsNullOrWhiteSpace(Model.PublicPreviewUrl))
+            {
+                <iframe class="admin-preview-browser-frame"
+                        src="@Model.PublicPreviewUrl"
+                        title="Anteprima pubblica di @Model.Reference"
+                        loading="lazy"></iframe>
+            }
+            else
+            {
+                <section class="medri-client-empty-state" aria-label="Anteprima non disponibile">
+                    <h2>Anteprima non disponibile</h2>
+                    <p>Salva prima i dati minimi dell'immobile per generare la pagina pubblica.</p>
+                </section>
+            }
+        </div>
+    </section>
+</div>

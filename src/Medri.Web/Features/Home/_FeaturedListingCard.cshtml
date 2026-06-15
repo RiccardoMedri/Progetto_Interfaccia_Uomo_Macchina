@@ -1,0 +1,25 @@
+@model Medri.Web.Features.Home.HomeFeaturedListingCardViewModel
+@{
+    var property = Model.Property;
+    var favoriteAction = property.IsSaved ? "/preferiti/rimuovi" : "/preferiti/aggiungi";
+}
+<article class="listing-card card h-100 @(Model.IsPrimary ? "featured-listing-primary" : "featured-listing-secondary")">
+    <a class="featured-listing-link" href="@property.DetailUrl" aria-label="Apri @property.Title">
+        <div class="card-media" style="background-image: linear-gradient(to top, rgba(23, 40, 64, 0.32), transparent 58%), url('@property.ImageUrl')">
+            <span class="visually-hidden">Foto di @property.Title</span>
+        </div>
+        <div class="card-body">
+            <span class="tag badge text-bg-light">@property.Tag</span>
+            <h3>@property.Title</h3>
+            <p>@property.DisplayLocation</p>
+            <p>@property.FactsLabel</p>
+            <strong>@property.PriceLabel</strong>
+        </div>
+    </a>
+    <form action="@favoriteAction" method="post" class="featured-save-form" data-favorite-form data-property-id="@property.Id">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="propertyId" value="@property.Id" />
+        <input type="hidden" name="returnUrl" value="@Model.FavoriteReturnUrl" />
+        <button class="save-ad-button @(property.IsSaved ? "is-selected" : null) btn btn-sm btn-outline-secondary" type="submit" aria-label="@(property.IsSaved ? $"Rimuovi {property.Title} dai preferiti" : $"Salva {property.Title} nei preferiti")" aria-pressed="@(property.IsSaved ? "true" : "false")" data-favorite-button data-property-id="@property.Id" data-property-title="@property.Title"></button>
+    </form>
+</article>

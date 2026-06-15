@@ -1,0 +1,53 @@
+@model Medri.Web.Areas.Admin.AdminNavigationViewModel
+@using Medri.Web.Areas.Admin
+<aside class="admin-sidebar" aria-label="Navigazione area riservata">
+    <label class="admin-sidebar-toggle-button d-none d-md-grid" for="admin-sidebar-state" title="Comprimi menu">
+        <i class="ph ph-list" aria-hidden="true"></i>
+        <span class="visually-hidden">Comprimi menu</span>
+    </label>
+
+    <a class="admin-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index" aria-label="Dashboard area riservata">
+        <span class="admin-brand-mark" aria-hidden="true">M</span>
+        <span class="admin-brand-copy">
+            <strong>Medri</strong>
+            <small>Area riservata</small>
+        </span>
+    </a>
+
+    <nav class="admin-nav nav nav-pills flex-md-column" aria-label="Sezioni amministrative">
+        <a class="nav-link @(Model.IsActive(AdminSections.Dashboard) ? "active" : null)" asp-area="Admin" asp-controller="Dashboard" asp-action="Index" aria-current="@(Model.IsActive(AdminSections.Dashboard) ? "page" : null)">
+            <i class="ph ph-squares-four admin-nav-icon" aria-hidden="true"></i>
+            <span class="admin-nav-label">Dashboard</span>
+        </a>
+        <a class="nav-link @(Model.IsActive(AdminSections.Leads) ? "active" : null)" asp-area="Admin" asp-controller="Leads" asp-action="Index" aria-current="@(Model.IsActive(AdminSections.Leads) ? "page" : null)">
+            <i class="ph ph-users admin-nav-icon" aria-hidden="true"></i>
+            <span class="admin-nav-label">Lead</span>
+            <strong>@Model.LeadCount</strong>
+        </a>
+        <a class="nav-link @(Model.IsActive(AdminSections.Requests) ? "active" : null)" asp-area="Admin" asp-controller="Requests" asp-action="Index" aria-current="@(Model.IsActive(AdminSections.Requests) ? "page" : null)">
+            <i class="ph ph-clipboard-text admin-nav-icon" aria-hidden="true"></i>
+            <span class="admin-nav-label">Richieste</span>
+            <strong>@Model.RequestCount</strong>
+        </a>
+        <a class="nav-link @(Model.IsActive(AdminSections.Properties) ? "active" : null)" asp-area="Admin" asp-controller="Properties" asp-action="Index" aria-current="@(Model.IsActive(AdminSections.Properties) ? "page" : null)">
+            <i class="ph ph-house admin-nav-icon" aria-hidden="true"></i>
+            <span class="admin-nav-label">Immobili</span>
+            <strong>@Model.ListingCount</strong>
+        </a>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+        <span class="admin-user-avatar" aria-hidden="true">@Model.Initials</span>
+        <div class="admin-user-copy">
+            <strong>@Model.DisplayName</strong>
+            <small>@Model.RoleLabel</small>
+        </div>
+        <form class="admin-logout-form" asp-area="" asp-controller="Login" asp-action="Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button class="admin-logout-action btn btn-outline-light btn-sm" type="submit">
+                <i class="ph ph-sign-out" aria-hidden="true"></i>
+                <span>Esci</span>
+            </button>
+        </form>
+    </div>
+</aside>

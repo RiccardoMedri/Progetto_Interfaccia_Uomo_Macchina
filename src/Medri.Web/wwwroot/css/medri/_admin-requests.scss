@@ -1,0 +1,48 @@
+.request-admin-table {
+  min-width: 68rem;
+}
+
+.request-contact-cell {
+  min-width: 12.5rem;
+}
+
+.admin-status-pill.is-assigned {
+  border-color: var(--admin-status-info-border-soft);
+  background: var(--admin-status-info-bg);
+  color: var(--admin-status-info-text);
+}
+
+.admin-status-pill.is-priority {
+  border-color: var(--admin-status-danger-border);
+  background: var(--admin-status-danger-bg);
+  color: var(--admin-status-danger-text);
+}
+
+.admin-status-pill.is-low {
+  border-color: var(--admin-line-strong);
+  background: var(--admin-status-neutral-bg);
+  color: var(--muted);
+}
+
+.request-list-panel .admin-empty-state {
+  padding: 0.25rem 0;
+  color: var(--muted);
+}
+
+.request-list-panel .admin-empty-state strong {
+  color: var(--ink);
+}
+
+.request-list-panel .admin-empty-state p {
+  margin: 0;
+}
+
+.request-side-panel .admin-primary-action {
+  justify-content: flex-start;
+}
+
+.request-side-panel {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+}

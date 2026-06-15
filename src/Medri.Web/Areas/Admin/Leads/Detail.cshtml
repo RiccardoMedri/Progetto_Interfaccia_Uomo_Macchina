@@ -1,0 +1,351 @@
+@model Medri.Web.Areas.Admin.Leads.AdminLeadDetailViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = Model.IsCreateMode
+        ? "Nuovo lead - Area riservata Medri"
+        : $"{Model.DisplayName} - Modifica lead - Area riservata Medri";
+    var leadFormAction = Model.IsCreateMode
+        ? Url.Action("Create", "Leads", new { area = "Admin" })
+        : Url.Action("Update", "Leads", new { area = "Admin", reference = Model.Reference });
+    var leadHeadingReference = Model.IsCreateMode
+        ? "Nuovo lead"
+        : $"{Model.Reference} - {Model.StatusLabel}";
+    var leadHeadingTitle = Model.IsCreateMode ? "Nuovo lead" : Model.DisplayName;
+}
+
+<div class="container-fluid px-0">
+    <section class="admin-page-heading lead-detail-heading card">
+        <div class="row g-3 align-items-center">
+            <div class="col-12 col-md-7">
+                <span class="lead-detail-reference">@leadHeadingReference</span>
+                <h1>@leadHeadingTitle</h1>
+            </div>
+            <div class="col-12 col-md-5">
+                <div class="lead-detail-heading-actions d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                    <button class="btn admin-btn-save" form="leadDetailForm" type="submit">
+                        <i class="ph ph-floppy-disk" aria-hidden="true"></i>
+                        <span>@(Model.IsCreateMode ? "Crea lead" : "Salva modifiche")</span>
+                    </button>
+                    <a class="admin-public-site-link btn" href="/">Sito pubblico</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="lead-detail-summary row row-cols-1 row-cols-md-4 g-3 mb-3" aria-label="Sintesi lead">
+        @foreach (var card in Model.SummaryCards)
+        {
+            <div class="col">
+                <article class="lead-summary-card card h-100">
+                    <span>@card.Label</span>
+                    <strong>@card.Value</strong>
+                    <p>@card.Description</p>
+                </article>
+            </div>
+        }
+    </div>
+
+    <div class="row g-3 align-items-start">
+        <div class="col-12 @(Model.IsCreateMode ? "col-md-9" : "col-md-8")">
+            <form id="leadDetailForm" class="d-grid gap-3" action="@leadFormAction" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <section class="admin-panel lead-detail-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Profilo contatto</h2>
+                        </div>
+                    </div>
+                    <div class="lead-detail-section-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="FirstName">Nome</label>
+                                <input class="form-control" asp-for="FirstName" />
+                                <span class="text-danger" asp-validation-for="FirstName"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="LastName">Cognome</label>
+                                <input class="form-control" asp-for="LastName" />
+                                <span class="text-danger" asp-validation-for="LastName"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Phone">Telefono</label>
+                                <input class="form-control" asp-for="Phone" />
+                                <span class="text-danger" asp-validation-for="Phone"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Email">Email</label>
+                                <input class="form-control" asp-for="Email" />
+                                <span class="text-danger" asp-validation-for="Email"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="SourceChannel">Fonte</label>
+                                <select class="form-select" asp-for="SourceChannel">
+                                    @foreach (var option in Model.SourceOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="SourceChannel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="AssignedAgencyUserId">Referente</label>
+                                <select class="form-select" asp-for="AssignedAgencyUserId">
+                                    @foreach (var option in Model.AdvisorOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-panel lead-detail-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Esigenza emersa</h2>
+                        </div>
+                    </div>
+                    <div class="lead-detail-section-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="RequestType">Tipo esigenza</label>
+                                <select class="form-select" asp-for="RequestType">
+                                    @foreach (var option in Model.RequestTypeOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="RequestType"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Urgency">Urgenza</label>
+                                <select class="form-select" asp-for="Urgency">
+                                    @foreach (var option in Model.UrgencyOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="DesiredLocation">Comune / zona</label>
+                                <input class="form-control" asp-for="DesiredLocation" placeholder="Da chiedere" />
+                                <span class="text-danger" asp-validation-for="DesiredLocation"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="ExpectedPriceOrMainQuestion">Budget / valore atteso</label>
+                                <input class="form-control" asp-for="ExpectedPriceOrMainQuestion" placeholder="Da chiedere" />
+                                <span class="text-danger" asp-validation-for="ExpectedPriceOrMainQuestion"></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" asp-for="LinkedPropertyReference">Immobile collegato</label>
+                                <input class="form-control" asp-for="LinkedPropertyReference" placeholder="Indirizzo o codice immobile" />
+                                <span class="text-danger" asp-validation-for="LinkedPropertyReference"></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" asp-for="ContactReason">Motivo contatto</label>
+                                <input class="form-control" asp-for="ContactReason" />
+                                <span class="text-danger" asp-validation-for="ContactReason"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-panel lead-detail-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Note operative</h2>
+                        </div>
+                    </div>
+                    <div class="lead-detail-section-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" asp-for="Notes">Riassunto conversazione</label>
+                                <textarea class="form-control" asp-for="Notes" rows="5"></textarea>
+                                <span class="text-danger" asp-validation-for="Notes"></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" asp-for="NextContactQuestions">Da chiedere al prossimo contatto</label>
+                                <textarea class="form-control" asp-for="NextContactQuestions" rows="4"></textarea>
+                                <span class="text-danger" asp-validation-for="NextContactQuestions"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </form>
+
+            <section class="admin-panel lead-detail-section card mt-3">
+                <div class="admin-panel-heading">
+                    <div>
+                        <h2>Storico interazioni</h2>
+                    </div>
+                </div>
+                <div class="lead-detail-section-body">
+                    @if (Model.Interactions.Count > 0)
+                    {
+                        <ol class="lead-timeline list-unstyled mb-0">
+                            @foreach (var interaction in Model.Interactions)
+                            {
+                                <li>
+                                    <span>@interaction.TimeLabel</span>
+                                    <strong>@interaction.Title</strong>
+                                    <p>@interaction.Notes</p>
+                                </li>
+                            }
+                        </ol>
+                    }
+                    else
+                    {
+                        <div class="admin-empty-state">
+                            <strong>Nessuna interazione registrata</strong>
+                            <p>Le azioni salvate dall'area Admin compariranno qui.</p>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+
+        @if (!Model.IsCreateMode)
+        {
+            <div class="col-12 col-md-4">
+                <div class="lead-detail-aside d-grid gap-3">
+                    <aside class="admin-panel lead-conversion-panel card">
+                        <div class="admin-panel-heading">
+                            <div>
+                                <h2>Conversione</h2>
+                                <p>Trasforma il lead in richiesta solo quando i dati minimi sono chiari.</p>
+                            </div>
+                        </div>
+                        <div class="lead-side-panel-body">
+                            <ul class="lead-conversion-checklist list-unstyled">
+                                @foreach (var item in Model.ConversionChecklist)
+                                {
+                                    <li class="@(item.IsDone ? "is-done" : null)">
+                                        <i class="ph @(item.IsDone ? "ph-check-circle" : "ph-circle")" aria-hidden="true"></i>
+                                        <span>@item.Label</span>
+                                    </li>
+                                }
+                            </ul>
+                            <form asp-area="Admin" asp-controller="Leads" asp-action="Convert" asp-route-reference="@Model.Reference" method="post">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-primary w-100" type="submit" disabled="@(!Model.CanConvert)">
+                                    <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                                    <span>Converti in richiesta</span>
+                                </button>
+                            </form>
+                            @if (!string.IsNullOrWhiteSpace(Model.SearchProfileReference))
+                            {
+                                <p class="lead-conversion-note mb-0">Richiesta collegata: <strong>@Model.SearchProfileReference</strong></p>
+                            }
+                        </div>
+                    </aside>
+
+                    <aside class="admin-panel lead-actions-panel card">
+                        <div class="admin-panel-heading">
+                            <div>
+                                <h2>Azioni</h2>
+                            </div>
+                        </div>
+                        <div class="lead-side-panel-body">
+                            <div class="lead-side-actions d-grid gap-2">
+                                @if (!string.IsNullOrWhiteSpace(Model.PhoneHref))
+                                {
+                                    <a class="btn btn-outline-secondary text-start" href="@Model.PhoneHref">
+                                        <i class="ph ph-phone" aria-hidden="true"></i>
+                                        <span>Chiama ora</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary text-start" type="button" disabled>
+                                        <i class="ph ph-phone" aria-hidden="true"></i>
+                                        <span>Chiama ora</span>
+                                    </button>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(Model.WhatsAppHref))
+                                {
+                                    <a class="btn btn-outline-secondary text-start" href="@Model.WhatsAppHref">
+                                        <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+                                        <span>Invia WhatsApp</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary text-start" type="button" disabled>
+                                        <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+                                        <span>Invia WhatsApp</span>
+                                    </button>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(Model.MailtoHref))
+                                {
+                                    <a class="btn btn-outline-secondary text-start" href="@Model.MailtoHref">
+                                        <i class="ph ph-envelope" aria-hidden="true"></i>
+                                        <span>Invia recap email</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary text-start" type="button" disabled>
+                                        <i class="ph ph-envelope" aria-hidden="true"></i>
+                                        <span>Invia recap email</span>
+                                    </button>
+                                }
+
+                                <form asp-area="Admin" asp-controller="Leads" asp-action="Archive" asp-route-reference="@Model.Reference" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn admin-btn-danger text-start w-100" type="submit" disabled="@(!Model.CanArchive)">
+                                        <i class="ph ph-archive" aria-hidden="true"></i>
+                                        <span>Archivia lead</span>
+                                    </button>
+                                </form>
+
+                                @if (Model.CanRestore)
+                                {
+                                    <form asp-area="Admin" asp-controller="Leads" asp-action="Restore" asp-route-reference="@Model.Reference" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-outline-secondary text-start w-100" type="submit">
+                                            <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                                            <span>Ripristina lead</span>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        }
+    </div>
+</div>

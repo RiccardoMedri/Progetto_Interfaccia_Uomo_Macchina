@@ -1,0 +1,80 @@
+$admin-request-detail-radius: 0.375rem;
+
+.request-detail-section .form-control[readonly] {
+  background-color: var(--admin-panel-bg-muted);
+  color: var(--muted);
+}
+
+.request-info-card,
+.request-preference-panel {
+  padding: 1rem;
+  border: 0.0625rem solid var(--admin-line);
+  border-radius: $admin-request-detail-radius;
+  background: var(--admin-panel-bg-muted);
+}
+
+.request-info-card span {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.request-info-card strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.request-info-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.request-edit-card {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.request-edit-card .form-label,
+.request-preference-panel .form-label {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.request-edit-card .form-control {
+  min-height: 2.45rem;
+}
+
+.request-info-card .text-danger,
+.request-preference-panel .text-danger {
+  margin: 0;
+  color: var(--bs-danger);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.request-preference-panel h3 {
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.request-tags-editor {
+  min-height: 7.75rem;
+  resize: vertical;
+}
+
+.request-actions-panel form {
+  margin: 0;
+}

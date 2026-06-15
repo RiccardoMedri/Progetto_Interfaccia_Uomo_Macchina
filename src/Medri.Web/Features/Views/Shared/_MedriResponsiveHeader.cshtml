@@ -1,0 +1,95 @@
+@model Medri.Web.Features.Views.Shared.MedriHeaderViewModel
+
+<header class="site-header medri-home-header">
+    <a class="brand" asp-controller="Home" asp-action="Index" aria-label="Homepage agenzia immobiliare">
+        <img class="brand-icon" src="/images/medri-logo.png" alt="" aria-hidden="true" />
+        <span class="brand-copy"><strong>AGENZIA</strong><small>servizi immobiliari dal 1974</small></span>
+    </a>
+
+    @if (Model.IsAuthenticated && Model.IsAdminAreaUser)
+    {
+        <a class="header-account-cta"
+           asp-area="Admin"
+           asp-controller="Dashboard"
+           asp-action="Index"
+           aria-label="@Model.AccountLabel"
+           title="@Model.AccountLabel">
+            <i class="ph ph-user" aria-hidden="true"></i>
+        </a>
+    }
+    else if (Model.IsAuthenticated)
+    {
+        <a class="header-account-cta"
+           asp-area="Client"
+           asp-controller="Saved"
+           asp-action="Index"
+           aria-label="@Model.AccountLabel"
+           title="@Model.AccountLabel">
+            <i class="ph ph-user" aria-hidden="true"></i>
+        </a>
+    }
+    else
+    {
+        <a class="header-account-cta"
+           asp-controller="Login"
+           asp-action="Login"
+           aria-label="@Model.AccountLabel"
+           title="@Model.AccountLabel">
+            <i class="ph ph-user" aria-hidden="true"></i>
+        </a>
+    }
+
+    <input class="menu-state" type="checkbox" id="medri-home-menu" aria-label="Apri menu" />
+    <label class="menu-button" for="medri-home-menu"><span></span><span></span><span></span></label>
+
+    <nav class="primary-nav nav" aria-label="Navigazione principale">
+        <div class="nav-group dropdown @(Model.IsBuySection ? "is-active" : null)">
+            <button class="nav-trigger btn btn-link dropdown-toggle @(Model.IsBuySection ? "is-active" : null)" type="button" aria-haspopup="true" aria-current="@(Model.IsBuySection ? "location" : null)">Compra</button>
+            <div class="nav-dropdown dropdown-menu" aria-label="Azioni acquisto">
+                <a class="dropdown-item" asp-controller="Search" asp-action="Index">Cerca annuncio</a>
+                <a class="dropdown-item @(Model.IsBuySection ? "is-active" : null)" asp-controller="LeadIntake" asp-action="Buy" aria-current="@(Model.IsBuySection ? "page" : null)">Raccontaci cosa cerchi</a>
+            </div>
+        </div>
+        <div class="nav-group dropdown @(Model.IsRentSection ? "is-active" : null)">
+            <button class="nav-trigger btn btn-link dropdown-toggle @(Model.IsRentSection ? "is-active" : null)" type="button" aria-haspopup="true" aria-current="@(Model.IsRentSection ? "location" : null)">Affitta</button>
+            <div class="nav-dropdown dropdown-menu" aria-label="Azioni affitto">
+                <a class="dropdown-item" asp-controller="Search" asp-action="Index">Cerca annuncio</a>
+                <a class="dropdown-item @(Model.IsRentSection ? "is-active" : null)" asp-controller="LeadIntake" asp-action="Rent" aria-current="@(Model.IsRentSection ? "page" : null)">Raccontaci cosa cerchi</a>
+            </div>
+        </div>
+        <div class="nav-group dropdown @(Model.IsOwnerSection ? "is-active" : null)">
+            <button class="nav-trigger btn btn-link dropdown-toggle @(Model.IsOwnerSection ? "is-active" : null)" type="button" aria-haspopup="true" aria-current="@(Model.IsOwnerSection ? "location" : null)">Proprietari</button>
+            <div class="nav-dropdown nav-dropdown-wide dropdown-menu" aria-label="Azioni proprietari">
+                <a class="dropdown-item @(Model.IsSellPage ? "is-active" : null)" asp-controller="LeadIntake" asp-action="Sell" aria-current="@(Model.IsSellPage ? "page" : null)">Vuoi vendere?</a>
+                <a class="dropdown-item @(Model.IsRentOutPage ? "is-active" : null)" asp-controller="LeadIntake" asp-action="RentOut" aria-current="@(Model.IsRentOutPage ? "page" : null)">Vuoi mettere in affitto?</a>
+                <a class="dropdown-item @(Model.IsValuationPage ? "is-active" : null)" asp-controller="LeadIntake" asp-action="Valuation" aria-current="@(Model.IsValuationPage ? "page" : null)">Valutazione</a>
+            </div>
+        </div>
+        @if (Model.IsAuthenticated && Model.IsAdminAreaUser)
+        {
+            <a class="nav-link account-nav-trigger btn @(Model.IsMyAreaSection ? "active is-active" : null)"
+               asp-area="Admin"
+               asp-controller="Dashboard"
+               asp-action="Index"
+               aria-current="@(Model.IsMyAreaSection ? "page" : null)">@Model.AccountLabel</a>
+        }
+        else if (Model.IsAuthenticated)
+        {
+            <a class="nav-link account-nav-trigger btn @(Model.IsMyAreaSection ? "active is-active" : null)"
+               asp-area="Client"
+               asp-controller="Saved"
+               asp-action="Index"
+               aria-current="@(Model.IsMyAreaSection ? "page" : null)">@Model.AccountLabel</a>
+        }
+        else
+        {
+            <a class="login-link nav-link btn btn-outline-secondary btn-sm" asp-controller="Login" asp-action="Login">@Model.AccountLabel</a>
+        }
+    </nav>
+
+    <div class="header-contact" aria-label="Contatti agenzia">
+        <a class="phone-link" href="tel:0547123456">0547 123456</a>
+        <a href="mailto:info@agenziamedri.it">info@agenziamedri.it</a>
+        <span>Via Cesare Battisti 18, Cesena</span>
+    </div>
+</header>

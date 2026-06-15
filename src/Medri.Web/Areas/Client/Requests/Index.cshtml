@@ -1,0 +1,93 @@
+@model Medri.Web.Areas.Client.Requests.ClientRequestsViewModel
+@{
+    ViewData["Title"] = "Area cliente - Richieste";
+}
+
+<main id="contenuto" class="medri-client-area medri-client-area--requests">
+    <div class="container-xxl medri-client-area__container">
+        <partial name="~/Areas/Client/Views/Shared/_ClientAreaHeader.cshtml" model="Model.Navigation" />
+
+        <section class="medri-client-content" aria-label="Richieste">
+            @if (Model.HasRequests)
+            {
+                <div class="row g-3 g-lg-4 medri-client-card-list">
+                    @foreach (var request in Model.Requests)
+                    {
+                        <div class="col-12">
+                            <article class="medri-client-request-card">
+                                <div class="medri-client-request-card__main">
+                                    <span class="medri-client-status-pill @(request.IsStrongStatus ? "is-strong" : null)">@request.StatusLabel</span>
+                                    <h2>@request.Title</h2>
+                                    <p>@request.Summary</p>
+                                </div>
+                            </article>
+                        </div>
+                    }
+                </div>
+
+                @if (Model.HasPagination)
+                {
+                    <nav class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" aria-label="Paginazione richieste">
+                        <div class="d-flex align-items-center gap-2">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <a class="btn btn-outline-secondary btn-sm"
+                                   asp-area="Client"
+                                   asp-controller="Requests"
+                                   asp-action="Index"
+                                   asp-route-Page="@(Model.Page - 1)"
+                                   asp-route-PageSize="@Model.PageSize">
+                                    Precedente
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="btn btn-outline-secondary btn-sm disabled" aria-disabled="true">Precedente</span>
+                            }
+
+                            <span class="small text-muted" aria-current="page">
+                                Pagina <strong>@Model.Page / @Model.TotalPages</strong>
+                            </span>
+
+                            @if (Model.HasNextPage)
+                            {
+                                <a class="btn btn-outline-secondary btn-sm"
+                                   asp-area="Client"
+                                   asp-controller="Requests"
+                                   asp-action="Index"
+                                   asp-route-Page="@(Model.Page + 1)"
+                                   asp-route-PageSize="@Model.PageSize">
+                                    Successiva
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="btn btn-outline-secondary btn-sm disabled" aria-disabled="true">Successiva</span>
+                            }
+                        </div>
+
+                        <form class="d-flex align-items-center gap-2" method="get" aria-label="Richieste per pagina">
+                            <input type="hidden" name="Page" value="1" />
+                            <label class="small text-muted" for="clientRequestPageSize">Righe</label>
+                            <select class="form-select form-select-sm w-auto" id="clientRequestPageSize" name="PageSize">
+                                @foreach (var pageSize in Model.PageSizeOptions)
+                                {
+                                    <option value="@pageSize.Value" selected="@pageSize.IsSelected">@pageSize.Label</option>
+                                }
+                            </select>
+                            <button class="btn btn-outline-secondary btn-sm" type="submit">Applica</button>
+                        </form>
+                    </nav>
+                }
+            }
+            else
+            {
+                <section class="medri-client-empty-state" aria-label="Nessuna richiesta inviata">
+                    <h2>Nessuna richiesta inviata</h2>
+                    <p>Le richieste inviate all'agenzia compariranno qui.</p>
+                    <a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index">Torna alla home</a>
+                </section>
+            }
+        </section>
+    </div>
+</main>

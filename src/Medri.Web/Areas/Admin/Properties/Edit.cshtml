@@ -1,0 +1,415 @@
+@model Medri.Web.Areas.Admin.Properties.AdminPropertyDetailViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = Model.IsCreateMode
+        ? "Nuovo immobile - Area riservata Medri"
+        : $"{Model.Reference} - Modifica immobile - Area riservata Medri";
+    var propertyFormAction = Model.IsCreateMode
+        ? Url.Action("Create", "Properties", new { area = "Admin" })
+        : Url.Action("Update", "Properties", new { area = "Admin", reference = Model.Reference });
+    var propertyHeadingReference = Model.IsCreateMode
+        ? "Nuovo immobile"
+        : $"{Model.Reference} - {Model.StatusLabel}";
+    var propertyHeadingTitle = Model.IsCreateMode ? "Nuovo immobile" : Model.Title;
+    var mediaInputIndex = 0;
+}
+
+<div class="container-fluid px-0">
+    <section class="admin-page-heading property-editor-heading card">
+        <div class="row g-3 align-items-center">
+            <div class="col-12 col-md-6">
+                <span class="lead-detail-reference">@propertyHeadingReference</span>
+                <h1>@propertyHeadingTitle</h1>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="property-editor-actions d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                    <button class="btn admin-btn-save" form="propertyDetailForm" type="submit">
+                        <i class="ph ph-floppy-disk" aria-hidden="true"></i>
+                        <span>@(Model.IsCreateMode ? "Crea immobile" : "Salva bozza")</span>
+                    </button>
+                    @if (!Model.IsCreateMode)
+                    {
+                        <form class="property-inline-form" asp-area="Admin" asp-controller="Properties" asp-action="MarkReady" asp-route-reference="@Model.Reference" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn admin-btn-save w-100" type="submit">
+                                <i class="ph ph-check-circle" aria-hidden="true"></i>
+                                <span>Segna pronto</span>
+                            </button>
+                        </form>
+                        <form class="property-inline-form" asp-area="Admin" asp-controller="Properties" asp-action="Publish" asp-route-reference="@Model.Reference" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn admin-btn-save w-100" type="submit">
+                                <i class="ph ph-upload-simple" aria-hidden="true"></i>
+                                <span>Pubblica</span>
+                            </button>
+                        </form>
+                        <form class="property-inline-form" asp-area="Admin" asp-controller="Properties" asp-action="Archive" asp-route-reference="@Model.Reference" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn admin-btn-danger w-100" type="submit">
+                                <i class="ph ph-trash" aria-hidden="true"></i>
+                                <span>Archivia</span>
+                            </button>
+                        </form>
+                    }
+                    <a class="admin-public-site-link btn" href="/">Sito pubblico</a>
+                </div>
+            </div>
+        </div>
+        <div class="property-editor-progress mt-3">
+            <div class="d-flex justify-content-between gap-3">
+                <span>Completezza scheda</span>
+                <strong>@Model.CompletionPercent%</strong>
+            </div>
+            <div class="progress" role="progressbar" aria-valuenow="@Model.CompletionPercent" aria-valuemin="0" aria-valuemax="100">
+                <i class="progress-bar" style="width: @Model.CompletionPercent%"></i>
+            </div>
+        </div>
+    </section>
+
+    @if (!Model.IsCreateMode)
+    {
+        <nav class="property-view-switcher nav nav-pills mb-3" aria-label="Vista scheda immobile">
+            <a class="nav-link active" asp-area="Admin" asp-controller="Properties" asp-action="Edit" asp-route-reference="@Model.Reference" aria-current="page">Dati</a>
+            <a class="nav-link" asp-area="Admin" asp-controller="Properties" asp-action="Preview" asp-route-reference="@Model.Reference">Anteprima</a>
+        </nav>
+    }
+
+    <div class="row g-3 align-items-start">
+        <div class="col-12 col-md-2">
+            <aside class="property-editor-section-nav card">
+                <a href="#media">Media</a>
+                <a href="#testi">Testi</a>
+                <a href="#dati-oggettivi">Dati oggettivi</a>
+            </aside>
+        </div>
+
+        <div class="col-12 col-md-7">
+            <form id="propertyDetailForm" class="d-grid gap-3" action="@propertyFormAction" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <section id="media" class="admin-panel property-editor-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Media immobile</h2>
+                            <p>Ordina le immagini e completa i testi alternativi prima dell'anteprima pubblica.</p>
+                        </div>
+                    </div>
+                    <div class="property-editor-section-body">
+                        <div class="property-upload-panel">
+                            <div>
+                                <label class="form-label" asp-for="UploadedMedia">Carica media</label>
+                                <input class="form-control" asp-for="UploadedMedia" type="file" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+                            </div>
+                            <button class="btn admin-btn-save property-upload-button"
+                                    type="submit"
+                                    name="SubmitAction"
+                                    value="UploadMedia"
+                                    formnovalidate>
+                                <i class="ph ph-upload-simple" aria-hidden="true"></i>
+                                <span>@(Model.IsCreateMode ? "Crea e carica media" : "Carica media")</span>
+                            </button>
+                        </div>
+                        @if (Model.MediaSlots.Count > 0)
+                        {
+                            <div class="property-media-grid row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-3" data-property-media-grid>
+                                @foreach (var slot in Model.MediaSlots)
+                                {
+                                    <div class="col" data-property-media-item draggable="true">
+                                        <article class="property-media-slot card h-100">
+                                            <div class="property-media-preview">
+                                                <img src="@slot.Url" alt="@slot.AltText" loading="lazy" />
+                                                <button class="map-card-close property-media-remove-button btn btn-sm btn-outline-secondary"
+                                                        type="button"
+                                                        aria-label="Rimuovi media @slot.SlotNumber"
+                                                        data-property-media-remove>
+                                                    <i class="ph ph-x" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                            <div class="property-media-slot-body">
+                                                <div class="property-media-slot-topline">
+                                                    <span data-property-media-position>@slot.SlotNumber</span>
+                                                    <strong data-property-media-cover hidden="@(!slot.IsCover)">Copertina</strong>
+                                                </div>
+                                                @if (!string.IsNullOrWhiteSpace(slot.AltText))
+                                                {
+                                                    <p>@slot.AltText</p>
+                                                }
+                                                <div class="property-media-title-field">
+                                                    <label class="form-label" for="Media_@(mediaInputIndex)__AltText">Titolo media</label>
+                                                    <input class="form-control" id="Media_@(mediaInputIndex)__AltText" name="Media[@mediaInputIndex].AltText" type="text" value="@slot.AltText" />
+                                                </div>
+                                                <input type="hidden" name="Media[@mediaInputIndex].Id" value="@slot.MediaId.GetValueOrDefault()" />
+                                                <input type="hidden" name="Media[@mediaInputIndex].SortOrder" value="@slot.SortOrder" data-property-media-sort-order />
+                                                <input type="hidden" name="Media[@mediaInputIndex].Remove" value="false" data-property-media-remove-input />
+                                                @{
+                                                    mediaInputIndex++;
+                                                }
+                                            </div>
+                                        </article>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </section>
+
+                <section id="testi" class="admin-panel property-editor-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Testi annuncio</h2>
+                            <p>I testi dell'anteprima cliente vengono generati da questi campi.</p>
+                        </div>
+                    </div>
+                    <div class="property-editor-section-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" asp-for="SummaryTitle">Titolo sezione pubblica</label>
+                                <input class="form-control" asp-for="SummaryTitle" />
+                                <span class="text-danger" asp-validation-for="SummaryTitle"></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" asp-for="Description">Primo paragrafo descrittivo</label>
+                                <textarea class="form-control" asp-for="Description" rows="5"></textarea>
+                                <span class="text-danger" asp-validation-for="Description"></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" asp-for="SummaryParagraph2">Secondo paragrafo descrittivo</label>
+                                <textarea class="form-control" asp-for="SummaryParagraph2" rows="4"></textarea>
+                                <span class="text-danger" asp-validation-for="SummaryParagraph2"></span>
+                            </div>
+                            <div class="col-12">
+                                <h3>Da sapere subito</h3>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label" asp-for="ReadinessNote">Stato e lavori</label>
+                                        <input class="form-control" asp-for="ReadinessNote" />
+                                        <span class="text-danger" asp-validation-for="ReadinessNote"></span>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label" asp-for="CostsNote">Costi</label>
+                                        <input class="form-control" asp-for="CostsNote" />
+                                        <span class="text-danger" asp-validation-for="CostsNote"></span>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label" asp-for="ContextNote">Contesto</label>
+                                        <input class="form-control" asp-for="ContextNote" />
+                                        <span class="text-danger" asp-validation-for="ContextNote"></span>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label" asp-for="DecisionMarginNote">Margine decisionale</label>
+                                        <input class="form-control" asp-for="DecisionMarginNote" />
+                                        <span class="text-danger" asp-validation-for="DecisionMarginNote"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" asp-for="HumanFitNote">Potrebbe essere adatta se</label>
+                                <textarea class="form-control" asp-for="HumanFitNote" rows="4"></textarea>
+                                <span class="text-danger" asp-validation-for="HumanFitNote"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="dati-oggettivi" class="admin-panel property-editor-section card">
+                    <div class="admin-panel-heading">
+                        <div>
+                            <h2>Dati oggettivi</h2>
+                            <p>Campi strutturati usati nella scheda pubblica e nel matching operativo.</p>
+                        </div>
+                    </div>
+                    <div class="property-editor-section-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="ListingCategory">Tipologia immobile</label>
+                                <select class="form-select" asp-for="ListingCategory">
+                                    @foreach (var option in Model.ListingCategoryOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="ListingCategory"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Title">Titolo annuncio</label>
+                                <input class="form-control" asp-for="Title" />
+                                <span class="text-danger" asp-validation-for="Title"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Contract">Contratto</label>
+                                <select class="form-select" asp-for="Contract">
+                                    @foreach (var option in Model.ContractOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="Contract"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="AssignedAgencyUserId">Referente</label>
+                                <select class="form-select" asp-for="AssignedAgencyUserId">
+                                    @foreach (var option in Model.AdvisorOptions)
+                                    {
+                                        if (option.IsSelected)
+                                        {
+                                            <option value="@option.Value" selected>@option.Label</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger" asp-validation-for="AssignedAgencyUserId"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="PriceText">Prezzo</label>
+                                <input class="form-control" asp-for="PriceText" />
+                                <span class="text-danger" asp-validation-for="PriceText"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="DisplayLocation">Comune e quartiere</label>
+                                <input class="form-control" asp-for="DisplayLocation" />
+                                <span class="text-danger" asp-validation-for="DisplayLocation"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="Address">Indirizzo interno</label>
+                                <input class="form-control" asp-for="Address" />
+                                <span class="text-danger" asp-validation-for="Address"></span>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label" asp-for="SurfaceText">Superficie</label>
+                                <input class="form-control" asp-for="SurfaceText" />
+                                <span class="text-danger" asp-validation-for="SurfaceText"></span>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label" asp-for="RoomsText">Locali</label>
+                                <input class="form-control" asp-for="RoomsText" />
+                                <span class="text-danger" asp-validation-for="RoomsText"></span>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label" asp-for="BathroomsText">Bagni</label>
+                                <input class="form-control" asp-for="BathroomsText" />
+                                <span class="text-danger" asp-validation-for="BathroomsText"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="BedroomsLabel">Camere</label>
+                                <input class="form-control" asp-for="BedroomsLabel" />
+                                <span class="text-danger" asp-validation-for="BedroomsLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="EnergyClass">Classe energetica</label>
+                                <input class="form-control" asp-for="EnergyClass" />
+                                <span class="text-danger" asp-validation-for="EnergyClass"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="RequiredWorksLabel">Stato immobile</label>
+                                <input class="form-control" asp-for="RequiredWorksLabel" />
+                                <span class="text-danger" asp-validation-for="RequiredWorksLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="CondoFeesLabel">Spese condominiali</label>
+                                <input class="form-control" asp-for="CondoFeesLabel" />
+                                <span class="text-danger" asp-validation-for="CondoFeesLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="FloorLabel">Piano</label>
+                                <input class="form-control" asp-for="FloorLabel" />
+                                <span class="text-danger" asp-validation-for="FloorLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="ElevatorLabel">Ascensore</label>
+                                <input class="form-control" asp-for="ElevatorLabel" />
+                                <span class="text-danger" asp-validation-for="ElevatorLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="OutdoorSpaceLabel">Esterni</label>
+                                <input class="form-control" asp-for="OutdoorSpaceLabel" />
+                                <span class="text-danger" asp-validation-for="OutdoorSpaceLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="GarageLabel">Garage / posto auto</label>
+                                <input class="form-control" asp-for="GarageLabel" />
+                                <span class="text-danger" asp-validation-for="GarageLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="AvailabilityLabel">Disponibilita</label>
+                                <input class="form-control" asp-for="AvailabilityLabel" />
+                                <span class="text-danger" asp-validation-for="AvailabilityLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="HeatingLabel">Riscaldamento</label>
+                                <input class="form-control" asp-for="HeatingLabel" />
+                                <span class="text-danger" asp-validation-for="HeatingLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="ConstructionYearLabel">Anno costruzione</label>
+                                <input class="form-control" asp-for="ConstructionYearLabel" />
+                                <span class="text-danger" asp-validation-for="ConstructionYearLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="BalconyLabel">Balcone</label>
+                                <input class="form-control" asp-for="BalconyLabel" />
+                                <span class="text-danger" asp-validation-for="BalconyLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="CellarLabel">Cantina</label>
+                                <input class="form-control" asp-for="CellarLabel" />
+                                <span class="text-danger" asp-validation-for="CellarLabel"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" asp-for="NearbyServicesLabel">Servizi vicini</label>
+                                <input class="form-control" asp-for="NearbyServicesLabel" />
+                                <span class="text-danger" asp-validation-for="NearbyServicesLabel"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </form>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <aside class="admin-panel property-checklist-panel card">
+                <div class="admin-panel-heading">
+                    <div>
+                        <h2>Checklist pubblicazione</h2>
+                        <p>@Model.MissingItems</p>
+                    </div>
+                </div>
+                <ul class="property-checklist list-unstyled">
+                    @foreach (var item in Model.Checklist)
+                    {
+                        <li class="@(item.IsDone ? "is-done" : null)">
+                            <i class="ph @(item.IsDone ? "ph-check-circle" : "ph-circle")" aria-hidden="true"></i>
+                            <span>@item.Label</span>
+                        </li>
+                    }
+                </ul>
+            </aside>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <environment include="Development">
+        <script src="/js/bundle-admin-property-media.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/bundle-admin-property-media.min.js" asp-append-version="true"></script>
+    </environment>
+}

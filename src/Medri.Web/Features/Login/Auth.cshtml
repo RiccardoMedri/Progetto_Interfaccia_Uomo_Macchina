@@ -1,0 +1,146 @@
+@using Medri.Web.Features.Login
+@using System.Collections.Generic
+@model Medri.Web.Features.Login.AuthPageViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "login";
+
+    var isRegister = Model.Mode == AuthModes.Register;
+    var currentReturnUrl = isRegister ? Model.Register.ReturnUrl : Model.Login.ReturnUrl;
+    var pendingFavoritePropertyId = isRegister ? Model.Register.PendingFavoritePropertyId : Model.Login.PendingFavoritePropertyId;
+    var loginUrl = BuildAuthUrl("/login", currentReturnUrl, pendingFavoritePropertyId);
+    var registerUrl = BuildAuthUrl("/registrazione", currentReturnUrl, pendingFavoritePropertyId);
+    var headingId = isRegister ? "register-heading" : "login-heading";
+
+    ViewData["Title"] = isRegister ? "Area cliente - Registrazione" : "Area cliente - Log In";
+    ViewData["BodyClass"] = "medri-login-body";
+    ViewData["RenderMedriFooter"] = false;
+    ViewData["MedriShellClass"] = "medri-public-shell medri-login-shell";
+}
+<main id="contenuto" class="medri-login-page">
+    <div class="container-xxl medri-login-page__container">
+        <div class="row g-4 medri-login-page__row">
+            <section class="col-12 col-lg-7 col-xl-6 medri-login-page__primary" aria-labelledby="@headingId">
+                <div class="medri-login-page__stack">
+                    <div class="medri-login-panel">
+                        <nav class="medri-auth-toggle" aria-label="Accesso area cliente">
+                            <a class="medri-auth-toggle__link @(isRegister ? string.Empty : "is-active")" href="@loginUrl" aria-current="@(isRegister ? null : "page")">Accedi</a>
+                            <a class="medri-auth-toggle__link @(isRegister ? "is-active" : string.Empty)" href="@registerUrl" aria-current="@(isRegister ? "page" : null)">Registrati</a>
+                        </nav>
+
+                        <div class="medri-login-panel__heading">
+                            @if (isRegister)
+                            {
+                                <span>Nuovo account</span>
+                                <h1 id="@headingId">Crea la tua area personale.</h1>
+                                <p>Registrati per salvare annunci, ritrovare le tue richieste e seguire gli aggiornamenti dell'agenzia.</p>
+                            }
+                            else
+                            {
+                                <span>Area cliente</span>
+                                <h1 id="@headingId">Accedi alla tua area personale.</h1>
+                                <p>Usa l'email con cui hai salvato annunci o inviato una richiesta all'agenzia.</p>
+                            }
+                        </div>
+
+                        @if (isRegister)
+                        {
+                            <form class="medri-login-form" method="post" asp-action="Register" autocomplete="off">
+                                @Html.AntiForgeryToken()
+                                <input asp-for="Register.ReturnUrl" type="hidden" />
+                                <input asp-for="Register.PendingFavoritePropertyId" type="hidden" />
+                                <div asp-validation-summary="All" class="medri-login-form__summary text-danger"></div>
+
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <div class="medri-login-form__field">
+                                            <label asp-for="Register.FirstName" class="form-label"></label>
+                                            <input asp-for="Register.FirstName" class="form-control" autocomplete="given-name" />
+                                            <span asp-validation-for="Register.FirstName" class="medri-login-form__validation text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="medri-login-form__field">
+                                            <label asp-for="Register.LastName" class="form-label"></label>
+                                            <input asp-for="Register.LastName" class="form-control" autocomplete="family-name" />
+                                            <span asp-validation-for="Register.LastName" class="medri-login-form__validation text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="medri-login-form__field">
+                                    <label asp-for="Register.Email" class="form-label"></label>
+                                    <input asp-for="Register.Email" class="form-control" type="email" autocomplete="email" />
+                                    <span asp-validation-for="Register.Email" class="medri-login-form__validation text-danger"></span>
+                                </div>
+
+                                <div class="medri-login-form__field">
+                                    <label asp-for="Register.Password" class="form-label"></label>
+                                    <input asp-for="Register.Password" class="form-control" autocomplete="new-password" />
+                                    <span asp-validation-for="Register.Password" class="medri-login-form__validation text-danger"></span>
+                                </div>
+
+                                <div class="medri-login-form__field">
+                                    <label asp-for="Register.ConfirmPassword" class="form-label"></label>
+                                    <input asp-for="Register.ConfirmPassword" class="form-control" autocomplete="new-password" />
+                                    <span asp-validation-for="Register.ConfirmPassword" class="medri-login-form__validation text-danger"></span>
+                                </div>
+
+                                <button class="btn btn-primary medri-login-form__submit" type="submit">Crea account</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form class="medri-login-form" method="post" asp-action="Login" autocomplete="off">
+                                @Html.AntiForgeryToken()
+                                <input asp-for="Login.ReturnUrl" type="hidden" />
+                                <input asp-for="Login.PendingFavoritePropertyId" type="hidden" />
+                                <div asp-validation-summary="All" class="medri-login-form__summary text-danger"></div>
+
+                                <div class="medri-login-form__field">
+                                    <label asp-for="Login.Email" class="form-label"></label>
+                                    <input asp-for="Login.Email" class="form-control" type="email" autocomplete="email" />
+                                    <span asp-validation-for="Login.Email" class="medri-login-form__validation text-danger"></span>
+                                </div>
+
+                                <div class="medri-login-form__field">
+                                    <label asp-for="Login.Password" class="form-label"></label>
+                                    <input asp-for="Login.Password" class="form-control" autocomplete="current-password" />
+                                    <span asp-validation-for="Login.Password" class="medri-login-form__validation text-danger"></span>
+                                </div>
+
+                                <div class="medri-login-form__meta">
+                                    <div class="form-check">
+                                        <input asp-for="Login.RememberMe" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label" for="Login_RememberMe">Ricordami</label>
+                                    </div>
+                                    <a href="tel:0547123456">Password dimenticata?</a>
+                                </div>
+
+                                <button class="btn btn-primary medri-login-form__submit" type="submit">Accedi</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+@functions {
+    private static string BuildAuthUrl(string path, string returnUrl, System.Guid? pendingFavoritePropertyId)
+    {
+        var query = new List<string>();
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            query.Add("returnUrl=" + Uri.EscapeDataString(returnUrl));
+        }
+
+        if (pendingFavoritePropertyId.HasValue)
+        {
+            query.Add("pendingFavoritePropertyId=" + Uri.EscapeDataString(pendingFavoritePropertyId.Value.ToString()));
+        }
+
+        return query.Count == 0 ? path : path + "?" + string.Join("&", query);
+    }
+}

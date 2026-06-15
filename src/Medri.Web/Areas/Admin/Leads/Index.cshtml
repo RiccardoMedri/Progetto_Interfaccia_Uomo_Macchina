@@ -1,0 +1,352 @@
+@model Medri.Web.Areas.Admin.Leads.AdminLeadListViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Lead - Area riservata Medri";
+    string FilterSummary(IEnumerable<Medri.Web.Areas.Admin.Leads.AdminLeadOptionViewModel> options, string emptyLabel)
+    {
+        var labels = options
+            .Where(option => option.IsSelected && !string.IsNullOrWhiteSpace(option.Value))
+            .Select(option => option.Label)
+            .ToArray();
+
+        return labels.Length == 0 ? emptyLabel : string.Join(", ", labels);
+    }
+}
+
+<div class="admin-page admin-lead-page container-fluid px-0">
+    <section class="admin-page-heading admin-lead-heading card">
+        <div class="row g-3 align-items-stretch">
+            <div class="col-12 col-md-3 d-flex align-items-center">
+                <div>
+                    <h1>Lead</h1>
+                </div>
+            </div>
+            <div class="col-12 col-md-7">
+                <div class="lead-status-strip row row-cols-1 row-cols-md-3 g-3 h-100" aria-label="Filtri rapidi per stato lead">
+                    @foreach (var card in Model.StatusCards)
+                    {
+                        <div class="col">
+                            <a class="lead-status-card btn btn-outline-secondary h-100 w-100 @(card.IsSelected ? "active" : null)"
+                               asp-area="Admin"
+                               asp-controller="Leads"
+                               asp-action="Index"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-Status="@card.ToggledStatusFilter"
+                               asp-route-RequestType="@Model.RequestType"
+                               asp-route-Advisor="@Model.Advisor"
+                               asp-route-Priority="@Model.Priority"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               aria-pressed="@(card.IsSelected ? "true" : "false")">
+                                <span>@card.Label</span>
+                                <strong>@card.Count</strong>
+                                <small>@card.Description</small>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="admin-heading-actions col-12 col-md-2">
+                <a class="admin-public-site-link btn" href="/">Sito pubblico</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="admin-main-grid row g-3 align-items-start">
+        <div class="admin-main-column col-12 col-md">
+            <section class="admin-panel admin-table-panel lead-list-panel card">
+                <div class="admin-panel-heading">
+                    <div>
+                        <h2>Lead da lavorare</h2>
+                        <p>La conversione in richiesta e un'azione: il lead non resta duplicato nella lista.</p>
+                    </div>
+                </div>
+
+                <form class="lead-list-tools row g-2 align-items-end" method="get" aria-label="Filtri lista lead">
+                    <input type="hidden" name="Page" value="1" />
+                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                    <div class="col-12 col-md">
+                        <label class="form-label" for="leadSearchTerm">Ricerca testuale</label>
+                        <input class="form-control" id="leadSearchTerm" name="SearchTerm" type="search" placeholder="Nome, telefono, email, nota, zona..." value="@Model.SearchTerm" />
+                    </div>
+                    <div class="col-12 col-md">
+                        <span class="form-label">Esigenza</span>
+                        <details class="admin-filter-dropdown">
+                            <summary><span>@FilterSummary(Model.RequestTypeOptions, "Tutte")</span></summary>
+                            <div class="admin-filter-options">
+                                @foreach (var option in Model.RequestTypeOptions.Where(option => !string.IsNullOrWhiteSpace(option.Value)))
+                                {
+                                    <label class="admin-filter-option">
+                                        <input type="checkbox" name="RequestTypes" value="@option.Value" checked="@option.IsSelected" />
+                                        <span>@option.Label</span>
+                                    </label>
+                                }
+                            </div>
+                        </details>
+                    </div>
+                    <div class="col-12 col-md">
+                        <span class="form-label">Priorita</span>
+                        <details class="admin-filter-dropdown">
+                            <summary><span>@FilterSummary(Model.PriorityOptions, "Tutte")</span></summary>
+                            <div class="admin-filter-options">
+                                @foreach (var option in Model.PriorityOptions.Where(option => !string.IsNullOrWhiteSpace(option.Value)))
+                                {
+                                    <label class="admin-filter-option">
+                                        <input type="checkbox" name="Priorities" value="@option.Value" checked="@option.IsSelected" />
+                                        <span>@option.Label</span>
+                                    </label>
+                                }
+                            </div>
+                        </details>
+                    </div>
+                    <div class="col-12 col-md">
+                        <span class="form-label">Referente</span>
+                        <details class="admin-filter-dropdown">
+                            <summary><span>@FilterSummary(Model.AdvisorOptions, "Tutti")</span></summary>
+                            <div class="admin-filter-options">
+                                @foreach (var option in Model.AdvisorOptions.Where(option => !string.IsNullOrWhiteSpace(option.Value)))
+                                {
+                                    <label class="admin-filter-option">
+                                        <input type="checkbox" name="Advisors" value="@option.Value" checked="@option.IsSelected" />
+                                        <span>@option.Label</span>
+                                    </label>
+                                }
+                            </div>
+                        </details>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <button class="btn btn-outline-secondary lead-filter-submit w-100" type="submit">
+                            <i class="ph ph-funnel" aria-hidden="true"></i>
+                            <span>Filtra</span>
+                        </button>
+                    </div>
+                </form>
+
+                <form id="leadBulkForm" class="admin-table-form" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ReturnTo" value="Index" />
+                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                    <input type="hidden" name="Status" value="@Model.Status" />
+                    <input type="hidden" name="RequestType" value="@Model.RequestType" />
+                    <input type="hidden" name="Advisor" value="@Model.Advisor" />
+                    <input type="hidden" name="Priority" value="@Model.Priority" />
+                    <input type="hidden" name="Page" value="@Model.Page" />
+                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+
+                    <div class="admin-table-scroll table-responsive">
+                        <table class="table admin-table lead-admin-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        <span class="lead-select-heading">
+                                            <span class="lead-select-spacer" aria-hidden="true"></span>
+                                            <span>Contatto</span>
+                                        </span>
+                                    </th>
+                                    <th scope="col">Fonte</th>
+                                    <th scope="col">Esigenza</th>
+                                    <th scope="col">Stato</th>
+                                    <th scope="col">Completamento</th>
+                                    <th scope="col">Priorita</th>
+                                    <th scope="col">Referente</th>
+                                    <th class="text-end" scope="col">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.HasLeads)
+                                {
+                                    foreach (var lead in Model.Leads)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="lead-select-contact">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input" id="leadSelect_@lead.Reference" name="SelectedLeadReferences" type="checkbox" value="@lead.Reference" aria-label="Seleziona lead @lead.Reference" />
+                                                    </div>
+                                                    <div class="lead-contact-cell">
+                                                        <span class="lead-code badge text-bg-light">@lead.Reference</span>
+                                                        <strong>@lead.FullName</strong>
+                                                        <p>@lead.ContactSummary</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@lead.SourceLabel</td>
+                                            <td>@lead.NeedLabel</td>
+                                            <td><span class="admin-status-pill badge rounded-pill @lead.StatusClass">@lead.StatusLabel</span></td>
+                                            <td>
+                                                <div class="lead-quality">
+                                                    <strong>@lead.QualificationPercent%</strong>
+                                                    <span class="progress" role="progressbar" aria-valuenow="@lead.QualificationPercent" aria-valuemin="0" aria-valuemax="100">
+                                                        <i class="progress-bar" style="width: @lead.QualificationPercent%"></i>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td><span class="admin-status-pill badge rounded-pill @lead.PriorityClass">@lead.PriorityLabel</span></td>
+                                            <td>@lead.AdvisorLabel</td>
+                                            <td class="text-end">
+                                                <div class="d-inline-flex gap-1">
+                                                    <a class="lead-icon-button btn btn-sm btn-outline-secondary" asp-area="Admin" asp-controller="Leads" asp-action="Detail" asp-route-reference="@lead.Reference" aria-label="Apri lead @lead.Reference" title="Apri lead">
+                                                        <i class="ph ph-arrow-right" aria-hidden="true"></i>
+                                                    </a>
+                                                    <button class="lead-icon-button btn btn-sm btn-outline-secondary"
+                                                            type="submit"
+                                                            formaction="@Url.Action("Convert", "Leads", new { area = "Admin", reference = lead.Reference })"
+                                                            disabled="@(!lead.CanConvert)"
+                                                            aria-label="Converti in richiesta @lead.Reference"
+                                                            title="Converti in richiesta">
+                                                        <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                                                    </button>
+                                                    <button class="lead-icon-button btn btn-sm btn-outline-secondary"
+                                                            type="submit"
+                                                            formaction="@Url.Action("Archive", "Leads", new { area = "Admin", reference = lead.Reference })"
+                                                            disabled="@(!lead.CanArchive)"
+                                                            aria-label="Archivia lead @lead.Reference"
+                                                            title="Archivia">
+                                                        <i class="ph ph-archive" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="admin-empty-state">
+                                                <strong>Nessun lead trovato</strong>
+                                                <p>Modifica i filtri per tornare ai contatti operativi.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+                <nav class="admin-pagination" aria-label="Paginazione lead">
+                    <div class="admin-pagination-metrics">
+                        <span>Risultati</span>
+                        <strong>@Model.TotalItems lead</strong>
+                    </div>
+                    <div class="admin-pagination-main">
+                        <div class="admin-pagination-stepper">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <a class="admin-pagination-link"
+                                   asp-area="Admin"
+                                   asp-controller="Leads"
+                                   asp-action="Index"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-Status="@Model.Status"
+                                   asp-route-RequestType="@Model.RequestType"
+                                   asp-route-Advisor="@Model.Advisor"
+                                   asp-route-Priority="@Model.Priority"
+                                   asp-route-Page="@(Model.Page - 1)"
+                                   asp-route-PageSize="@Model.PageSize"
+                                   aria-label="Pagina precedente">
+                                    <i class="ph ph-caret-left" aria-hidden="true"></i>
+                                    <span>Precedente</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="admin-pagination-link is-disabled" aria-disabled="true">
+                                    <i class="ph ph-caret-left" aria-hidden="true"></i>
+                                    <span>Precedente</span>
+                                </span>
+                            }
+
+                            <span class="admin-pagination-current" aria-current="page">
+                                <span>Pagina</span>
+                                <strong>@Model.Page / @Model.TotalPages</strong>
+                            </span>
+
+                            @if (Model.HasNextPage)
+                            {
+                                <a class="admin-pagination-link"
+                                   asp-area="Admin"
+                                   asp-controller="Leads"
+                                   asp-action="Index"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-Status="@Model.Status"
+                                   asp-route-RequestType="@Model.RequestType"
+                                   asp-route-Advisor="@Model.Advisor"
+                                   asp-route-Priority="@Model.Priority"
+                                   asp-route-Page="@(Model.Page + 1)"
+                                   asp-route-PageSize="@Model.PageSize"
+                                   aria-label="Pagina successiva">
+                                    <span>Successiva</span>
+                                    <i class="ph ph-caret-right" aria-hidden="true"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="admin-pagination-link is-disabled" aria-disabled="true">
+                                    <span>Successiva</span>
+                                    <i class="ph ph-caret-right" aria-hidden="true"></i>
+                                </span>
+                            }
+                        </div>
+                        <form class="admin-page-size-form" method="get" aria-label="Elementi per pagina lead">
+                            <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                            <input type="hidden" name="Status" value="@Model.Status" />
+                            <input type="hidden" name="RequestType" value="@Model.RequestType" />
+                            <input type="hidden" name="Advisor" value="@Model.Advisor" />
+                            <input type="hidden" name="Priority" value="@Model.Priority" />
+                            <input type="hidden" name="Page" value="1" />
+                            <label for="leadPageSize">Righe</label>
+                            <select class="form-select form-select-sm" id="leadPageSize" name="PageSize">
+                                @foreach (var pageSize in Model.PageSizeOptions)
+                                {
+                                    if (pageSize == Model.PageSize)
+                                    {
+                                        <option value="@pageSize" selected>@pageSize</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@pageSize">@pageSize</option>
+                                    }
+                                }
+                            </select>
+                            <button class="admin-page-size-submit btn btn-outline-secondary btn-sm" type="submit">Applica</button>
+                        </form>
+                    </div>
+                </nav>
+            </section>
+        </div>
+
+        <div class="admin-side-column lead-side-panel-col col-12 col-md-auto">
+            <aside class="admin-panel lead-side-panel card">
+                <div class="admin-panel-heading">
+                    <div>
+                        <h2>Azioni rapide</h2>
+                    </div>
+                </div>
+                <div class="lead-quick-actions d-grid gap-2">
+                    <a class="admin-primary-action btn admin-btn-create" asp-area="Admin" asp-controller="Leads" asp-action="Create">
+                        <i class="ph ph-plus" aria-hidden="true"></i>
+                        <span>Nuovo Lead</span>
+                    </a>
+                    <label class="lead-bulk-advisor">
+                        <span>Referente bulk</span>
+                        <select class="form-select" name="BulkAssignedAgencyUserId" form="leadBulkForm">
+                            <option value="">Seleziona referente</option>
+                            @foreach (var option in Model.AdvisorOptions)
+                            {
+                                if (!string.IsNullOrWhiteSpace(option.Value) && option.Value != "unassigned")
+                                {
+                                    <option value="@option.Value">@option.Label</option>
+                                }
+                            }
+                        </select>
+                    </label>
+                    <button class="btn btn-outline-secondary" form="leadBulkForm" formaction="@Url.Action("BulkAssign", "Leads", new { area = "Admin" })" type="submit">Assegna selezionati</button>
+                    <button class="btn btn-outline-secondary" form="leadBulkForm" formaction="@Url.Action("BulkConvert", "Leads", new { area = "Admin" })" formnovalidate type="submit">Converti selezionati</button>
+                    <button class="btn admin-btn-danger" form="leadBulkForm" formaction="@Url.Action("BulkArchive", "Leads", new { area = "Admin" })" formnovalidate type="submit">Archivia selezionati</button>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>

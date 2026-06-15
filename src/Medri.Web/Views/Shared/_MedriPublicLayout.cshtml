@@ -1,0 +1,54 @@
+@{
+    var title = ViewData["Title"] as string ?? "Agenzia Immobiliare";
+    var bodyClass = ViewData["BodyClass"] as string ?? "medri-public-body";
+    var renderMedriFooter = ViewData["RenderMedriFooter"] as bool? ?? true;
+    var shellClass = ViewData["MedriShellClass"] as string ?? "medri-public-shell";
+    
+    
+    var pageBundle = ViewData["PageBundle"] as string;
+}
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="/css/bundle-global.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/css/bundle-medri-base.css" asp-append-version="true" />
+        @if (pageBundle != null)
+        {
+            <link rel="stylesheet" href="/css/bundle-medri-@(pageBundle).css" asp-append-version="true" />
+        }
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/bundle-global.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/css/bundle-medri-base.min.css" asp-append-version="true" />
+        @if (pageBundle != null)
+        {
+            <link rel="stylesheet" href="/css/bundle-medri-@(pageBundle).min.css" asp-append-version="true" />
+        }
+    </environment>
+    @RenderSection("styles", required: false)
+</head>
+<body class="@bodyClass" data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")">
+    <a class="skip-link" href="#contenuto">Salta al contenuto</a>
+    <div class="@shellClass">
+        @await Component.InvokeAsync("MedriHeader")
+        @RenderBody()
+        @if (renderMedriFooter)
+        {
+            <partial name="~/Features/Views/Shared/_MedriFooter.cshtml" />
+        }
+    </div>
+    <environment include="Development">
+        <script src="/js/bundle-global.js" asp-append-version="true"></script>
+        <script src="/js/bundle-medri-public-actions.js" defer asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/bundle-global.min.js" asp-append-version="true"></script>
+        <script src="/js/bundle-medri-public-actions.min.js" defer asp-append-version="true"></script>
+    </environment>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

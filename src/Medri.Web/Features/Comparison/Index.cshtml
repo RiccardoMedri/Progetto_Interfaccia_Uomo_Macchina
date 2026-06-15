@@ -1,0 +1,136 @@
+@model Medri.Web.Features.Comparison.ComparisonIndexViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "comparison";
+    ViewData["Title"] = "Confronta immobili - Agenzia Immobiliare Medri";
+    ViewData["BodyClass"] = "medri-comparison-body";
+    ViewData["MedriShellClass"] = "medri-public-shell medri-comparison-shell";
+    ViewData["NavSection"] = "Buy";
+}
+
+<div class="medri-comparison-page">
+    <nav class="medri-comparison__breadcrumb breadcrumb" aria-label="Percorso">
+        <a class="breadcrumb-item" asp-controller="Home" asp-action="Index">Home</a>
+        <a class="breadcrumb-item" asp-controller="Search" asp-action="Index">Immobili</a>
+        <span class="breadcrumb-item active" aria-current="page">Confronta immobili</span>
+    </nav>
+
+    <main id="contenuto" class="medri-comparison" aria-label="Confronto immobili">
+    <div class="container-xxl">
+        <a class="medri-comparison__back" asp-controller="Search" asp-action="Index">Torna ai risultati</a>
+
+        <section class="medri-comparison__hero" aria-labelledby="comparison-title">
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-lg-7">
+                    <div class="medri-comparison__hero-copy">
+                        <h1 id="comparison-title">Confronta immobili</h1>
+                        <p>Valuta @Model.SelectedCount annunci non solo per dati tecnici, ma per impatto sulla decisione: lavori, contesto, spazi esterni e compromessi.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-5">
+                    <div class="medri-comparison__actions" aria-label="Azioni confronto">
+                        <button class="medri-comparison__action medri-comparison__action-secondary btn btn-outline-secondary" type="button" data-print-button>Stampa</button>
+                        <button class="medri-comparison__action medri-comparison__action-secondary btn btn-outline-secondary" type="button" data-share-button aria-label="Condividi confronto">Condividi</button>
+                        <a class="medri-comparison__action medri-comparison__action-primary btn btn-primary" asp-controller="LeadIntake" asp-action="Buy">Parla con un agente</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="medri-comparison__selection" aria-labelledby="selected-properties-title">
+            <div class="row g-3 align-items-stretch">
+                <div class="col-12 col-xl-2">
+                    <article class="medri-comparison__selection-status h-100" aria-label="Stato selezione confronto">
+                        <span>Confronto attivo</span>
+                        <h2 id="selected-properties-title">@Model.SelectedCount immobili selezionati</h2>
+                        <p>Rimuovi o sostituisci un annuncio prima di valutare i criteri.</p>
+                    </article>
+                </div>
+
+                <div class="col-12 col-xl-10">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-@Model.CardColumns g-3 align-items-stretch h-100">
+                        @foreach (var property in Model.Properties)
+                        {
+                            <div class="col">
+                                <article class="medri-comparison__property-card h-100" data-property-detail-url="@property.DetailUrl">
+                                    <form class="medri-comparison__remove-form" method="post" asp-controller="Comparison" asp-action="Remove">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="ids" value="@Model.SelectedIdsQueryValue" />
+                                        <input type="hidden" name="removeId" value="@property.Id" />
+                                        <button class="medri-comparison__remove-button btn btn-sm btn-outline-secondary" type="submit" aria-label="Rimuovi @property.Title">
+                                            <i class="ph ph-x" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
+                                    <a class="medri-comparison__property-link" href="@property.DetailUrl" aria-label="Apri scheda @property.Title">
+                                        <span class="medri-comparison__media" aria-hidden="true">
+                                            <img class="medri-comparison__media-image" src="@property.ImageUrl" alt="" loading="lazy" />
+                                        </span>
+                                        <span class="medri-comparison__property-body">
+                                            <strong class="medri-comparison__price">@property.PriceLabel</strong>
+                                            <span class="medri-comparison__property-title">@property.Title</span>
+                                            <span class="medri-comparison__location">@property.DisplayLocation</span>
+                                        </span>
+                                    </a>
+                                </article>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="medri-comparison__matrix-section" aria-labelledby="comparison-matrix-title">
+            <div class="medri-comparison__section-heading">
+                <h2 id="comparison-matrix-title">Confronto decisionale</h2>
+            </div>
+
+            <div class="medri-comparison__groups accordion" id="comparisonGroupsAccordion">
+                @foreach (var group in Model.Groups)
+                {
+                    <section class="medri-comparison__group accordion-item">
+                        <h3 class="accordion-header" id="@group.HeadingId">
+                            <button class="medri-comparison__group-button accordion-button @(group.IsOpen ? null : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#@group.Id" aria-expanded="@(group.IsOpen ? "true" : "false")" aria-controls="@group.Id">
+                                @group.Title
+                            </button>
+                        </h3>
+                        <div id="@group.Id" class="accordion-collapse collapse @(group.IsOpen ? "show" : null)" aria-labelledby="@group.HeadingId" data-bs-parent="#comparisonGroupsAccordion">
+                            <div class="accordion-body">
+                                <div class="medri-comparison__matrix-wrap table-responsive">
+                                    <table class="medri-comparison__matrix table mb-0">
+                                        <caption class="visually-hidden">@group.Title per @Model.SelectedCount immobili selezionati</caption>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Criterio</th>
+                                                @foreach (var property in Model.Properties)
+                                                {
+                                                    <th scope="col">
+                                                        <a href="@property.DetailUrl">@property.ShortTitle</a>
+                                                    </th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var row in group.Rows)
+                                            {
+                                                <tr>
+                                                    <th scope="row">@row.Criterion</th>
+                                                    @foreach (var value in row.Values)
+                                                    {
+                                                        <td data-label="@value.PropertyLabel">
+                                                            <span>@value.Value</span>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                }
+            </div>
+        </section>
+    </div>
+    </main>
+</div>

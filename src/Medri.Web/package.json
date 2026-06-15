@@ -1,0 +1,19 @@
+{
+  "name": "medri-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:ts": "tsc -p tsconfig.json",
+    "build:compiled-assets": "node scripts/build-assets.mjs",
+    "build:assets": "npm run build:ts && npm run build:compiled-assets"
+  },
+  "dependencies": {
+    "bootstrap": "5.3.3",
+    "vue": "^3.5.38"
+  },
+  "devDependencies": {
+    "sass": "^1.101.0",
+    "terser": "^5.48.0",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,83 @@
+@use "tokens";
+
+.search-layout .map-canvas{
+  position: relative;
+  overflow: hidden;
+}
+
+.google-map-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.google-map-surface > div {
+  min-height: 100%;
+}
+
+.google-map-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: tokens.$map-layer-overlay;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  color: var(--muted);
+  background: linear-gradient(135deg, #f4f0e8 0%, #e7dfd1 100%);
+  text-align: center;
+  &[hidden] {
+    display: none;
+  }
+}
+.map-card,
+.map-controls{
+  position: relative;
+  z-index: tokens.$map-layer-content;
+}
+
+.map-marker-pin {
+  width: 2.125rem;
+  height: 2.125rem;
+  border: 0.0625rem solid rgba(36, 28, 19, 0.24);
+  border-radius: 62.4375rem;
+  background: #f5efe3;
+  color: #241c13;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 0.75rem 1.5rem rgba(35, 27, 18, 0.22);
+  &.is-selected {
+    background: #241c13;
+    color: #fffaf2;
+  }
+}
+
+.search-card.is-map-selected {
+  outline: 0.125rem solid rgba(36, 28, 19, 0.24);
+  outline-offset: 0.125rem;
+}
+
+.mobile-map-canvas .google-map-surface {
+  border-radius: inherit;
+}
+
+@media (max-width: tokens.$public-mobile-max) {
+  .medri-public-body .public-desktop-reference {
+    display: none;
+  }
+
+  .medri-public-body .public-mobile-reference {
+    display: block;
+  }
+}
+
+@media (min-width: tokens.$public-desktop-min) {
+  .medri-public-body .public-desktop-reference {
+    display: block;
+  }
+
+  .medri-public-body .public-mobile-reference {
+    display: none;
+  }
+}
+
+

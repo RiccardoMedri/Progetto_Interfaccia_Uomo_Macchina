@@ -1,0 +1,9 @@
+@model Medri.Web.Features.Search.SaveSearchFormViewModel
+
+<form id="@Model.FormId" method="post" asp-controller="SavedSearches" asp-action="Save">
+    @Html.AntiForgeryToken()
+    @foreach (var input in Model.HiddenInputs)
+    {
+        <input type="hidden" name="@input.Name" value="@input.Value" />
+    }
+</form>

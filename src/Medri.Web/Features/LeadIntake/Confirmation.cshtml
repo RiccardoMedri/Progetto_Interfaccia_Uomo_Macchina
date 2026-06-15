@@ -1,0 +1,153 @@
+@model Medri.Web.Features.LeadIntake.LeadConfirmationViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "funnels";
+    ViewData["Title"] = "Contatta l'agenzia - Richiesta inviata";
+    ViewData["BodyClass"] = "medri-lead-body";
+    ViewData["RenderMedriFooter"] = false;
+    ViewData["MedriShellClass"] = "medri-public-shell medri-lead-shell";
+    ViewData["NavSection"] = Model.PathLabel == "Affitta casa"
+        ? "Rent"
+        : Model.PathLabel == "Cerchi casa"
+            ? "Buy"
+            : "Owner";
+}
+
+<main id="contenuto" class="medri-lead-confirmation">
+    <section class="container-xxl medri-lead-confirmation__shell">
+        <section class="medri-lead-confirmation__hero" aria-labelledby="lead-confirmation-title">
+            <div class="confirmation-mark medri-lead-confirmation__mark" aria-hidden="true"></div>
+            <div>
+                <span>Conferma</span>
+                <h1 id="lead-confirmation-title">Richiesta inviata correttamente</h1>
+                <p>Abbiamo ricevuto la tua richiesta. Un agente Medri la leggera e ti ricontattera con il contesto gia chiaro.</p>
+            </div>
+        </section>
+
+        <section class="medri-lead-confirmation__summary row g-3" aria-label="Riepilogo richiesta">
+            <div class="col-12 col-lg-4">
+                <div class="medri-lead-confirmation__summary-copy h-100">
+                    <span class="tag badge text-bg-light">@Model.PathLabel</span>
+                    <h2>La tua richiesta in sintesi</h2>
+                    <p>Un agente Medri trova questi dati gia collegati e ti ricontatta con il contesto chiaro.</p>
+                </div>
+            </div>
+            <div class="col-12 col-lg-8">
+                <div class="medri-lead-confirmation__facts row row-cols-1 row-cols-md-3 g-2 h-100">
+                    <div class="col">
+                        <article class="h-100">
+                            <span>Percorso</span>
+                            <strong>@Model.PathLabel</strong>
+                        </article>
+                    </div>
+                    <div class="col">
+                        <article class="h-100">
+                            <span>Modalita</span>
+                            <strong>@Model.PreferredContactMode</strong>
+                        </article>
+                    </div>
+                    <div class="col">
+                        <article class="h-100">
+                            <span>Quando</span>
+                            <strong>@Model.WhenLabel</strong>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <section class="confirmation-progress-section" aria-label="Prossimi passaggi">
+            <h2>Da qui in avanti</h2>
+            <ol class="post-send-timeline">
+                <li class="is-active">
+                    <span class="timeline-icon receipt-icon" aria-hidden="true"></span>
+                    <div>
+                        <strong>Richiesta presa in carico</strong>
+                        <p>L'agenzia riceve dati di contatto e sintesi del bisogno in un unico contesto.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="timeline-icon phone-option-icon" aria-hidden="true"></span>
+                    <div>
+                        <strong>Ti ricontattiamo</strong>
+                        <p>Un agente verifica priorita, urgenza e informazioni mancanti.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="timeline-icon remote-option-icon" aria-hidden="true"></span>
+                    <div>
+                        <strong>Priorita ordinate con un referente</strong>
+                        <p>Il referente mette in ordine opzioni, vincoli e prossimi passaggi.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="timeline-icon office-option-icon" aria-hidden="true"></span>
+                    <div>
+                        <strong>Prossimo passo guidato</strong>
+                        <p>Se serve, si passa a incontro, visita o valutazione dedicata.</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        @if (Model.FeaturedProperties.Count > 0)
+        {
+            <section class="medri-lead-confirmation__properties">
+                <div class="section-heading medri-lead-confirmation__section-heading">
+                    <h2>Immobili disponibili</h2>
+                    <a asp-controller="Search" asp-action="Index">Vedi immobili</a>
+                </div>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+                    @foreach (var property in Model.FeaturedProperties)
+                    {
+                        <div class="col">
+                            <a class="medri-lead-confirmation__property-card h-100" href="@property.DetailUrl">
+                                <span class="medri-lead-confirmation__property-media"
+                                      style="background-image: url('@property.ImageUrl')"
+                                      role="img"
+                                      aria-label="Foto di @property.Title"></span>
+                                <span class="medri-lead-confirmation__property-copy">
+                                    <span class="tag badge text-bg-light">@property.Tag</span>
+                                    <strong>@property.PriceLabel</strong>
+                                    <span>@property.Title</span>
+                                    <small>@property.DisplayLocation</small>
+                                </span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        <section class="medri-lead-confirmation__support" aria-label="Assistenza">
+            <article>
+                <span class="support-icon headset-icon" aria-hidden="true"></span>
+                <div>
+                    <h2>Hai bisogno di aiuto?</h2>
+                    <p>L'agenzia resta disponibile per chiarire i prossimi passaggi.</p>
+                </div>
+            </article>
+            <article>
+                <span class="support-icon phone-support-icon" aria-hidden="true"></span>
+                <div>
+                    <strong><a href="tel:0547123456">0547 123456</a></strong>
+                    <p>Lun-Ven 9:00-12:30 / 15:00-19:00</p>
+                </div>
+            </article>
+            <article>
+                <span class="support-icon mail-icon" aria-hidden="true"></span>
+                <div>
+                    <strong><a href="mailto:info@agenziamedri.it">info@agenziamedri.it</a></strong>
+                    <p>Risposta entro il giorno lavorativo</p>
+                </div>
+            </article>
+        </section>
+
+        <section class="medri-lead-confirmation__actions">
+            <a class="primary-cta btn btn-primary" asp-controller="Search" asp-action="Index">Cerca immobili</a>
+            <a class="secondary-cta btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Torna alla home</a>
+            <a class="secondary-cta btn btn-outline-secondary" href="tel:0547123456">Chiama l'agenzia</a>
+        </section>
+    </section>
+</main>

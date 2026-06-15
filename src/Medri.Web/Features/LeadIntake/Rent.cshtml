@@ -1,0 +1,155 @@
+@model Medri.Web.Features.LeadIntake.RentLeadRequestViewModel
+@{
+    Layout = "_MedriPublicLayout";
+    ViewData["PageBundle"] = "funnels";
+    ViewData["Title"] = "Vuoi affittare casa?";
+    ViewData["BodyClass"] = "medri-lead-body";
+    ViewData["RenderMedriFooter"] = false;
+    ViewData["MedriShellClass"] = "medri-public-shell medri-lead-shell";
+    ViewData["NavSection"] = "Rent";
+}
+
+<main id="contenuto" class="medri-lead-funnel medri-lead-funnel--rent">
+    <section class="container-xxl medri-lead-funnel__shell">
+        <nav class="detail-breadcrumb breadcrumb medri-lead-funnel__breadcrumb" aria-label="Percorso">
+            <a class="breadcrumb-item" asp-controller="Home" asp-action="Index">Home</a>
+            <span class="breadcrumb-item active" aria-current="page">Affitta casa</span>
+        </nav>
+
+        <a class="back-to-search secondary-cta btn btn-outline-secondary medri-lead-funnel__back" asp-controller="Home" asp-action="Index">Torna alla home</a>
+
+        <form class="medri-lead-funnel__form row g-4 align-items-start" method="post" data-lead-form>
+            @Html.AntiForgeryToken()
+
+            <div class="medri-lead-funnel__main col-12">
+                <div class="visit-heading-row medri-lead-funnel__heading-row">
+                    <div class="visit-heading medri-lead-funnel__heading">
+                        <span>Richiesta guidata</span>
+                        <h1>Vuoi affittare casa?</h1>
+                        <p>Indica canone sostenibile, tempi e garanzie: l'agenzia puo capire subito quali proposte sono realistiche.</p>
+                    </div>
+                    <ol class="visit-stepper medri-lead-funnel__stepper" aria-label="Avanzamento richiesta">
+                        <li class="is-active"><span>1</span>Dati</li>
+                        <li><span>2</span>Conferma</li>
+                    </ol>
+                </div>
+
+                <partial name="_LeadContactPreferences" model="Model.ContactPreferences" />
+                <partial name="_LeadTimePreferences" model="Model.TimePreferences" />
+
+                <section class="visit-section medri-lead-funnel__section">
+                    <div class="section-inline-heading medri-lead-funnel__section-heading">
+                        <div>
+                            <h2>I tuoi dati</h2>
+                            <p>Servono per assegnare la richiesta al referente corretto.</p>
+                        </div>
+                        <span class="selected-intent-pill badge rounded-pill text-bg-light">Affitto casa</span>
+                    </div>
+                    <div class="visit-form-grid row g-3">
+                        <div class="col-12 col-md-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Nome e cognome</span>
+                                <input class="form-control" asp-for="FullName" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Telefono</span>
+                                <input class="form-control" asp-for="Phone" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Email</span>
+                                <input class="form-control" asp-for="Email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="visit-section medri-lead-funnel__section">
+                    <h2>La casa che stai cercando</h2>
+                    <div class="visit-form-grid row g-3">
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Canone massimo sostenibile</span>
+                                <input class="form-control" asp-for="SustainableBudget" />
+                                <span asp-validation-for="SustainableBudget" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Zone cercate</span>
+                                <input class="form-control" asp-for="DesiredLocations" />
+                                <span asp-validation-for="DesiredLocations" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Persone che abiteranno la casa</span>
+                                <input class="form-control" asp-for="HouseholdDescription" />
+                                <span asp-validation-for="HouseholdDescription" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Situazione lavorativa o studio</span>
+                                <select class="form-select" asp-for="WorkStudySituation">
+                                    <option>Contratto di lavoro stabile</option>
+                                    <option>Studente con garante</option>
+                                    <option>Libero professionista</option>
+                                </select>
+                                <span asp-validation-for="WorkStudySituation" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Garanzie disponibili</span>
+                                <select class="form-select" asp-for="AvailableGuarantees">
+                                    <option>Busta paga e referenze</option>
+                                    <option>Garante familiare</option>
+                                    <option>Da verificare</option>
+                                </select>
+                                <span asp-validation-for="AvailableGuarantees" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Ingresso desiderato</span>
+                                <select class="form-select" asp-for="DesiredMoveIn">
+                                    <option>Entro 2 mesi</option>
+                                    <option>Prima possibile</option>
+                                    <option>Oltre 2 mesi</option>
+                                </select>
+                                <span asp-validation-for="DesiredMoveIn" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <div class="col-12">
+                            <label class="medri-lead-funnel__field">
+                                <span class="form-label">Vincoli e preferenze</span>
+                                <textarea class="form-control" asp-for="PreferencesAndCompromises"></textarea>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="visit-actions medri-lead-funnel__actions d-flex flex-column flex-sm-row justify-content-sm-end gap-2">
+                    <a class="secondary-cta btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Indietro</a>
+                    <button class="primary-cta btn btn-primary" type="submit">Invia richiesta</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</main>
+
+@section scripts {
+    <environment include="Development">
+        <script src="/js/bundle-medri-lead-forms.js" defer asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/bundle-medri-lead-forms.min.js" defer asp-append-version="true"></script>
+    </environment>
+}
