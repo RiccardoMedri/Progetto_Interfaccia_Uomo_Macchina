@@ -9,7 +9,7 @@
             var optionId = Model.IdPrefix + "-" + index;
             var isSelected = option.Value == Model.SelectedValue;
             <div class="col">
-                <label class="choice-card contact-option-card h-100 @(isSelected ? "is-selected" : null)" for="@optionId" data-contact-choice>
+                <label class="choice-card contact-option-card h-100" for="@optionId">
                     <input class="visually-hidden"
                            id="@optionId"
                            name="@Model.FieldName"

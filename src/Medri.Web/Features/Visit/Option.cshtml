@@ -20,7 +20,7 @@
 
         <a class="back-to-search secondary-cta btn btn-outline-secondary medri-request-funnel__back" asp-controller="Property" asp-action="Detail" asp-route-slug="@Model.Property.Slug">Torna alla scheda immobile</a>
 
-        <form class="visit-shell medri-request-funnel__form row g-4 align-items-start" method="post" asp-controller="Visit" asp-action="Option" asp-route-slug="@Model.Property.Slug" data-lead-form>
+        <form class="visit-shell medri-request-funnel__form row g-4 align-items-start" method="post" asp-controller="Visit" asp-action="Option" asp-route-slug="@Model.Property.Slug">
             @Html.AntiForgeryToken()
             <input asp-for="AppointmentId" type="hidden" />
             <input asp-for="FullName" type="hidden" />
@@ -58,12 +58,3 @@
         </form>
     </section>
 </main>
-
-@section scripts {
-    <environment include="Development">
-        <script src="/js/bundle-medri-lead-forms.js" defer asp-append-version="true"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="/js/bundle-medri-lead-forms.min.js" defer asp-append-version="true"></script>
-    </environment>
-}

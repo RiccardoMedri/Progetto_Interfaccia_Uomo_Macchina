@@ -529,6 +529,12 @@
     size: A4;
     margin: 1.2cm;
   }
+  .skip-link,
+  .site-header,
+  .medri-home-header,
+  .site-footer {
+    display: none;
+  }
   .medri-comparison-body,
   .medri-comparison-shell {
     background: var(--surface);

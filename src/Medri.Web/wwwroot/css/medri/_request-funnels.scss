@@ -277,7 +277,7 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
       transform: translateY(-0.08rem);
     }
 
-    &.is-selected {
+    &:has(input:checked) {
       border-color: var(--button);
       background: var(--surface);
       box-shadow: inset 0 0 0 0.0625rem var(--button);
@@ -329,7 +329,7 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
     background: var(--surface);
   }
 
-  .contact-option-card.is-selected .selection-dot {
+  .contact-option-card:has(input:checked) .selection-dot {
     border-color: var(--button);
     background:
       radial-gradient(circle at center, var(--button) 0 45%, transparent 47% 100%),
@@ -364,16 +364,16 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
     }
 
     &:hover,
-    &:focus-visible {
+    &:has(input:focus-visible) {
       border-color: rgba(31, 54, 88, 0.28);
       transform: translateY(-0.08rem);
     }
 
-    &:focus-visible {
+    &:has(input:focus-visible) {
       @include mixins.focus-ring;
     }
 
-    &.is-selected {
+    &:has(input:checked) {
       border-color: var(--button);
       background: var(--button);
       color: var(--surface);
@@ -386,10 +386,7 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
 
   .custom-time-panel {
     padding-top: map.get($request-space, "xs");
-
-    &.is-collapsed {
-      display: none;
-    }
+    display: none;
 
     label {
       display: grid;
@@ -1154,7 +1151,7 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
       transform: translateY(-0.08rem);
     }
 
-    &.is-selected {
+    &:has(input:checked) {
       border-color: var(--button);
       background: var(--surface);
       box-shadow: inset 0 0 0 0.0625rem var(--button);
@@ -1206,7 +1203,7 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
     background: var(--surface);
   }
 
-  .contact-option-card.is-selected .selection-dot {
+  .contact-option-card:has(input:checked) .selection-dot {
     border-color: var(--button);
     background:
       radial-gradient(circle at center, var(--button) 0 45%, transparent 47% 100%),
@@ -1241,16 +1238,16 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
     }
 
     &:hover,
-    &:focus-visible {
+    &:has(input:focus-visible) {
       border-color: rgba(31, 54, 88, 0.28);
       transform: translateY(-0.08rem);
     }
 
-    &:focus-visible {
+    &:has(input:focus-visible) {
       @include mixins.focus-ring;
     }
 
-    &.is-selected {
+    &:has(input:checked) {
       border-color: var(--button);
       background: var(--button);
       color: var(--surface);
@@ -1263,10 +1260,7 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
 
   .custom-time-panel {
     padding-top: map.get($request-space, "xs");
-
-    &.is-collapsed {
-      display: none;
-    }
+    display: none;
 
     label {
       display: grid;
@@ -1744,4 +1738,11 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
   .medri-request-funnel__main {
     order: 1;
   }
+}
+
+// Custom-time panel reveal (replaces the former JS is-collapsed toggle).
+// The "Altro orario" radio carries .time-choice-altro; when it is checked the
+// panel (hidden by default above) is shown again as the Bootstrap .row it is.
+.lead-time-section:has(.time-choice-altro:checked) .custom-time-panel {
+  display: flex;
 }

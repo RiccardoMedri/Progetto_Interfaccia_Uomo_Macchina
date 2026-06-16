@@ -1,35 +1,38 @@
 @model Medri.Web.Features.LeadIntake.LeadFunnelTimePreferencesViewModel
 
-<section class="@Model.SectionClass">
+<section class="@Model.SectionClass lead-time-section">
     <h2>@Model.Heading</h2>
-    <input id="@Model.SlotFieldName" name="@Model.SlotFieldName" type="hidden" value="@Model.NormalizedSelectedTimeSlot" />
     <div class="row row-cols-2 row-cols-md-4 g-3">
         <div class="col">
-            <button class="time-choice-button h-100 w-100 @(Model.NormalizedSelectedTimeSlot == "Mattina" ? "is-selected" : null)" type="button" data-time-choice="Mattina">
+            <label class="time-choice-button h-100 w-100">
+                <input class="visually-hidden" name="@Model.SlotFieldName" type="radio" value="Mattina" checked="@(Model.NormalizedSelectedTimeSlot == "Mattina")" />
                 <strong>Mattina</strong>
                 <span>9-12</span>
-            </button>
+            </label>
         </div>
         <div class="col">
-            <button class="time-choice-button h-100 w-100 @(Model.NormalizedSelectedTimeSlot == "Pomeriggio" ? "is-selected" : null)" type="button" data-time-choice="Pomeriggio">
+            <label class="time-choice-button h-100 w-100">
+                <input class="visually-hidden" name="@Model.SlotFieldName" type="radio" value="Pomeriggio" checked="@(Model.NormalizedSelectedTimeSlot == "Pomeriggio")" />
                 <strong>Pomeriggio</strong>
                 <span>14-17</span>
-            </button>
+            </label>
         </div>
         <div class="col">
-            <button class="time-choice-button h-100 w-100 @(Model.NormalizedSelectedTimeSlot == "Sera" ? "is-selected" : null)" type="button" data-time-choice="Sera">
+            <label class="time-choice-button h-100 w-100">
+                <input class="visually-hidden" name="@Model.SlotFieldName" type="radio" value="Sera" checked="@(Model.NormalizedSelectedTimeSlot == "Sera")" />
                 <strong>Sera</strong>
                 <span>17-19</span>
-            </button>
+            </label>
         </div>
         <div class="col">
-            <button class="time-choice-button h-100 w-100 @(Model.IsCustomTime ? "is-selected" : null)" type="button" data-time-choice="Altro orario">
+            <label class="time-choice-button h-100 w-100">
+                <input class="visually-hidden time-choice-altro" name="@Model.SlotFieldName" type="radio" value="Altro orario" checked="@Model.IsCustomTime" />
                 <strong>Altro orario</strong>
                 <span>Scegli giorno e ora</span>
-            </button>
+            </label>
         </div>
     </div>
-    <div class="custom-time-panel row g-3 @(Model.IsCustomTime ? null : "is-collapsed")" aria-label="Scelta giorno e orario specifico" data-custom-time>
+    <div class="custom-time-panel row g-3" aria-label="Scelta giorno e orario specifico">
         <div class="col-12 col-md-6">
             <label>
                 <span class="form-label">Giorno</span>

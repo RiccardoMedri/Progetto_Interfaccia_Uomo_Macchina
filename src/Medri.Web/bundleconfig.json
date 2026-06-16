@@ -84,13 +84,6 @@
     "sourceMap": false
   },
   {
-    "outputFileName": "wwwroot/js/bundle-medri-lead-forms.js",
-    "inputFiles": [ "wwwroot/js/lead-forms.js" ],
-    "minify": { "enabled": true },
-    "includeInProject": true,
-    "sourceMap": false
-  },
-  {
     "outputFileName": "wwwroot/js/bundle-admin-property-media.js",
     "inputFiles": [ "wwwroot/js/admin-property-media.js" ],
     "minify": { "enabled": true },

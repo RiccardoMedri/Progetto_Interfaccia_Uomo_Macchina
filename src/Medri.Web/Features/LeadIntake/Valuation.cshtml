@@ -18,7 +18,7 @@
 
         <a class="back-to-search secondary-cta btn btn-outline-secondary medri-lead-funnel__back" asp-controller="Home" asp-action="Index">Torna alla home</a>
 
-        <form class="medri-lead-funnel__form row g-4 align-items-start" method="post" data-lead-form>
+        <form class="medri-lead-funnel__form row g-4 align-items-start" method="post">
             @Html.AntiForgeryToken()
 
             <div class="medri-lead-funnel__main col-12">
@@ -146,12 +146,3 @@
         </form>
     </section>
 </main>
-
-@section scripts {
-    <environment include="Development">
-        <script src="/js/bundle-medri-lead-forms.js" defer asp-append-version="true"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="/js/bundle-medri-lead-forms.min.js" defer asp-append-version="true"></script>
-    </environment>
-}
