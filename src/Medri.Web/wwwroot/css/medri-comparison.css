@@ -524,6 +524,11 @@
     text-align: right;
   }
 }
+.medri-comparison__action.is-copied {
+  border-color: var(--role-match);
+  color: var(--role-match-strong);
+}
+
 @media print {
   @page {
     size: A4;

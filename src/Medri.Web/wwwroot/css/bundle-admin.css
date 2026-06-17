@@ -2227,3 +2227,13 @@ span.property-thumb {
   background: var(--role-risk-strong) !important;
   color: #fff !important;
 }
+
+.admin-btn-exit {
+  border-color: transparent !important;
+  background: var(--role-valuation) !important;
+  color: var(--button-strong) !important;
+}
+.admin-btn-exit:hover, .admin-btn-exit:focus-visible {
+  background: var(--role-valuation-strong) !important;
+  color: #fff !important;
+}

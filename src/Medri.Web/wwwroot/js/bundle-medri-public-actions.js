@@ -75,13 +75,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                                 return [2];
                             }
                             if (!response.ok) {
-                                throw new Error("Favorite request failed with status ".concat(response.status, "."));
+                                throw new Error("Richiesta preferiti non riuscita con stato ".concat(response.status, "."));
                             }
                             return [4, response.json()];
                         case 3:
                             result = _b.sent();
                             if (!result.succeeded) {
-                                throw new Error("Favorite request was not completed.");
+                                throw new Error("Richiesta preferiti non completata.");
                             }
                             syncFavoriteControls(result.propertyId, result.isSaved);
                             return [3, 6];
@@ -235,6 +235,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function bindShareButtons() {
         var _this = this;
         document.querySelectorAll("[data-share-button]").forEach(function (button) {
+            var _a, _b;
+            var originalLabel = (_a = button.textContent) !== null && _a !== void 0 ? _a : "";
+            var originalAria = (_b = button.getAttribute("aria-label")) !== null && _b !== void 0 ? _b : "";
+            var resetHandle = 0;
             button.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
                 var shareData, _a;
                 return __generator(this, function (_b) {
@@ -257,7 +261,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                             return [4, navigator.clipboard.writeText(shareData.url)];
                         case 4:
                             _b.sent();
+                            button.textContent = "Link copiato";
+                            button.classList.add("is-copied");
                             button.setAttribute("aria-label", "Link confronto copiato");
+                            if (resetHandle) {
+                                window.clearTimeout(resetHandle);
+                            }
+                            resetHandle = window.setTimeout(function () {
+                                button.textContent = originalLabel;
+                                button.classList.remove("is-copied");
+                                button.setAttribute("aria-label", originalAria);
+                                resetHandle = 0;
+                            }, 2200);
                             _b.label = 5;
                         case 5: return [3, 7];
                         case 6:

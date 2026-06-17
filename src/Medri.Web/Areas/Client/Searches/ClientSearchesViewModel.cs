@@ -14,8 +14,6 @@ namespace Medri.Web.Areas.Client.Searches
         public IReadOnlyList<ClientSavedSearchItemViewModel> Searches { get; set; } =
             new List<ClientSavedSearchItemViewModel>();
 
-        public bool IsJustSaved { get; set; }
-
         public bool HasSearches => Searches.Count > 0;
     }
 
@@ -34,8 +32,7 @@ namespace Medri.Web.Areas.Client.Searches
             IReadOnlyList<ClientSavedSearchDto> savedSearches,
             int favoriteCount,
             int requestCount,
-            string searchBaseUrl,
-            bool isJustSaved)
+            string searchBaseUrl)
         {
             return new ClientSearchesViewModel
             {
@@ -43,7 +40,6 @@ namespace Medri.Web.Areas.Client.Searches
                     ClientAreaTabs.Searches,
                     favoriteCount,
                     requestCount),
-                IsJustSaved = isJustSaved,
                 Searches = savedSearches.Select(saved => new ClientSavedSearchItemViewModel
                 {
                     Id = saved.Id,

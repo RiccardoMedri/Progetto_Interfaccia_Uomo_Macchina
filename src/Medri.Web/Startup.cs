@@ -127,9 +127,12 @@ namespace Medri.Web
                 endpoints.MapAreaControllerRoute("admin-request-edit", "Admin", "admin/richieste/{reference}", new { controller = "Requests", action = "Edit" });
                 endpoints.MapAreaControllerRoute("admin-properties", "Admin", "admin/immobili", new { controller = "Properties", action = "Index" });
                 endpoints.MapAreaControllerRoute("admin-property-create", "Admin", "admin/immobili/nuovo", new { controller = "Properties", action = "Create" });
+                endpoints.MapAreaControllerRoute("admin-property-geocode", "Admin", "admin/immobili/geocodifica", new { controller = "Properties", action = "Geocode" });
                 endpoints.MapAreaControllerRoute("admin-property-ready", "Admin", "admin/immobili/{reference}/segna-pronto", new { controller = "Properties", action = "MarkReady" });
                 endpoints.MapAreaControllerRoute("admin-property-update", "Admin", "admin/immobili/{reference}/salva", new { controller = "Properties", action = "Update" });
                 endpoints.MapAreaControllerRoute("admin-property-preview", "Admin", "admin/immobili/{reference}/anteprima", new { controller = "Properties", action = "Preview" });
+                endpoints.MapAreaControllerRoute("admin-property-preview-map", "Admin", "admin/immobili/{reference}/anteprima-mappa", new { controller = "Properties", action = "PreviewMap" });
+                endpoints.MapAreaControllerRoute("admin-property-discard", "Admin", "admin/immobili/{reference}/scarta", new { controller = "Properties", action = "Discard" });
                 endpoints.MapAreaControllerRoute("admin-property-edit", "Admin", "admin/immobili/{reference}", new { controller = "Properties", action = "Edit" });
                 endpoints.MapAreaControllerRoute("admin", "Admin", "admin/{controller=Dashboard}/{action=Index}/{id?}");
                 endpoints.MapAreaControllerRoute("client-saved", "Client", "client-saved", new { controller = "Saved", action = "Index" });

@@ -1,4 +1,8 @@
 @model Medri.Web.Features.Views.Shared.MedriHeaderViewModel
+@inject Microsoft.Extensions.Options.IOptions<Medri.Web.Infrastructure.AgencyContactOptions> AgencyContactOptions
+@{
+    var agencyContact = AgencyContactOptions.Value;
+}
 
 <header class="site-header medri-home-header">
     <a class="brand" asp-controller="Home" asp-action="Index" aria-label="Homepage agenzia immobiliare">
@@ -88,8 +92,8 @@
     </nav>
 
     <div class="header-contact" aria-label="Contatti agenzia">
-        <a class="phone-link" href="tel:0547123456">0547 123456</a>
-        <a href="mailto:info@agenziamedri.it">info@agenziamedri.it</a>
-        <span>Via Cesare Battisti 18, Cesena</span>
+        <a class="phone-link" href="@agencyContact.PhoneHref">@agencyContact.PhoneLabel</a>
+        <a href="@agencyContact.EmailHref">@agencyContact.EmailLabel</a>
+        <span>@agencyContact.AddressLabel</span>
     </div>
 </header>

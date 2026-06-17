@@ -1,3 +1,8 @@
+@inject Microsoft.Extensions.Options.IOptions<Medri.Web.Infrastructure.AgencyContactOptions> AgencyContactOptions
+@{
+    var agencyContact = AgencyContactOptions.Value;
+}
+
 <footer class="site-footer" aria-label="Informazioni agenzia">
     <div class="footer-info">
         <div class="footer-brand">
@@ -5,9 +10,9 @@
             <p>Servizi immobiliari a Cesena dal 1974.</p>
         </div>
         <div class="footer-contact">
-            <span>Via Cesare Battisti 18, Cesena</span>
-            <a href="tel:0547123456">0547 123456</a>
-            <a href="mailto:info@agenziamedri.it">info@agenziamedri.it</a>
+            <span>@agencyContact.AddressLabel</span>
+            <a href="@agencyContact.PhoneHref">@agencyContact.PhoneLabel</a>
+            <a href="@agencyContact.EmailHref">@agencyContact.EmailLabel</a>
         </div>
         <nav class="footer-links" aria-label="Collegamenti footer">
             <a asp-controller="Search" asp-action="Index">Immobili</a>

@@ -208,6 +208,8 @@ namespace Medri.Services.Medri.Application
                 UpdatedAtUtc = now,
                 AssignedAgencyUserId = input.AssignedAgencyUserId,
                 Address = ApplicationText.Clean(input.Address),
+                Latitude = input.Latitude.GetValueOrDefault(),
+                Longitude = input.Longitude.GetValueOrDefault(),
                 BedroomsLabel = ApplicationText.Clean(input.BedroomsLabel),
                 FloorLabel = ApplicationText.Clean(input.FloorLabel),
                 ElevatorLabel = ApplicationText.Clean(input.ElevatorLabel),
@@ -234,8 +236,7 @@ namespace Medri.Services.Medri.Application
 
             var completion = AdminPropertyCompletionCalculator.Calculate(
                 listing,
-                0,
-                false);
+                0);
             AdminPropertyCompletionCalculator.ApplyToListing(listing, completion);
             if (completion.IsComplete)
             {

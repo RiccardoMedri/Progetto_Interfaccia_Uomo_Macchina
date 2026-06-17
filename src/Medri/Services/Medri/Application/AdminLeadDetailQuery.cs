@@ -39,12 +39,7 @@ namespace Medri.Services.Medri.Application
                     .CountAsync(
                         profile => profile.PublicReference != null && profile.Status != RequestStatuses.Archived,
                         cancellationToken),
-                ListingCount = await dbContext.PropertyListings
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .CountAsync(
-                        listing => listing.InternalReference != null,
-                        cancellationToken),
+                ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken),
                 Advisors = await dbContext.AgencyUsers
                     .AsNoTracking()
                     .Where(advisor => !advisor.IsSystemSeed)
@@ -125,12 +120,7 @@ namespace Medri.Services.Medri.Application
                 .CountAsync(
                     profile => profile.PublicReference != null && profile.Status != RequestStatuses.Archived,
                     cancellationToken);
-            lead.ListingCount = await dbContext.PropertyListings
-                .IgnoreQueryFilters()
-                .AsNoTracking()
-                .CountAsync(
-                    listing => listing.InternalReference != null,
-                    cancellationToken);
+            lead.ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken);
             lead.Advisors = await dbContext.AgencyUsers
                 .AsNoTracking()
                 .Where(advisor => !advisor.IsSystemSeed)

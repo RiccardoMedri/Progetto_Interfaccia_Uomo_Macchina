@@ -8,19 +8,6 @@
         <partial name="~/Areas/Client/Views/Shared/_ClientAreaHeader.cshtml" model="Model.Navigation" />
 
         <section class="medri-client-content" aria-label="Ricerche salvate">
-            @if (Model.IsJustSaved)
-            {
-                <aside class="medri-client-search-card" role="status" aria-live="polite">
-                    <div class="medri-client-search-card__body">
-                        <span class="medri-client-search-card__kicker">Ricerca salvata</span>
-                        <p class="medri-client-search-card__label">La ricerca e stata aggiunta alla tua area cliente.</p>
-                    </div>
-                    <div class="medri-client-search-card__actions">
-                        <a class="btn btn-primary medri-client-search-card__open" asp-area="" asp-controller="Search" asp-action="Index">Torna agli immobili</a>
-                    </div>
-                </aside>
-            }
-
             @if (Model.HasSearches)
             {
                 <div class="medri-client-search-list">

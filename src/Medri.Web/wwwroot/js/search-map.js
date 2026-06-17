@@ -56,7 +56,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             var callbackName = "__medriSearchMapReady";
             browserWindow[callbackName] = function () { return resolve(); };
             if (existingScript) {
-                existingScript.addEventListener("error", function () { return reject(new Error("maps-load-failed")); }, { once: true });
+                existingScript.addEventListener("error", function () { return reject(new Error("caricamento-mappa-non-riuscito")); }, { once: true });
                 return;
             }
             var script = document.createElement("script");
@@ -68,7 +68,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                     encodeURIComponent(apiKey) +
                     "&v=weekly&libraries=marker&callback=" +
                     encodeURIComponent(callbackName);
-            script.onerror = function () { return reject(new Error("maps-load-failed")); };
+            script.onerror = function () { return reject(new Error("caricamento-mappa-non-riuscito")); };
             document.head.appendChild(script);
         });
     }

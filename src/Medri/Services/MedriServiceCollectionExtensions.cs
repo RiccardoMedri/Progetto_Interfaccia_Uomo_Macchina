@@ -82,6 +82,7 @@ namespace Medri.Services
             services.AddScoped<MarkAdminPropertyReadyCommand>();
             services.AddScoped<PublishAdminPropertyCommand>();
             services.AddScoped<ArchiveAdminPropertyCommand>();
+            services.AddScoped<DiscardDraftAdminPropertyCommand>();
             services.AddScoped<BulkAssignAdminPropertiesCommand>();
             services.AddScoped<FeatureAdminPropertyCommand>();
             services.AddScoped<MoveFeaturedAdminPropertyCommand>();

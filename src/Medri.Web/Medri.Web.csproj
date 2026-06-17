@@ -23,7 +23,7 @@
 		<ProjectReference Include="..\Medri\Medri.csproj" />
 	</ItemGroup>
 
-	<Target Name="BuildClientAssets" BeforeTargets="BundleMinify;BeforeBuild">
+	<Target Name="BuildClientAssets" BeforeTargets="DefineStaticWebAssets;BundleMinify;BeforeBuild">
 		<Exec Command="npm.cmd run build:assets" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'$(OS)' == 'Windows_NT'" />
 		<Exec Command="npm run build:assets" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'$(OS)' != 'Windows_NT'" />
 	</Target>

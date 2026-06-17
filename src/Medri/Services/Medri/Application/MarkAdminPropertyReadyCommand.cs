@@ -41,8 +41,7 @@ namespace Medri.Services.Medri.Application
                 .ToArrayAsync(cancellationToken);
             var completion = AdminPropertyCompletionCalculator.Calculate(
                 listing,
-                media.Length,
-                AdminPropertyCompletionCalculator.HasFloorPlan(media));
+                media.Length);
             AdminPropertyCompletionCalculator.ApplyToListing(listing, completion);
 
             if (!completion.IsComplete)

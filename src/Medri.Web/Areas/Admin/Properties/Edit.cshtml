@@ -12,6 +12,7 @@
         : $"{Model.Reference} - {Model.StatusLabel}";
     var propertyHeadingTitle = Model.IsCreateMode ? "Nuovo immobile" : Model.Title;
     var mediaInputIndex = 0;
+    var propertyGeocodeAction = Url.Action("Geocode", "Properties", new { area = "Admin" });
 }
 
 <div class="container-fluid px-0">
@@ -49,6 +50,17 @@
                                 <i class="ph ph-trash" aria-hidden="true"></i>
                                 <span>Archivia</span>
                             </button>
+                        </form>
+                    }
+                    @if (Model.IsCreateMode || !Model.CanDiscardDraft)
+                    {
+                        <a class="btn admin-btn-exit" asp-area="Admin" asp-controller="Properties" asp-action="Index">Esci senza salvare</a>
+                    }
+                    else
+                    {
+                        <form class="property-inline-form" asp-area="Admin" asp-controller="Properties" asp-action="Discard" asp-route-reference="@Model.Reference" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn admin-btn-exit w-100" type="submit">Esci senza salvare</button>
                         </form>
                     }
                     <a class="admin-public-site-link btn" href="/">Sito pubblico</a>
@@ -220,7 +232,7 @@
                         </div>
                     </div>
                     <div class="property-editor-section-body">
-                        <div class="row g-3">
+                        <div class="row g-3" data-property-location data-property-location-geocode-url="@propertyGeocodeAction">
                             <div class="col-12 col-md-6">
                                 <label class="form-label" asp-for="ListingCategory">Tipologia immobile</label>
                                 <select class="form-select" asp-for="ListingCategory">
@@ -284,13 +296,16 @@
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label" asp-for="DisplayLocation">Comune e quartiere</label>
-                                <input class="form-control" asp-for="DisplayLocation" />
+                                <input class="form-control" asp-for="DisplayLocation" data-property-location-display />
                                 <span class="text-danger" asp-validation-for="DisplayLocation"></span>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label class="form-label" asp-for="Address">Indirizzo interno</label>
-                                <input class="form-control" asp-for="Address" />
+                                <label class="form-label" asp-for="Address">Indirizzo preciso</label>
+                                <input class="form-control" asp-for="Address" data-property-location-address />
                                 <span class="text-danger" asp-validation-for="Address"></span>
+                                <span class="form-text d-block" data-property-location-status></span>
+                                <input asp-for="LatitudeText" type="hidden" data-property-location-latitude />
+                                <input asp-for="LongitudeText" type="hidden" data-property-location-longitude />
                             </div>
                             <div class="col-12 col-md-4">
                                 <label class="form-label" asp-for="SurfaceText">Superficie</label>

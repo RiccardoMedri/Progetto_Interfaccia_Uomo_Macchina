@@ -1,4 +1,5 @@
 @model Medri.Web.Features.Visit.VisitConfirmationViewModel
+@inject Microsoft.Extensions.Options.IOptions<Medri.Web.Infrastructure.AgencyContactOptions> AgencyContactOptions
 @{
     Layout = "_MedriPublicLayout";
     ViewData["PageBundle"] = "funnels";
@@ -7,6 +8,7 @@
     ViewData["RenderMedriFooter"] = false;
     ViewData["MedriShellClass"] = "medri-public-shell medri-request-shell";
     ViewData["NavSection"] = Model.Property.NavSection;
+    var agencyContact = AgencyContactOptions.Value;
 }
 
 <main id="contenuto" class="medri-request-funnel medri-request-funnel--confirmation">
@@ -113,14 +115,14 @@
             <article>
                 <span class="support-icon phone-support-icon" aria-hidden="true"></span>
                 <div>
-                    <strong><a href="tel:0547123456">0547 123456</a></strong>
+                    <strong><a href="@agencyContact.PhoneHref">@agencyContact.PhoneLabel</a></strong>
                     <p>Lun-Ven 9:00-12:30 / 15:00-19:00</p>
                 </div>
             </article>
             <article>
                 <span class="support-icon mail-icon" aria-hidden="true"></span>
                 <div>
-                    <strong><a href="mailto:info@agenziamedri.it">info@agenziamedri.it</a></strong>
+                    <strong><a href="@agencyContact.EmailHref">@agencyContact.EmailLabel</a></strong>
                     <p>Risposta entro il giorno lavorativo</p>
                 </div>
             </article>

@@ -27,20 +27,22 @@ namespace Medri.Web.Features.Search
                 IsSaved = listing.IsSaved
             }).ToList();
 
-            var markers = result.MapListings.Select((listing, index) => new SearchMapMarkerViewModel
-            {
-                Id = listing.Id.ToString(),
-                Label = (index + 1).ToString(CultureInfo.InvariantCulture),
-                Title = listing.Title,
-                Tag = listing.Status,
-                PriceLabel = PropertyFormatting.FormatPrice(listing.Price, listing.Contract),
-                DisplayLocation = PropertyFormatting.DisplayOrFallback(listing.DisplayLocation, listing.Location),
-                FactsLabel = $"{listing.Rooms} locali - {listing.Bathrooms} bagni - {listing.SurfaceSquareMeters} mq",
-                ImageUrl = listing.ImageUrl,
-                Latitude = listing.Latitude,
-                Longitude = listing.Longitude,
-                DetailUrl = "/immobili/" + listing.Slug
-            }).ToList();
+            var markers = result.MapListings
+                .Where(listing => HasUsableCoordinates(listing.Latitude, listing.Longitude))
+                .Select((listing, index) => new SearchMapMarkerViewModel
+                {
+                    Id = listing.Id.ToString(),
+                    Label = (index + 1).ToString(CultureInfo.InvariantCulture),
+                    Title = listing.Title,
+                    Tag = listing.Status,
+                    PriceLabel = PropertyFormatting.FormatPrice(listing.Price, listing.Contract),
+                    DisplayLocation = PropertyFormatting.DisplayOrFallback(listing.DisplayLocation, listing.Location),
+                    FactsLabel = $"{listing.Rooms} locali - {listing.Bathrooms} bagni - {listing.SurfaceSquareMeters} mq",
+                    ImageUrl = listing.ImageUrl,
+                    Latitude = listing.Latitude,
+                    Longitude = listing.Longitude,
+                    DetailUrl = "/immobili/" + listing.Slug
+                }).ToList();
 
             return new SearchIndexViewModel
             {
@@ -51,6 +53,15 @@ namespace Medri.Web.Features.Search
                 GoogleMapsBrowserApiKey = googleMapsOptions.BrowserApiKey,
                 GoogleMapsMapId = googleMapsOptions.MapId
             };
+        }
+
+        private static bool HasUsableCoordinates(double latitude, double longitude)
+        {
+            return latitude >= -90d &&
+                latitude <= 90d &&
+                longitude >= -180d &&
+                longitude <= 180d &&
+                (latitude != 0d || longitude != 0d);
         }
     }
 }

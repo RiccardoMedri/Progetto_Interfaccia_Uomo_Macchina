@@ -19,12 +19,14 @@ namespace Medri.Web.Areas.Admin.Properties
         private readonly MarkAdminPropertyReadyCommand markAdminPropertyReadyCommand;
         private readonly PublishAdminPropertyCommand publishAdminPropertyCommand;
         private readonly ArchiveAdminPropertyCommand archiveAdminPropertyCommand;
+        private readonly DiscardDraftAdminPropertyCommand discardDraftAdminPropertyCommand;
         private readonly BulkAssignAdminPropertiesCommand bulkAssignAdminPropertiesCommand;
         private readonly FeatureAdminPropertyCommand featureAdminPropertyCommand;
         private readonly MoveFeaturedAdminPropertyCommand moveFeaturedAdminPropertyCommand;
         private readonly RemoveFeaturedAdminPropertyCommand removeFeaturedAdminPropertyCommand;
         private readonly AddAdminPropertyMediaCommand addAdminPropertyMediaCommand;
         private readonly IAdminPropertyMediaStorage propertyMediaStorage;
+        private readonly IAdminPropertyGeocoder propertyGeocoder;
 
         public PropertiesController(
             AdminPropertyListQuery adminPropertyListQuery,
@@ -34,12 +36,14 @@ namespace Medri.Web.Areas.Admin.Properties
             MarkAdminPropertyReadyCommand markAdminPropertyReadyCommand,
             PublishAdminPropertyCommand publishAdminPropertyCommand,
             ArchiveAdminPropertyCommand archiveAdminPropertyCommand,
+            DiscardDraftAdminPropertyCommand discardDraftAdminPropertyCommand,
             BulkAssignAdminPropertiesCommand bulkAssignAdminPropertiesCommand,
             FeatureAdminPropertyCommand featureAdminPropertyCommand,
             MoveFeaturedAdminPropertyCommand moveFeaturedAdminPropertyCommand,
             RemoveFeaturedAdminPropertyCommand removeFeaturedAdminPropertyCommand,
             AddAdminPropertyMediaCommand addAdminPropertyMediaCommand,
-            IAdminPropertyMediaStorage propertyMediaStorage)
+            IAdminPropertyMediaStorage propertyMediaStorage,
+            IAdminPropertyGeocoder propertyGeocoder)
         {
             this.adminPropertyListQuery = adminPropertyListQuery;
             this.adminPropertyDetailQuery = adminPropertyDetailQuery;
@@ -48,12 +52,14 @@ namespace Medri.Web.Areas.Admin.Properties
             this.markAdminPropertyReadyCommand = markAdminPropertyReadyCommand;
             this.publishAdminPropertyCommand = publishAdminPropertyCommand;
             this.archiveAdminPropertyCommand = archiveAdminPropertyCommand;
+            this.discardDraftAdminPropertyCommand = discardDraftAdminPropertyCommand;
             this.bulkAssignAdminPropertiesCommand = bulkAssignAdminPropertiesCommand;
             this.featureAdminPropertyCommand = featureAdminPropertyCommand;
             this.moveFeaturedAdminPropertyCommand = moveFeaturedAdminPropertyCommand;
             this.removeFeaturedAdminPropertyCommand = removeFeaturedAdminPropertyCommand;
             this.addAdminPropertyMediaCommand = addAdminPropertyMediaCommand;
             this.propertyMediaStorage = propertyMediaStorage;
+            this.propertyGeocoder = propertyGeocoder;
         }
 
         [HttpGet]
@@ -68,9 +74,15 @@ namespace Medri.Web.Areas.Admin.Properties
             return View(AdminPropertyListViewModelMapper.Create(result, input, User));
         }
 
+        // Tracks the draft auto-created in the CURRENT creation flow (media upload before save),
+        // so "Esci senza salvare" can discard only that one and never a pre-existing incomplete listing.
+        private const string PendingDraftSessionKey = "admin:pendingDraftProperty";
+
         [HttpGet]
         public virtual async Task<IActionResult> Create()
         {
+            HttpContext.Session.Remove(PendingDraftSessionKey);
+
             var result = await adminPropertyDetailQuery.CreateNewAsync(
                 HttpContext.RequestAborted);
 
@@ -79,9 +91,45 @@ namespace Medri.Web.Areas.Admin.Properties
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> Geocode(AdminPropertyGeocodeInputModel input)
+        {
+            input ??= new AdminPropertyGeocodeInputModel();
+
+            var result = await propertyGeocoder.GeocodeAsync(
+                input.Address,
+                input.DisplayLocation,
+                HttpContext.RequestAborted);
+
+            return Json(new
+            {
+                succeeded = result.Succeeded,
+                latitude = result.Latitude,
+                longitude = result.Longitude,
+                message = result.Message
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> Create(AdminPropertyDetailInputModel input)
         {
             var isMediaUploadAction = IsMediaUploadAction();
+
+            // Media upload during creation: persist a draft (skipping the full required-field
+            // validation) so the operator can upload media, see the cards and reorder them,
+            // and only afterwards fill the remaining fields before the final save. Mirrors Update().
+            if (!ModelState.IsValid && isMediaUploadAction && HasUploadedMedia(input))
+            {
+                var draftResult = await adminCreatePropertyCommand.ExecuteAsync(
+                    input.ToUpdateDto(),
+                    HttpContext.RequestAborted);
+
+                await SaveUploadedMediaAsync(draftResult.Reference, input);
+
+                HttpContext.Session.SetString(PendingDraftSessionKey, draftResult.Reference);
+                return RedirectToAction(nameof(Edit), new { reference = draftResult.Reference });
+            }
+
             if (!ModelState.IsValid)
             {
                 var result = await adminPropertyDetailQuery.CreateNewAsync(
@@ -116,7 +164,19 @@ namespace Medri.Web.Areas.Admin.Properties
                 return NotFound();
             }
 
-            return View(AdminPropertyDetailViewModelMapper.CreateEdit(result, null, User));
+            // "Esci senza salvare" discards a draft ONLY if it is the one auto-created in the current
+            // creation flow (session-tracked); a pre-existing incomplete listing is never deleted.
+            var pendingDraftReference = HttpContext.Session.GetString(PendingDraftSessionKey);
+            var canDiscardDraft = pendingDraftReference != null &&
+                string.Equals(pendingDraftReference, result.Reference, StringComparison.Ordinal);
+            if (!canDiscardDraft && pendingDraftReference != null)
+            {
+                HttpContext.Session.Remove(PendingDraftSessionKey);
+            }
+
+            var viewModel = AdminPropertyDetailViewModelMapper.CreateEdit(result, null, User);
+            viewModel.CanDiscardDraft = canDiscardDraft;
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -160,6 +220,8 @@ namespace Medri.Web.Areas.Admin.Properties
 
             if (!isMediaUploadAction)
             {
+                // Explicit save = the creation is finalized; it can no longer be auto-discarded.
+                HttpContext.Session.Remove(PendingDraftSessionKey);
                 Alerts.AddSuccess(this, $"Immobile {commandResult.Reference} aggiornato.");
             }
 
@@ -233,6 +295,25 @@ namespace Medri.Web.Areas.Admin.Properties
 
             Alerts.AddSuccess(this, $"Immobile {commandResult.Reference} archiviato.");
             return RedirectAfterListAction(commandResult.Reference, input);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> Discard(string reference)
+        {
+            // "Esci senza salvare": elimina SOLO la bozza auto-creata in questa sessione di creazione
+            // (tracciata in sessione) e solo se ancora incompleta; altrimenti esce e basta.
+            var pendingDraftReference = HttpContext.Session.GetString(PendingDraftSessionKey);
+            if (pendingDraftReference != null &&
+                string.Equals(pendingDraftReference, reference, StringComparison.Ordinal))
+            {
+                await discardDraftAdminPropertyCommand.ExecuteAsync(
+                    reference,
+                    HttpContext.RequestAborted);
+            }
+
+            HttpContext.Session.Remove(PendingDraftSessionKey);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -330,6 +411,21 @@ namespace Medri.Web.Areas.Admin.Properties
             }
 
             return View(AdminPropertyDetailViewModelMapper.CreatePreview(result, mode, User));
+        }
+
+        [HttpGet]
+        public virtual async Task<IActionResult> PreviewMap(string reference)
+        {
+            var result = await adminPropertyDetailQuery.ExecuteAsync(
+                reference,
+                HttpContext.RequestAborted);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return View(AdminPropertyDetailViewModelMapper.CreatePreviewMap(result, User));
         }
 
         private IActionResult RedirectAfterListAction(

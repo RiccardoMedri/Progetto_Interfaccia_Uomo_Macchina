@@ -1,0 +1,110 @@
+@model Medri.Web.Areas.Admin.Properties.AdminPropertyPreviewMapViewModel
+@inject Microsoft.Extensions.Options.IOptions<Medri.Web.Infrastructure.GoogleMapsOptions> GoogleMapsOptions
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = $"{Model.Reference} - Anteprima mappa - Area riservata Medri";
+    var googleMapsOptions = GoogleMapsOptions.Value;
+}
+
+<div class="container-fluid px-0">
+    <section class="admin-page-heading property-editor-heading card">
+        <div class="row g-3 align-items-center">
+            <div class="col-12 col-md-7">
+                <span class="lead-detail-reference">@Model.Reference - Anteprima mappa</span>
+                <h1>@Model.Title</h1>
+            </div>
+            <div class="col-12 col-md-5">
+                <div class="property-editor-actions d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                    <a class="btn btn-outline-secondary" href="@Model.PreviewUrl">
+                        <i class="ph ph-eye" aria-hidden="true"></i>
+                        <span>Anteprima annuncio</span>
+                    </a>
+                    <a class="btn btn-primary" href="@Model.EditUrl">
+                        <i class="ph ph-pencil-simple" aria-hidden="true"></i>
+                        <span>Modifica dati</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-panel admin-preview-panel card">
+        <div class="admin-preview-toolbar">
+            <div>
+                <span>Posizione immobile</span>
+                <p>La mappa mostra la posizione salvata anche prima della pubblicazione.</p>
+            </div>
+        </div>
+
+        @if (!Model.HasMarker)
+        {
+            <section class="medri-client-empty-state" aria-label="Posizione non disponibile">
+                <h2>Posizione non disponibile</h2>
+                <p>Salva un indirizzo preciso con coordinate valide prima di aprire l'anteprima mappa.</p>
+                <a class="btn btn-primary" href="@Model.EditUrl">Modifica dati</a>
+            </section>
+        }
+        else
+        {
+            <div id="search-map-app" class="medri-search search-mode-map admin-preview-map" data-search-map-root>
+                <main id="contenuto" class="search-page" aria-label="Anteprima posizione immobile">
+                    <div class="search-content row g-3">
+                        <section class="map-panel col-12" aria-label="Mappa annuncio">
+                            <div class="map-canvas" data-map-canvas>
+                                <div class="google-map-surface" data-google-map></div>
+                                <div class="google-map-fallback" data-map-fallback @(string.IsNullOrWhiteSpace(googleMapsOptions.BrowserApiKey) || string.IsNullOrWhiteSpace(googleMapsOptions.MapId) ? null : "hidden")>Mappa non disponibile.</div>
+                                <article class="map-card search-card" data-map-preview hidden>
+                                    <button class="map-card-close btn btn-sm btn-outline-secondary" type="button" aria-label="Chiudi annuncio selezionato" data-map-preview-close>
+                                        <i class="ph ph-x" aria-hidden="true"></i>
+                                    </button>
+                                    <a class="map-card-link" href="@Model.PreviewUrl" aria-label="Apri anteprima annuncio" data-map-preview-link>
+                                        <div class="search-card-media map-card-media" data-map-preview-image></div>
+                                        <div class="search-card-body">
+                                            <span class="search-card-tag" data-map-preview-tag>@Model.Markers[0].Tag</span>
+                                            <strong class="search-card-price" data-map-preview-price>@Model.Markers[0].PriceLabel</strong>
+                                            <h2 data-map-preview-title>@Model.Markers[0].Title</h2>
+                                            <p data-map-preview-location>@Model.Markers[0].DisplayLocation</p>
+                                            <p data-map-preview-facts>@Model.Markers[0].FactsLabel</p>
+                                        </div>
+                                    </a>
+                                </article>
+                                <div class="map-controls">
+                                    <button class="btn btn-outline-secondary" type="button" data-map-zoom-in>+</button>
+                                    <button class="btn btn-outline-secondary" type="button" data-map-zoom-out>-</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <script type="application/json" id="search-map-config">@Html.Raw(Model.MapConfigJson(googleMapsOptions.BrowserApiKey, googleMapsOptions.MapId))</script>
+                <span data-search-map-vue-controller hidden></span>
+            </div>
+        }
+    </section>
+</div>
+
+@section styles {
+    <environment include="Development">
+        <link rel="stylesheet" href="/css/bundle-medri-base.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/css/bundle-medri-search.css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/bundle-medri-base.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/css/bundle-medri-search.min.css" asp-append-version="true" />
+    </environment>
+}
+
+@section scripts {
+    @if (Model.HasMarker)
+    {
+        <environment include="Development">
+            <script src="/js/bundle-vue.js" defer asp-append-version="true"></script>
+            <script src="/js/bundle-medri-search-map.js" defer asp-append-version="true"></script>
+        </environment>
+        <environment exclude="Development">
+            <script src="/js/bundle-vue.min.js" defer asp-append-version="true"></script>
+            <script src="/js/bundle-medri-search-map.min.js" defer asp-append-version="true"></script>
+        </environment>
+    }
+}

@@ -105,6 +105,8 @@ namespace Medri.Services.Medri.Application
 
     public class PropertyDetailDto : PropertySummaryDto
     {
+        public string InternalReference { get; set; }
+
         public bool IsSaved { get; set; }
 
         public string Address { get; set; }

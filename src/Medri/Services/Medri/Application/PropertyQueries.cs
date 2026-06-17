@@ -311,14 +311,23 @@ namespace Medri.Services.Medri.Application
         public async Task<PropertyDetailDto> ExecuteAsync(
             string slug,
             Guid? userId,
+            bool includeUnpublished,
             CancellationToken cancellationToken = default)
         {
-            var detail = await dbContext.PropertyListings
-                .AsNoTracking()
+            var listings = dbContext.PropertyListings.AsNoTracking();
+            if (includeUnpublished)
+            {
+                // Admin "Anteprima" embeds this public page in an iframe to preview a listing
+                // before publication: bypass the published-only global query filter in that case.
+                listings = listings.IgnoreQueryFilters();
+            }
+
+            var detail = await listings
                 .Where(property => property.Slug == slug)
                 .Select(property => new PropertyDetailDto
                 {
                     Id = property.Id,
+                    InternalReference = property.InternalReference,
                     Title = property.Title,
                     Slug = property.Slug,
                     Status = property.Status,

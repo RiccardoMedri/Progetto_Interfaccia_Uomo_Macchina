@@ -72,7 +72,7 @@ namespace Medri.Services.Medri.Application
                     .CountAsync(
                         profile => profile.PublicReference != null && profile.Status != RequestStatuses.Archived,
                         cancellationToken),
-                ListingCount = await baseQuery.CountAsync(cancellationToken),
+                ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken),
                 IncompleteCount = await baseQuery.CountAsync(row => row.PublicationStatus == PropertyPublicationStatuses.Incomplete, cancellationToken),
                 ReadyCount = await baseQuery.CountAsync(row => row.PublicationStatus == PropertyPublicationStatuses.Ready, cancellationToken),
                 PublishedCount = await baseQuery.CountAsync(row => row.PublicationStatus == PropertyPublicationStatuses.Published, cancellationToken),

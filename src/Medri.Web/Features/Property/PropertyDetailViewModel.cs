@@ -12,6 +12,8 @@ namespace Medri.Web.Features.Property
 
         public bool IsSaved { get; set; }
 
+        public bool IsAdminPreview { get; set; }
+
         public string PriceLabel { get; set; }
 
         public string Address { get; set; }

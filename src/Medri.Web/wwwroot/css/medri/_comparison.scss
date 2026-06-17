@@ -667,6 +667,11 @@ $comparison-panel-shadow: 0 1.25rem 3rem rgba(31, 54, 88, 0.13);
   }
 }
 
+.medri-comparison__action.is-copied {
+  border-color: var(--role-match);
+  color: var(--role-match-strong);
+}
+
 @media print {
   @page {
     size: A4;

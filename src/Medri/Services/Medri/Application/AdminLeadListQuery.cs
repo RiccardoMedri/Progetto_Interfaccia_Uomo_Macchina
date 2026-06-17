@@ -82,12 +82,7 @@ namespace Medri.Services.Medri.Application
                     .CountAsync(
                         profile => profile.PublicReference != null && profile.Status != RequestStatuses.Archived,
                         cancellationToken),
-                ListingCount = await dbContext.PropertyListings
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .CountAsync(
-                        listing => listing.InternalReference != null,
-                        cancellationToken),
+                ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken),
                 Page = page,
                 PageSize = pageSize,
                 TotalItems = totalItems,

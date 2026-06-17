@@ -147,6 +147,25 @@ namespace Medri.Services.Medri.Application
         }
     }
 
+    internal static class AdminNavigationCounts
+    {
+        // Sidebar "Immobili" badge: managed listings not yet published
+        // (Incomplete / Ready / NeedsUpdate), archived ones excluded.
+        public static Task<int> UnpublishedListingsAsync(
+            MedriDbContext dbContext,
+            CancellationToken cancellationToken)
+        {
+            return dbContext.PropertyListings
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .CountAsync(
+                    listing => listing.InternalReference != null &&
+                               listing.PublicationStatus != PropertyPublicationStatuses.Published &&
+                               listing.PublicationStatus != PropertyPublicationStatuses.Archived,
+                    cancellationToken);
+        }
+    }
+
     internal static class LeadQualificationCalculator
     {
         public static int Calculate(

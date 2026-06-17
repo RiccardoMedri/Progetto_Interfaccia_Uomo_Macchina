@@ -8,8 +8,7 @@ namespace Medri.Services.Medri.Application
     {
         public static AdminPropertyCompletionResult Calculate(
             PropertyListing listing,
-            int mediaCount,
-            bool hasFloorPlan)
+            int mediaCount)
         {
             if (listing == null)
             {
@@ -20,11 +19,11 @@ namespace Medri.Services.Medri.Application
             {
                 Item("Prezzo", listing.Price > 0),
                 Item("Zona e indirizzo", HasText(listing.DisplayLocation) && HasText(listing.Address)),
+                Item("Posizione mappa", HasUsableCoordinates(listing.Latitude, listing.Longitude)),
                 Item("Superficie, locali e bagni", listing.SurfaceSquareMeters > 0 && listing.Rooms > 0 && listing.Bathrooms > 0),
                 Item("Classe energetica", HasText(listing.EnergyClass)),
                 Item("Descrizione", HasText(listing.SummaryParagraph1)),
                 Item("6 foto", mediaCount >= 6),
-                Item("Planimetria", hasFloorPlan),
                 Item("Stato e lavori", HasText(listing.RequiredWorksLabel)),
                 Item("CTA contatto", true)
             };
@@ -44,14 +43,6 @@ namespace Medri.Services.Medri.Application
                     : string.Join(", ", missingItems),
                 Checklist = items
             };
-        }
-
-        public static bool HasFloorPlan(IEnumerable<PropertyMedia> media)
-        {
-            return (media ?? Array.Empty<PropertyMedia>())
-                .Any(item =>
-                    Contains(item.AltText, "planimetr") ||
-                    Contains(item.Url, "planimetr"));
         }
 
         public static void ApplyToListing(
@@ -78,9 +69,13 @@ namespace Medri.Services.Medri.Application
             return !string.IsNullOrWhiteSpace(value);
         }
 
-        private static bool Contains(string value, string searchTerm)
+        private static bool HasUsableCoordinates(double latitude, double longitude)
         {
-            return value?.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0;
+            return latitude >= -90d &&
+                latitude <= 90d &&
+                longitude >= -180d &&
+                longitude <= 180d &&
+                (latitude != 0d || longitude != 0d);
         }
     }
 

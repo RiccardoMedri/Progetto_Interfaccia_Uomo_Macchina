@@ -10,7 +10,8 @@ namespace Medri.Web.Features.Property
     {
         public static PropertyDetailViewModel Create(
             PropertyDetailDto property,
-            AgencyContactOptions agencyContactOptions)
+            AgencyContactOptions agencyContactOptions,
+            bool isAdminPreview = false)
         {
             var model = new PropertyDetailViewModel
             {
@@ -18,6 +19,7 @@ namespace Medri.Web.Features.Property
                 Title = property.Title,
                 Tag = property.Status,
                 IsSaved = property.IsSaved,
+                IsAdminPreview = isAdminPreview,
                 PriceLabel = PropertyFormatting.FormatPrice(property.Price, property.Contract),
                 Address = PropertyFormatting.DisplayOrFallback(property.Address, property.DisplayLocation),
                 Media = CreateMedia(property),
@@ -46,7 +48,7 @@ namespace Medri.Web.Features.Property
                 ContextNote = property.ContextNote,
                 DecisionMarginNote = property.DecisionMarginNote,
                 HumanFitNote = property.HumanFitNote,
-                MapUrl = "/immobili?view=map&focusId=" + Uri.EscapeDataString(property.Id.ToString()),
+                MapUrl = MapUrl(property, isAdminPreview),
                 RequestInfoUrl = "/immobili/" + property.Slug + "/richiedi",
                 AdvisorDisplayName = property.AdvisorDisplayName,
                 AdvisorRole = PropertyFormatting.DisplayOrFallback(property.AdvisorRole, "Referente per visite e prime informazioni"),
@@ -57,6 +59,16 @@ namespace Medri.Web.Features.Property
 
             model.TechnicalSections = CreateTechnicalSections(model);
             return model;
+        }
+
+        private static string MapUrl(PropertyDetailDto property, bool isAdminPreview)
+        {
+            if (isAdminPreview && !string.IsNullOrWhiteSpace(property.InternalReference))
+            {
+                return "/admin/immobili/" + Uri.EscapeDataString(property.InternalReference) + "/anteprima-mappa";
+            }
+
+            return "/immobili?view=map&focusId=" + Uri.EscapeDataString(property.Id.ToString());
         }
 
         public static PropertySummaryCardViewModel CreateSummary(PropertySummaryDto property)

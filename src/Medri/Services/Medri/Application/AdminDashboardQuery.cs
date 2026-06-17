@@ -58,12 +58,7 @@ namespace Medri.Services.Medri.Application
                 LeadWorkCount = await newLeads.CountAsync(cancellationToken),
                 ActiveRequestCount = await activeRequests.CountAsync(cancellationToken),
                 IncompleteListingCount = await incompleteListings.CountAsync(cancellationToken),
-                ListingCount = await dbContext.PropertyListings
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .CountAsync(
-                        listing => listing.InternalReference != null,
-                        cancellationToken),
+                ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken),
                 RecentLeads = await recentLeads
                     .OrderByDescending(lead => lead.UpdatedAtUtc)
                     .ThenByDescending(lead => lead.CreatedAtUtc)

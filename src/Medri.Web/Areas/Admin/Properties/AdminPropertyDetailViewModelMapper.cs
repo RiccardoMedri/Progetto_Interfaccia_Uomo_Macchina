@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using Medri.Services.Medri.Application;
 using Medri.Web.Areas.Admin;
+using Medri.Web.Features.Search;
 
 namespace Medri.Web.Areas.Admin.Properties
 {
@@ -34,6 +35,8 @@ namespace Medri.Web.Areas.Admin.Properties
                 PriceText = values.PriceText,
                 DisplayLocation = values.DisplayLocation,
                 Address = values.Address,
+                LatitudeText = values.LatitudeText,
+                LongitudeText = values.LongitudeText,
                 SurfaceText = values.SurfaceText,
                 RoomsText = values.RoomsText,
                 BedroomsLabel = values.BedroomsLabel,
@@ -91,7 +94,7 @@ namespace Medri.Web.Areas.Admin.Properties
                 Title = result.Title,
                 PublicPreviewUrl = string.IsNullOrWhiteSpace(result.Slug)
                     ? null
-                    : "/immobili/" + Uri.EscapeDataString(result.Slug),
+                    : "/immobili/" + Uri.EscapeDataString(result.Slug) + "?preview=true",
                 DisplayLocation = result.DisplayLocation,
                 Contract = result.Contract,
                 PriceLabel = PriceLabel(result.Price, result.Contract),
@@ -130,6 +133,39 @@ namespace Medri.Web.Areas.Admin.Properties
             };
         }
 
+        public static AdminPropertyPreviewMapViewModel CreatePreviewMap(
+            AdminPropertyDetailResultDto result,
+            ClaimsPrincipal user)
+        {
+            return new AdminPropertyPreviewMapViewModel
+            {
+                Navigation = CreateNavigation(result, user),
+                Reference = result.Reference,
+                Title = result.Title,
+                Markers = HasUsableCoordinates(result.Latitude, result.Longitude)
+                    ? new[]
+                    {
+                        new SearchMapMarkerViewModel
+                        {
+                            Id = result.Id.ToString(),
+                            Label = "1",
+                            Title = result.Title,
+                            Tag = result.Contract,
+                            PriceLabel = PriceLabel(result.Price, result.Contract),
+                            DisplayLocation = string.IsNullOrWhiteSpace(result.DisplayLocation)
+                                ? result.Address
+                                : result.DisplayLocation,
+                            FactsLabel = $"{result.Rooms.ToString(CultureInfo.InvariantCulture)} locali - {result.Bathrooms.ToString(CultureInfo.InvariantCulture)} bagni - {result.SurfaceSquareMeters.ToString(CultureInfo.InvariantCulture)} mq",
+                            ImageUrl = result.ImageUrl,
+                            Latitude = result.Latitude.GetValueOrDefault(),
+                            Longitude = result.Longitude.GetValueOrDefault(),
+                            DetailUrl = "/admin/immobili/" + Uri.EscapeDataString(result.Reference) + "/anteprima"
+                        }
+                    }
+                    : Array.Empty<SearchMapMarkerViewModel>()
+            };
+        }
+
         private static AdminNavigationViewModel CreateNavigation(
             AdminPropertyDetailResultDto result,
             ClaimsPrincipal user)
@@ -163,6 +199,8 @@ namespace Medri.Web.Areas.Admin.Properties
                 PriceText = PriceLabel(result.Price, result.Contract),
                 DisplayLocation = result.DisplayLocation,
                 Address = result.Address,
+                LatitudeText = CoordinateLabel(result.Latitude),
+                LongitudeText = CoordinateLabel(result.Longitude),
                 SurfaceText = result.SurfaceSquareMeters > 0
                     ? $"{result.SurfaceSquareMeters.ToString(CultureInfo.InvariantCulture)} mq"
                     : string.Empty,
@@ -407,6 +445,20 @@ namespace Medri.Web.Areas.Admin.Properties
 
             var suffix = contract == "Affitto" ? " / mese" : string.Empty;
             return $"EUR {price.ToString("N0", CultureInfo.GetCultureInfo("it-IT"))}{suffix}";
+        }
+
+        private static string CoordinateLabel(double? value)
+        {
+            return value.HasValue && value.Value != 0d
+                ? value.Value.ToString("0.######", CultureInfo.InvariantCulture)
+                : string.Empty;
+        }
+
+        private static bool HasUsableCoordinates(double? latitude, double? longitude)
+        {
+            return latitude.HasValue &&
+                longitude.HasValue &&
+                AdminPropertyInputParser.HasUsableCoordinates(latitude.Value, longitude.Value);
         }
 
         private static string ShortState(string value)

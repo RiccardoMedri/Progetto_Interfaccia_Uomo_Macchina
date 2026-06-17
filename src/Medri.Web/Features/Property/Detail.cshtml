@@ -6,6 +6,13 @@
     ViewData["BodyClass"] = "medri-detail-body";
     ViewData["MedriShellClass"] = "medri-public-shell medri-detail-shell";
     ViewData["NavSection"] = Model.Tag == "Affitto" ? "Rent" : "Buy";
+    if (Model.IsAdminPreview)
+    {
+        ViewData["RenderMedriHeader"] = false;
+        ViewData["RenderMedriFooter"] = false;
+        ViewData["BodyClass"] = "medri-detail-body medri-admin-preview-detail-body";
+        ViewData["MedriShellClass"] = "medri-public-shell medri-detail-shell medri-admin-preview-detail-shell";
+    }
 
     var favoriteAction = Model.IsSaved ? "/preferiti/rimuovi" : "/preferiti/aggiungi";
     var favoriteReturnUrl = Context.Request.Path.Value + Context.Request.QueryString.Value;
@@ -13,15 +20,21 @@
 }
 
 <div class="medri-property-detail">
-    <nav class="detail-breadcrumb breadcrumb" aria-label="Percorso">
-        <a class="breadcrumb-item" href="/">Home</a>
-        <a class="breadcrumb-item" href="/immobili">Immobili</a>
-        <span class="breadcrumb-item active" aria-current="page">@Model.Title</span>
-    </nav>
+    @if (!Model.IsAdminPreview)
+    {
+        <nav class="detail-breadcrumb breadcrumb" aria-label="Percorso">
+            <a class="breadcrumb-item" href="/">Home</a>
+            <a class="breadcrumb-item" href="/immobili">Immobili</a>
+            <span class="breadcrumb-item active" aria-current="page">@Model.Title</span>
+        </nav>
+    }
 
     <main id="contenuto" class="property-detail-page" aria-label="Dettaglio immobile">
         <div class="container-xxl">
-            <a class="back-to-search btn btn-link" href="@Model.SearchReturnUrl" aria-label="Torna alla ricerca" title="Torna alla ricerca"></a>
+            @if (!Model.IsAdminPreview)
+            {
+                <a class="back-to-search btn btn-link" href="@Model.SearchReturnUrl" aria-label="Torna alla ricerca" title="Torna alla ricerca"></a>
+            }
             @if (Model.HasMedia)
             {
                 <section class="detail-gallery-section" aria-label="Gallery immobile">
@@ -44,17 +57,20 @@
                     <section class="property-title-band h-100">
                         <div class="detail-status-row">
                             <span class="tag badge text-bg-light">@Model.Tag</span>
-                            <form action="@favoriteAction" method="post" data-favorite-form data-property-id="@Model.Id">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="propertyId" value="@Model.Id" />
-                                <input type="hidden" name="returnUrl" value="@favoriteReturnUrl" />
-                                <button class="save-ad-button detail-save-button @(Model.IsSaved ? "is-selected" : null) btn btn-sm btn-outline-secondary" type="submit" aria-label="@(Model.IsSaved ? $"Rimuovi {Model.Title} dai preferiti" : $"Salva {Model.Title} nei preferiti")" aria-pressed="@(Model.IsSaved ? "true" : "false")" data-favorite-button data-property-id="@Model.Id" data-property-title="@Model.Title"></button>
-                            </form>
+                            @if (!Model.IsAdminPreview)
+                            {
+                                <form action="@favoriteAction" method="post" data-favorite-form data-property-id="@Model.Id">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="propertyId" value="@Model.Id" />
+                                    <input type="hidden" name="returnUrl" value="@favoriteReturnUrl" />
+                                    <button class="save-ad-button detail-save-button @(Model.IsSaved ? "is-selected" : null) btn btn-sm btn-outline-secondary" type="submit" aria-label="@(Model.IsSaved ? $"Rimuovi {Model.Title} dai preferiti" : $"Salva {Model.Title} nei preferiti")" aria-pressed="@(Model.IsSaved ? "true" : "false")" data-favorite-button data-property-id="@Model.Id" data-property-title="@Model.Title"></button>
+                                </form>
+                            }
                         </div>
                         <strong class="detail-price title-band-price">@Model.PriceLabel</strong>
                         <p class="detail-location">@Model.Address</p>
                         <nav class="detail-inline-actions" aria-label="Azioni rapide annuncio">
-                            <a class="detail-map-link btn btn-outline-secondary" href="@Model.MapUrl">Apri mappa</a>
+                            <a class="detail-map-link btn btn-outline-secondary" href="@Model.MapUrl" target="@(Model.IsAdminPreview ? "_top" : null)">Apri mappa</a>
                             <a class="detail-contact-link btn btn-primary" href="#detail-contact">Contattaci</a>
                         </nav>
                     </section>
@@ -62,8 +78,8 @@
 
                 <div class="col-12 col-xl-5">
                     <section class="detail-map-section compact-map-section h-100" aria-label="Posizione sintetica">
-                        <a class="compact-map-button btn btn-outline-secondary" href="@Model.MapUrl">Apri mappa</a>
-                        <a class="detail-address-map" href="@Model.MapUrl" aria-label="Apri la posizione di @Model.Title sulla mappa"></a>
+                        <a class="compact-map-button btn btn-outline-secondary" href="@Model.MapUrl" target="@(Model.IsAdminPreview ? "_top" : null)">Apri mappa</a>
+                        <a class="detail-address-map" href="@Model.MapUrl" target="@(Model.IsAdminPreview ? "_top" : null)" aria-label="Apri la posizione di @Model.Title sulla mappa"></a>
                     </section>
                 </div>
             </section>
@@ -133,17 +149,17 @@
                         }
                         <h2>Ti interessa questo immobile?</h2>
                         <p class="contact-note">Lascia i dati essenziali: un agente ti ricontatta prima di proporre visite o appuntamenti.</p>
-                        <form method="post" action="@Model.RequestInfoUrl/inizia">
+                        <form method="post" action="@(Model.IsAdminPreview ? "#" : Model.RequestInfoUrl + "/inizia")" onsubmit="@(Model.IsAdminPreview ? "return false;" : null)">
                             @Html.AntiForgeryToken()
                             <div class="detail-contact-form" aria-label="Richiesta informazioni">
-                                <label><span class="form-label">Nome e cognome</span><input class="form-control" name="FullName" type="text" autocomplete="name" required /></label>
-                                <label><span class="form-label">Telefono</span><input class="form-control" name="Phone" type="tel" autocomplete="tel" required /></label>
-                                <label><span class="form-label">Email</span><input class="form-control" name="Email" type="email" autocomplete="email" required /></label>
-                                <label><span class="form-label">Messaggio</span><textarea class="form-control" name="Message"></textarea></label>
+                                <label><span class="form-label">Nome e cognome</span><input class="form-control" name="FullName" type="text" autocomplete="name" required disabled="@Model.IsAdminPreview" /></label>
+                                <label><span class="form-label">Telefono</span><input class="form-control" name="Phone" type="tel" autocomplete="tel" required disabled="@Model.IsAdminPreview" /></label>
+                                <label><span class="form-label">Email</span><input class="form-control" name="Email" type="email" autocomplete="email" required disabled="@Model.IsAdminPreview" /></label>
+                                <label><span class="form-label">Messaggio</span><textarea class="form-control" name="Message" disabled="@Model.IsAdminPreview"></textarea></label>
                             </div>
                             <div class="decision-actions side-decision-actions">
-                                <button class="primary-cta btn btn-primary" type="submit">Richiedi informazioni</button>
-                                @if (Model.HasAgencyPhone)
+                                <button class="primary-cta btn btn-primary" type="submit" disabled="@Model.IsAdminPreview">Richiedi informazioni</button>
+                                @if (Model.HasAgencyPhone && !Model.IsAdminPreview)
                                 {
                                     <a class="secondary-cta btn btn-outline-secondary" href="@Model.AgencyPhoneHref">Chiama ora</a>
                                 }
@@ -159,13 +175,30 @@
                         <h2>Immobili Simili</h2>
                         <p>Soluzioni vicine per prezzo, spazi e contesto.</p>
                     </div>
-                    <a href="/immobili">Vedi altri</a>
+                    @if (!Model.IsAdminPreview)
+                    {
+                        <a href="/immobili">Vedi altri</a>
+                    }
                 </div>
                 <div class="similar-properties-grid row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
                     @foreach (var property in Model.SimilarProperties)
                     {
                         <div class="col">
-                            <a class="detail-similar-card" href="@property.DetailUrl">
+                            @if (Model.IsAdminPreview)
+                            {
+                                <article class="detail-similar-card">
+                                    <div class="detail-similar-media" style="background-image: url('@property.ImageUrl')"></div>
+                                    <div class="detail-similar-body">
+                                        <span class="tag badge text-bg-light">@property.Tag</span>
+                                        <strong>@property.PriceLabel</strong>
+                                        <h3>@property.Title</h3>
+                                        <p>@property.DisplayLocation</p>
+                                    </div>
+                                </article>
+                            }
+                            else
+                            {
+                                <a class="detail-similar-card" href="@property.DetailUrl">
                                 <div class="detail-similar-media" style="background-image: url('@property.ImageUrl')"></div>
                                 <div class="detail-similar-body">
                                     <span class="tag badge text-bg-light">@property.Tag</span>
@@ -173,7 +206,8 @@
                                     <h3>@property.Title</h3>
                                     <p>@property.DisplayLocation</p>
                                 </div>
-                            </a>
+                                </a>
+                            }
                         </div>
                     }
                 </div>

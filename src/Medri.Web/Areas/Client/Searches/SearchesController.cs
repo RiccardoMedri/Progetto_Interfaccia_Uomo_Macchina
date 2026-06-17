@@ -49,8 +49,7 @@ namespace Medri.Web.Areas.Client.Searches
                 savedSearches,
                 favoriteCount,
                 requestCount,
-                Url.Action("Index", "Search", new { area = string.Empty }) ?? "/immobili",
-                string.Equals(HttpContext.Request.Query["saved"], "1", StringComparison.Ordinal)));
+                Url.Action("Index", "Search", new { area = string.Empty }) ?? "/immobili"));
         }
 
         [HttpPost]

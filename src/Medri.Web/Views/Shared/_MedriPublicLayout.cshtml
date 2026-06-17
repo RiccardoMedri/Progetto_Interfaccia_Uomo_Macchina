@@ -1,6 +1,7 @@
 @{
     var title = ViewData["Title"] as string ?? "Agenzia Immobiliare";
     var bodyClass = ViewData["BodyClass"] as string ?? "medri-public-body";
+    var renderMedriHeader = ViewData["RenderMedriHeader"] as bool? ?? true;
     var renderMedriFooter = ViewData["RenderMedriFooter"] as bool? ?? true;
     var shellClass = ViewData["MedriShellClass"] as string ?? "medri-public-shell";
     
@@ -34,7 +35,10 @@
 <body class="@bodyClass" data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")">
     <a class="skip-link" href="#contenuto">Salta al contenuto</a>
     <div class="@shellClass">
-        @await Component.InvokeAsync("MedriHeader")
+        @if (renderMedriHeader)
+        {
+            @await Component.InvokeAsync("MedriHeader")
+        }
         @RenderBody()
         @if (renderMedriFooter)
         {

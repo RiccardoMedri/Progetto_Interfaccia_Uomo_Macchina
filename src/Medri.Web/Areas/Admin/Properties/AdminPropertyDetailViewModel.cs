@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Medri.Services.Medri.Application;
 using Medri.Web.Areas.Admin;
+using Medri.Web.Features.Search;
 
 namespace Medri.Web.Areas.Admin.Properties
 {
-    public sealed class AdminPropertyDetailInputModel
+    public sealed class AdminPropertyDetailInputModel : IValidatableObject
     {
         [Required, StringLength(80)]
         public string ListingCategory { get; set; }
@@ -26,8 +28,14 @@ namespace Medri.Web.Areas.Admin.Properties
         [Required, StringLength(160)]
         public string DisplayLocation { get; set; }
 
-        [StringLength(300)]
+        [Required, StringLength(300)]
         public string Address { get; set; }
+
+        [StringLength(40)]
+        public string LatitudeText { get; set; }
+
+        [StringLength(40)]
+        public string LongitudeText { get; set; }
 
         [Required, StringLength(40)]
         public string SurfaceText { get; set; }
@@ -122,6 +130,8 @@ namespace Medri.Web.Areas.Admin.Properties
                 Price = AdminPropertyInputParser.ParseDecimal(PriceText),
                 DisplayLocation = DisplayLocation,
                 Address = Address,
+                Latitude = AdminPropertyInputParser.ParseLatitude(LatitudeText),
+                Longitude = AdminPropertyInputParser.ParseLongitude(LongitudeText),
                 SurfaceSquareMeters = AdminPropertyInputParser.ParseInt(SurfaceText),
                 Rooms = AdminPropertyInputParser.ParseInt(RoomsText),
                 BedroomsLabel = BedroomsLabel,
@@ -160,6 +170,22 @@ namespace Medri.Web.Areas.Admin.Properties
                     .ToArray()
             };
         }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var hasLatitude = AdminPropertyInputParser.TryParseLatitude(LatitudeText, out var latitude);
+            var hasLongitude = AdminPropertyInputParser.TryParseLongitude(LongitudeText, out var longitude);
+
+            if (!string.IsNullOrWhiteSpace(Address) &&
+                (!hasLatitude ||
+                 !hasLongitude ||
+                 !AdminPropertyInputParser.HasUsableCoordinates(latitude, longitude)))
+            {
+                yield return new ValidationResult(
+                    "Verifica l'indirizzo: la posizione mappa non e stata trovata.",
+                    new[] { nameof(Address) });
+            }
+        }
     }
 
     public sealed class AdminPropertyMediaInputModel
@@ -181,6 +207,8 @@ namespace Medri.Web.Areas.Admin.Properties
         public string Reference { get; set; }
 
         public bool IsCreateMode { get; set; }
+
+        public bool CanDiscardDraft { get; set; }
 
         public string StatusLabel { get; set; }
 
@@ -208,6 +236,10 @@ namespace Medri.Web.Areas.Admin.Properties
         public string DisplayLocation { get; set; }
 
         public string Address { get; set; }
+
+        public string LatitudeText { get; set; }
+
+        public string LongitudeText { get; set; }
 
         public string SurfaceText { get; set; }
 
@@ -328,6 +360,42 @@ namespace Medri.Web.Areas.Admin.Properties
             Array.Empty<string>();
     }
 
+    public sealed class AdminPropertyPreviewMapViewModel : IAdminPageViewModel
+    {
+        public AdminNavigationViewModel Navigation { get; set; }
+
+        public string Reference { get; set; }
+
+        public string Title { get; set; }
+
+        public string EditUrl => "/admin/immobili/" + Uri.EscapeDataString(Reference);
+
+        public string PreviewUrl => "/admin/immobili/" + Uri.EscapeDataString(Reference) + "/anteprima";
+
+        public IReadOnlyList<SearchMapMarkerViewModel> Markers { get; set; } =
+            Array.Empty<SearchMapMarkerViewModel>();
+
+        public bool HasMarker => Markers.Count > 0;
+
+        public string SelectedId => Markers.FirstOrDefault()?.Id;
+
+        public string MapConfigJson(string apiKey, string mapId)
+        {
+            return JsonSerializer.Serialize(
+                new
+                {
+                    apiKey,
+                    mapId,
+                    isConfigured = HasMarker &&
+                        !string.IsNullOrWhiteSpace(apiKey) &&
+                        !string.IsNullOrWhiteSpace(mapId),
+                    selectedId = SelectedId,
+                    markers = Markers
+                },
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        }
+    }
+
     public sealed class AdminPropertyQuickNoteViewModel
     {
         public int Number { get; set; }
@@ -390,6 +458,35 @@ namespace Medri.Web.Areas.Admin.Properties
             return 0m;
         }
 
+        public static double? ParseLatitude(string value)
+        {
+            return TryParseLatitude(value, out var result) ? result : null;
+        }
+
+        public static double? ParseLongitude(string value)
+        {
+            return TryParseLongitude(value, out var result) ? result : null;
+        }
+
+        public static bool TryParseLatitude(string value, out double result)
+        {
+            return TryParseCoordinate(value, -90d, 90d, out result);
+        }
+
+        public static bool TryParseLongitude(string value, out double result)
+        {
+            return TryParseCoordinate(value, -180d, 180d, out result);
+        }
+
+        public static bool HasUsableCoordinates(double latitude, double longitude)
+        {
+            return latitude >= -90d &&
+                latitude <= 90d &&
+                longitude >= -180d &&
+                longitude <= 180d &&
+                (latitude != 0d || longitude != 0d);
+        }
+
         private static string NumberText(string value)
         {
             var parts = string.IsNullOrWhiteSpace(value)
@@ -403,6 +500,27 @@ namespace Medri.Web.Areas.Admin.Properties
             return string.IsNullOrWhiteSpace(parts)
                 ? null
                 : parts;
+        }
+
+        private static bool TryParseCoordinate(
+            string value,
+            double minimum,
+            double maximum,
+            out double result)
+        {
+            result = 0d;
+            var normalized = string.IsNullOrWhiteSpace(value)
+                ? null
+                : value.Trim().Replace(',', '.');
+
+            return !string.IsNullOrWhiteSpace(normalized) &&
+                double.TryParse(
+                    normalized,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out result) &&
+                result >= minimum &&
+                result <= maximum;
         }
 
         private static string Digits(string value)

@@ -16,6 +16,11 @@ namespace Medri.Web
                 client.BaseAddress = new Uri("https://places.googleapis.com/v1/");
                 client.Timeout = TimeSpan.FromSeconds(5);
             });
+            services.AddHttpClient<IAdminPropertyGeocoder, GoogleAdminPropertyGeocoder>(client =>
+            {
+                client.BaseAddress = new Uri("https://maps.googleapis.com/maps/api/geocode/");
+                client.Timeout = TimeSpan.FromSeconds(5);
+            });
             services.AddScoped<IAdminPropertyMediaStorage, AdminPropertyMediaStorage>();
 
             return services;

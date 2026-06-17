@@ -149,8 +149,38 @@ async function buildVueSource() {
     writeFile(path.join(jsRoot, "bundle-vue.min.js"), cleaned);
 }
 
+async function buildJsBundle(outputName, inputNames) {
+    const content = inputNames
+        .map(inputName => fs.readFileSync(path.join(jsRoot, inputName), "utf8"))
+        .join("\n");
+    writeFile(path.join(jsRoot, outputName), content);
+
+    const minified = await minify(content, {
+        compress: true,
+        mangle: true,
+        format: {
+            comments: false
+        }
+    });
+    if (!minified.code) {
+        throw new Error(`${outputName} minification produced no output.`);
+    }
+
+    writeFile(path.join(jsRoot, outputName.replace(/\.js$/, ".min.js")), minified.code);
+}
+
 await buildVueSource();
 
 await buildGlobalJs();
 
-console.log("CSS bundles and global JavaScript bundle rebuilt.");
+await buildJsBundle("bundle-medri-home.js", [ "home-search.js" ]);
+
+await buildJsBundle("bundle-medri-search-map.js", [ "search-map.js" ]);
+
+await buildJsBundle("bundle-medri-public-actions.js", [ "public-property-actions.js" ]);
+
+await buildJsBundle("bundle-admin-property-media.js", [ "admin-property-media.js" ]);
+
+await buildJsBundle("bundle-admin-featured-slots.js", [ "admin-featured-slots.js" ]);
+
+console.log("CSS and JavaScript bundles rebuilt.");

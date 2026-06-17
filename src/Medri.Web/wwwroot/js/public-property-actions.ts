@@ -41,12 +41,12 @@
                     }
 
                     if (!response.ok) {
-                        throw new Error(`Favorite request failed with status ${response.status}.`);
+                        throw new Error(`Richiesta preferiti non riuscita con stato ${response.status}.`);
                     }
 
                     const result = await response.json() as FavoriteCommandResult;
                     if (!result.succeeded) {
-                        throw new Error("Favorite request was not completed.");
+                        throw new Error("Richiesta preferiti non completata.");
                     }
 
                     syncFavoriteControls(result.propertyId, result.isSaved);
@@ -214,6 +214,10 @@
 
     function bindShareButtons(): void {
         document.querySelectorAll<HTMLElement>("[data-share-button]").forEach((button) => {
+            const originalLabel = button.textContent ?? "";
+            const originalAria = button.getAttribute("aria-label") ?? "";
+            let resetHandle = 0;
+
             button.addEventListener("click", async () => {
                 const shareData = {
                     title: document.title,
@@ -225,10 +229,22 @@
                         await navigator.share(shareData);
                     } else if (navigator.clipboard) {
                         await navigator.clipboard.writeText(shareData.url);
+                        // Visible confirmation: swap the label to "Link copiato" + a copied state, then restore.
+                        button.textContent = "Link copiato";
+                        button.classList.add("is-copied");
                         button.setAttribute("aria-label", "Link confronto copiato");
+                        if (resetHandle) {
+                            window.clearTimeout(resetHandle);
+                        }
+                        resetHandle = window.setTimeout(() => {
+                            button.textContent = originalLabel;
+                            button.classList.remove("is-copied");
+                            button.setAttribute("aria-label", originalAria);
+                            resetHandle = 0;
+                        }, 2200);
                     }
                 } catch {
-                    
+
                 }
             });
         });

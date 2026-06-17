@@ -49,12 +49,7 @@ namespace Medri.Services.Medri.Application
                         lead => lead.InternalReference != null && lead.WorkflowStatus == LeadWorkflowStatuses.New,
                         cancellationToken),
                 ActiveRequestCount = await baseQuery.CountAsync(cancellationToken),
-                ListingCount = await dbContext.PropertyListings
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .CountAsync(
-                        listing => listing.InternalReference != null,
-                        cancellationToken),
+                ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken),
                 NewCount = await baseQuery.CountAsync(row => row.Status == RequestStatuses.New, cancellationToken),
                 AssignedCount = await baseQuery.CountAsync(row => row.AssignedAgencyUserId.HasValue, cancellationToken),
                 UpdatingCount = await baseQuery.CountAsync(row => row.Status == RequestStatuses.Updating, cancellationToken),

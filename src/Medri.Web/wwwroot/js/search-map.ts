@@ -72,7 +72,7 @@ declare const google: any;
             browserWindow[callbackName] = () => resolve();
 
             if (existingScript) {
-                existingScript.addEventListener("error", () => reject(new Error("maps-load-failed")), { once: true });
+                existingScript.addEventListener("error", () => reject(new Error("caricamento-mappa-non-riuscito")), { once: true });
                 return;
             }
 
@@ -85,7 +85,7 @@ declare const google: any;
                 encodeURIComponent(apiKey) +
                 "&v=weekly&libraries=marker&callback=" +
                 encodeURIComponent(callbackName);
-            script.onerror = () => reject(new Error("maps-load-failed"));
+            script.onerror = () => reject(new Error("caricamento-mappa-non-riuscito"));
             document.head.appendChild(script);
         });
     }

@@ -1,4 +1,5 @@
 @model Medri.Web.Features.LeadIntake.LeadConfirmationViewModel
+@inject Microsoft.Extensions.Options.IOptions<Medri.Web.Infrastructure.AgencyContactOptions> AgencyContactOptions
 @{
     Layout = "_MedriPublicLayout";
     ViewData["PageBundle"] = "funnels";
@@ -11,6 +12,7 @@
         : Model.PathLabel == "Cerchi casa"
             ? "Buy"
             : "Owner";
+    var agencyContact = AgencyContactOptions.Value;
 }
 
 <main id="contenuto" class="medri-lead-confirmation">
@@ -131,14 +133,14 @@
             <article>
                 <span class="support-icon phone-support-icon" aria-hidden="true"></span>
                 <div>
-                    <strong><a href="tel:0547123456">0547 123456</a></strong>
+                    <strong><a href="@agencyContact.PhoneHref">@agencyContact.PhoneLabel</a></strong>
                     <p>Lun-Ven 9:00-12:30 / 15:00-19:00</p>
                 </div>
             </article>
             <article>
                 <span class="support-icon mail-icon" aria-hidden="true"></span>
                 <div>
-                    <strong><a href="mailto:info@agenziamedri.it">info@agenziamedri.it</a></strong>
+                    <strong><a href="@agencyContact.EmailHref">@agencyContact.EmailLabel</a></strong>
                     <p>Risposta entro il giorno lavorativo</p>
                 </div>
             </article>
@@ -147,7 +149,7 @@
         <section class="medri-lead-confirmation__actions">
             <a class="primary-cta btn btn-primary" asp-controller="Search" asp-action="Index">Cerca immobili</a>
             <a class="secondary-cta btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Torna alla home</a>
-            <a class="secondary-cta btn btn-outline-secondary" href="tel:0547123456">Chiama l'agenzia</a>
+            <a class="secondary-cta btn btn-outline-secondary" href="@agencyContact.PhoneHref">Chiama l'agenzia</a>
         </section>
     </section>
 </main>

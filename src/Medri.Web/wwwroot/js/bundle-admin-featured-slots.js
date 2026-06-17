@@ -62,7 +62,7 @@
         })
             .then(function (response) {
             if (!response.ok) {
-                throw new Error("Featured request failed");
+                throw new Error("Richiesta homepage non riuscita");
             }
             return response.text().then(function (html) {
                 syncFeaturedPanel(html, response.url);

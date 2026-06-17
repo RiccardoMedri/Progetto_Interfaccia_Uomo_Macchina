@@ -44,6 +44,13 @@ namespace Medri.Services.Medri.Application
             listing.DisplayLocation = update.DisplayLocation;
             listing.Location = update.DisplayLocation;
             listing.Address = update.Address;
+            // Keep the existing coordinates if geocoding was unavailable / produced nothing,
+            // so editing an address while the map service is down never resets the pin to (0,0).
+            if (update.Latitude.HasValue && update.Longitude.HasValue)
+            {
+                listing.Latitude = update.Latitude.Value;
+                listing.Longitude = update.Longitude.Value;
+            }
             listing.SurfaceSquareMeters = update.SurfaceSquareMeters;
             listing.Rooms = update.Rooms;
             listing.BedroomsLabel = update.BedroomsLabel;
@@ -140,8 +147,7 @@ namespace Medri.Services.Medri.Application
 
             var completion = AdminPropertyCompletionCalculator.Calculate(
                 listing,
-                activeMedia.Length,
-                AdminPropertyCompletionCalculator.HasFloorPlan(activeMedia));
+                activeMedia.Length);
             AdminPropertyCompletionCalculator.ApplyToListing(listing, completion);
             UpdatePublicationStatusAfterSave(listing, completion);
 

@@ -29,8 +29,7 @@ namespace Medri.Services.Medri.Application
             var media = await MediaAsync(listing.Id, cancellationToken);
             var completion = AdminPropertyCompletionCalculator.Calculate(
                 listing,
-                media.Length,
-                AdminPropertyCompletionCalculator.HasFloorPlan(media));
+                media.Length);
             AdminPropertyCompletionCalculator.ApplyToListing(listing, completion);
             listing.UpdatedAtUtc = DateTime.UtcNow;
 
@@ -110,6 +109,53 @@ namespace Medri.Services.Medri.Application
             await FeaturedPropertySlots.NormalizeAsync(dbContext, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
             return AdminPropertyCommandResult.Success(listing.InternalReference);
+        }
+    }
+
+    public sealed class DiscardDraftAdminPropertyCommand
+    {
+        private readonly MedriDbContext dbContext;
+
+        public DiscardDraftAdminPropertyCommand(MedriDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+
+        // Hard-deletes a still-incomplete draft (used by "Esci senza salvare" during creation).
+        // Anything already promoted (Ready/Published/NeedsUpdate/Archived) is left untouched.
+        public async Task<AdminPropertyCommandResult> ExecuteAsync(
+            string reference,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(reference))
+            {
+                return AdminPropertyCommandResult.NotFound();
+            }
+
+            var listing = await dbContext.PropertyListings
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(
+                    item => item.InternalReference == reference,
+                    cancellationToken);
+
+            if (listing == null)
+            {
+                return AdminPropertyCommandResult.NotFound();
+            }
+
+            if (listing.PublicationStatus != PropertyPublicationStatuses.Incomplete)
+            {
+                return AdminPropertyCommandResult.Success(listing.InternalReference);
+            }
+
+            var media = await dbContext.PropertyMedia
+                .Where(item => item.PropertyListingId == listing.Id)
+                .ToArrayAsync(cancellationToken);
+            dbContext.PropertyMedia.RemoveRange(media);
+            dbContext.PropertyListings.Remove(listing);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return AdminPropertyCommandResult.Success(reference);
         }
     }
 
@@ -382,8 +428,7 @@ namespace Medri.Services.Medri.Application
 
             var completion = AdminPropertyCompletionCalculator.Calculate(
                 listing,
-                activeMedia.Length,
-                AdminPropertyCompletionCalculator.HasFloorPlan(activeMedia));
+                activeMedia.Length);
             AdminPropertyCompletionCalculator.ApplyToListing(listing, completion);
             if (listing.PublicationStatus != PropertyPublicationStatuses.Archived)
             {

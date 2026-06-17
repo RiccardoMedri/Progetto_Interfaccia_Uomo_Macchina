@@ -41,12 +41,7 @@ namespace Medri.Services.Medri.Application
                     .CountAsync(
                         profile => profile.PublicReference != null && profile.Status != RequestStatuses.Archived,
                         cancellationToken),
-                ListingCount = await dbContext.PropertyListings
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .CountAsync(
-                        item => item.InternalReference != null && item.PublicationStatus != PropertyPublicationStatuses.Archived,
-                        cancellationToken),
+                ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken),
                 Checklist = Checklist(new PropertyListing
                 {
                     DisplayLocation = string.Empty,
@@ -92,8 +87,7 @@ namespace Medri.Services.Medri.Application
                 .ToArrayAsync(cancellationToken);
             var completion = AdminPropertyCompletionCalculator.Calculate(
                 listing,
-                mediaRows.Length,
-                AdminPropertyCompletionCalculator.HasFloorPlan(mediaRows));
+                mediaRows.Length);
             var media = mediaRows
                 .Select(item => new AdminPropertyMediaDto
                 {
@@ -117,6 +111,8 @@ namespace Medri.Services.Medri.Application
                 ListingCategory = listing.ListingCategory,
                 DisplayLocation = DisplayLocation(listing),
                 Address = listing.Address,
+                Latitude = listing.Latitude,
+                Longitude = listing.Longitude,
                 Contract = listing.Contract,
                 Price = listing.Price,
                 SurfaceSquareMeters = listing.SurfaceSquareMeters,
@@ -157,12 +153,7 @@ namespace Medri.Services.Medri.Application
                     .CountAsync(
                         profile => profile.PublicReference != null && profile.Status != RequestStatuses.Archived,
                         cancellationToken),
-                ListingCount = await dbContext.PropertyListings
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .CountAsync(
-                        item => item.InternalReference != null && item.PublicationStatus != PropertyPublicationStatuses.Archived,
-                        cancellationToken),
+                ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken),
                 Media = media,
                 Checklist = completion.Checklist
                     .Select(item => new AdminPropertyChecklistItemDto
@@ -219,8 +210,7 @@ namespace Medri.Services.Medri.Application
         {
             var completion = AdminPropertyCompletionCalculator.Calculate(
                 listing,
-                media.Count,
-                AdminPropertyCompletionCalculator.HasFloorPlan(media));
+                media.Count);
             return completion.Checklist
                 .Select(item => new AdminPropertyChecklistItemDto
                 {

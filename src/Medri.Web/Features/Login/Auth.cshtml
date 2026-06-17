@@ -1,6 +1,7 @@
 @using Medri.Web.Features.Login
 @using System.Collections.Generic
 @model Medri.Web.Features.Login.AuthPageViewModel
+@inject Microsoft.Extensions.Options.IOptions<Medri.Web.Infrastructure.AgencyContactOptions> AgencyContactOptions
 @{
     Layout = "_MedriPublicLayout";
     ViewData["PageBundle"] = "login";
@@ -16,6 +17,7 @@
     ViewData["BodyClass"] = "medri-login-body";
     ViewData["RenderMedriFooter"] = false;
     ViewData["MedriShellClass"] = "medri-public-shell medri-login-shell";
+    var agencyContact = AgencyContactOptions.Value;
 }
 <main id="contenuto" class="medri-login-page">
     <div class="container-xxl medri-login-page__container">
@@ -114,7 +116,7 @@
                                         <input asp-for="Login.RememberMe" class="form-check-input" type="checkbox" />
                                         <label class="form-check-label" for="Login_RememberMe">Ricordami</label>
                                     </div>
-                                    <a href="tel:0547123456">Password dimenticata?</a>
+                                    <a href="@agencyContact.PhoneHref">Password dimenticata?</a>
                                 </div>
 
                                 <button class="btn btn-primary medri-login-form__submit" type="submit">Accedi</button>
