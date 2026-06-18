@@ -1,4 +1,4 @@
-@use "sass:map";
+﻿@use "sass:map";
 @use "tokens";
 @use "mixins";
 
@@ -799,13 +799,14 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
     .search-card-media {
       position: relative;
       overflow: hidden;
-      min-height: 10rem;
+      height: 10rem;
     }
 
     .search-card-media-image {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
-      min-height: inherit;
       display: block;
       object-fit: cover;
     }
@@ -1740,9 +1741,6 @@ $request-panel-shadow: 0 1.5rem 4rem rgba(24, 32, 43, 0.12);
   }
 }
 
-// Custom-time panel reveal (replaces the former JS is-collapsed toggle).
-// The "Altro orario" radio carries .time-choice-altro; when it is checked the
-// panel (hidden by default above) is shown again as the Bootstrap .row it is.
 .lead-time-section:has(.time-choice-altro:checked) .custom-time-panel {
   display: flex;
 }

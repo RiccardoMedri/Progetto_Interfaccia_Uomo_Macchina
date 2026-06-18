@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,9 +9,6 @@ using Medri.Services.Medri.Identity;
 
 namespace Medri.Infrastructure
 {
-    // Deterministic in-memory demo seed. The public entry points are InitializeUsers and
-    // InitializeMedriDemoData; the latter delegates to one Seed* method per domain area so the
-    // overall shape is readable at a glance. All cross-entity ids live in SeedReferences.
     public class DataGenerator
     {
         public static void InitializeUsers(MedriDbContext context)
@@ -68,7 +65,6 @@ namespace Medri.Infrastructure
             context.SaveChanges();
         }
 
-        // --- Agency users -------------------------------------------------------------------
 
         private static void SeedAgencyUsers(MedriDbContext context, SeedReferences refs)
         {
@@ -111,7 +107,6 @@ namespace Medri.Infrastructure
                 });
         }
 
-        // --- Listings (operational drafts + generated published/reserved) + media ------------
 
         private static void SeedListings(MedriDbContext context, SeedReferences refs)
         {
@@ -132,7 +127,6 @@ namespace Medri.Infrastructure
             context.PropertyListings.AddRange(publishedAdminListings);
             context.PropertyListings.AddRange(reservedAdminListings);
 
-            // Rich admin example (IM-1042) gets a full named gallery.
             var adminPropertyMediaTitles = new[]
             {
                 "Copertina",
@@ -162,7 +156,6 @@ namespace Medri.Infrastructure
                     .ToArray());
         }
 
-        // Common defaults for the hand-curated operational drafts; only the distinctive fields are passed.
         private static PropertyListing OperationalListing(
             string idSuffix,
             string reference,
@@ -217,7 +210,6 @@ namespace Medri.Infrastructure
                 OperationalListing("000000000102", "IM-329", "NeedsUpdate", 76, "Prezzo, disponibilita", refs.Martina, "Appartamento con terrazzo", "bozza-im-329", "Cesena - Fiorenzuola", 260000m, 4, 2, 105, "Vendita", "Appartamento", "Fiorenzuola", "/medri-reference/assets/properties/property-05.jpg", 202),
                 OperationalListing("000000000103", "IM-318", "Ready", 100, "Nessun dato mancante", refs.Lorenzo, "Villetta a schiera", "bozza-im-318", "Cesena - S. Egidio", 285000m, 4, 2, 120, "Vendita", "Villetta", "Sant'Egidio", "/medri-reference/assets/properties/property-03.jpg", 203),
 
-                // Rich admin example kept explicit (drives the detail/preview demo).
                 new PropertyListing
                 {
                     Id = Guid.Parse("20000000-0000-0000-0000-000000001042"),
@@ -274,7 +266,6 @@ namespace Medri.Infrastructure
             };
         }
 
-        // Blueprints reused by the generated published/reserved listings.
         private static GeneratedListingBlueprint[] GeneratedListingBlueprints()
         {
             return new[]
@@ -399,7 +390,6 @@ namespace Medri.Infrastructure
                 .ToArray();
         }
 
-        // Fills coordinates/address/energy class on the hand-curated listings from the nearest blueprint.
         private static void BackfillGeneratedListingDetails(PropertyListing[] listings)
         {
             var blueprints = GeneratedListingBlueprints();
@@ -429,7 +419,6 @@ namespace Medri.Infrastructure
             }
         }
 
-        // --- Favorites ----------------------------------------------------------------------
 
         private static void SeedFavorites(MedriDbContext context, SeedReferences refs)
         {
@@ -457,7 +446,6 @@ namespace Medri.Infrastructure
                 });
         }
 
-        // --- Client notification preferences ------------------------------------------------
 
         private static void SeedNotificationPreferences(MedriDbContext context, SeedReferences refs)
         {
@@ -494,7 +482,6 @@ namespace Medri.Infrastructure
                 });
         }
 
-        // --- Leads (technical seed + client requests + admin board + request board) ---------
 
         private static void SeedLeads(MedriDbContext context, SeedReferences refs)
         {
@@ -694,7 +681,6 @@ namespace Medri.Infrastructure
                 RequestLead(310, "Davide Farina", "davide.farina@example.test", "333 2018000", "Valuation", "Aggiornare obiettivo valutazione", null, -14));
         }
 
-        // --- Search profiles ----------------------------------------------------------------
 
         private static void SeedSearchProfiles(MedriDbContext context, SeedReferences refs)
         {
@@ -787,7 +773,6 @@ namespace Medri.Infrastructure
                 RequestProfile(210, 310, "RQ-2018", "Updating", "Valutazione|obiettivo cambiato|richiamare", "davide.farina@example.test", "Aggiornare obiettivo valutazione", -14));
         }
 
-        // --- Lead preferences ---------------------------------------------------------------
 
         private static void SeedLeadPreferences(MedriDbContext context, SeedReferences refs)
         {
@@ -867,7 +852,6 @@ namespace Medri.Infrastructure
                 });
         }
 
-        // --- Interactions -------------------------------------------------------------------
 
         private static void SeedInteractions(MedriDbContext context, SeedReferences refs)
         {
@@ -925,7 +909,6 @@ namespace Medri.Infrastructure
                 });
         }
 
-        // --- Appointments -------------------------------------------------------------------
 
         private static void SeedAppointments(MedriDbContext context, SeedReferences refs)
         {
@@ -964,7 +947,6 @@ namespace Medri.Infrastructure
                 });
         }
 
-        // --- Listing detail completion + gallery helpers (unchanged behaviour) --------------
 
         private static void CompleteSeedListingDetails(PropertyListing[] listings)
         {
@@ -1161,7 +1143,6 @@ namespace Medri.Infrastructure
             return new Guid(bytes);
         }
 
-        // --- Shared seed identifiers (point 4: no scattered literal GUIDs) ------------------
 
         private sealed class SeedReferences
         {
@@ -1173,7 +1154,6 @@ namespace Medri.Infrastructure
             public Guid Lorenzo { get; } = Guid.Parse("10000000-0000-0000-0000-000000000004");
             public Guid Marco { get; } = Guid.Parse("10000000-0000-0000-0000-000000000005");
 
-            // Default linked listing for the technical seed appointment/favorite (a published listing).
             public Guid PropertyListingId { get; } = Guid.Parse("20000000-0000-0000-0000-000000000301");
 
             public Guid LeadId { get; } = Guid.Parse("30000000-0000-0000-0000-000000000001");

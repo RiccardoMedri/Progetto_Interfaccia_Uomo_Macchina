@@ -49,6 +49,7 @@ namespace Medri.Services
             services.AddScoped<PropertyContactQuery>();
             services.AddScoped<CreatePropertyContactRequestCommand>();
             services.AddScoped<SubmitPropertyContactRequestCommand>();
+            services.AddScoped<ClaimClientRequestsCommand>();
             services.AddScoped<ClientRequestsQuery>();
             services.AddScoped<ClientRequestCountQuery>();
             services.AddScoped<ClientNotificationPreferencesQuery>();

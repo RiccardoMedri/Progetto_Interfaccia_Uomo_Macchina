@@ -35,13 +35,7 @@ namespace Medri.Web.Features.LeadIntake
             }
 
             var userId = AuthenticatedUserId.Get(User);
-            if (!userId.HasValue)
-            {
-                PendingLeadRequestSession.Store(HttpContext.Session, viewModel);
-                return RedirectToPendingLeadLogin();
-            }
-
-            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId.Value);
+            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId);
         }
 
         [HttpGet]
@@ -60,13 +54,7 @@ namespace Medri.Web.Features.LeadIntake
             }
 
             var userId = AuthenticatedUserId.Get(User);
-            if (!userId.HasValue)
-            {
-                PendingLeadRequestSession.Store(HttpContext.Session, viewModel);
-                return RedirectToPendingLeadLogin();
-            }
-
-            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId.Value);
+            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId);
         }
 
         [HttpGet]
@@ -85,13 +73,7 @@ namespace Medri.Web.Features.LeadIntake
             }
 
             var userId = AuthenticatedUserId.Get(User);
-            if (!userId.HasValue)
-            {
-                PendingLeadRequestSession.Store(HttpContext.Session, viewModel);
-                return RedirectToPendingLeadLogin();
-            }
-
-            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId.Value);
+            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId);
         }
 
         [HttpGet]
@@ -110,13 +92,7 @@ namespace Medri.Web.Features.LeadIntake
             }
 
             var userId = AuthenticatedUserId.Get(User);
-            if (!userId.HasValue)
-            {
-                PendingLeadRequestSession.Store(HttpContext.Session, viewModel);
-                return RedirectToPendingLeadLogin();
-            }
-
-            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId.Value);
+            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId);
         }
 
         [HttpGet]
@@ -135,13 +111,7 @@ namespace Medri.Web.Features.LeadIntake
             }
 
             var userId = AuthenticatedUserId.Get(User);
-            if (!userId.HasValue)
-            {
-                PendingLeadRequestSession.Store(HttpContext.Session, viewModel);
-                return RedirectToPendingLeadLogin();
-            }
-
-            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId.Value);
+            return await SubmitAsync(LeadIntakeMapper.Create(viewModel), userId);
         }
 
         [HttpGet]
@@ -169,12 +139,18 @@ namespace Medri.Web.Features.LeadIntake
             return result == null ? NotFound() : View(LeadIntakeMapper.Create(result));
         }
 
-        private async Task<IActionResult> SubmitAsync(LeadRequestDto request, Guid userId)
+        private async Task<IActionResult> SubmitAsync(LeadRequestDto request, Guid? userId)
         {
             request.ClientUserId = userId;
             var leadId = await submitLeadRequestCommand.ExecuteAsync(
                 request,
                 HttpContext.RequestAborted);
+
+            if (!userId.HasValue)
+            {
+                PendingClientRequestSession.Add(HttpContext.Session, leadId);
+            }
+
             return RedirectToAction(nameof(Confirmation), new { id = leadId });
         }
 

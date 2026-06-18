@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -317,8 +317,6 @@ namespace Medri.Services.Medri.Application
             var listings = dbContext.PropertyListings.AsNoTracking();
             if (includeUnpublished)
             {
-                // Admin "Anteprima" embeds this public page in an iframe to preview a listing
-                // before publication: bypass the published-only global query filter in that case.
                 listings = listings.IgnoreQueryFilters();
             }
 

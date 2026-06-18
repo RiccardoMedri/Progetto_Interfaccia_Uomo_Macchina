@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
@@ -44,8 +44,6 @@ namespace Medri.Services.Medri.Application
             listing.DisplayLocation = update.DisplayLocation;
             listing.Location = update.DisplayLocation;
             listing.Address = update.Address;
-            // Keep the existing coordinates if geocoding was unavailable / produced nothing,
-            // so editing an address while the map service is down never resets the pin to (0,0).
             if (update.Latitude.HasValue && update.Longitude.HasValue)
             {
                 listing.Latitude = update.Latitude.Value;

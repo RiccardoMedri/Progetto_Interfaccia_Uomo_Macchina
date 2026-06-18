@@ -1,8 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
-		<UserSecretsId>medri-web-google-integrations</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -22,6 +21,13 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Medri\Medri.csproj" />
 	</ItemGroup>
+
+	<Target Name="RestoreClientAssets"
+			BeforeTargets="BuildClientAssets"
+			Condition="!Exists('$(MSBuildProjectDirectory)\node_modules\.bin\tsc.cmd') And !Exists('$(MSBuildProjectDirectory)/node_modules/.bin/tsc')">
+		<Exec Command="npm.cmd ci" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'$(OS)' == 'Windows_NT'" />
+		<Exec Command="npm ci" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'$(OS)' != 'Windows_NT'" />
+	</Target>
 
 	<Target Name="BuildClientAssets" BeforeTargets="DefineStaticWebAssets;BundleMinify;BeforeBuild">
 		<Exec Command="npm.cmd run build:assets" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'$(OS)' == 'Windows_NT'" />

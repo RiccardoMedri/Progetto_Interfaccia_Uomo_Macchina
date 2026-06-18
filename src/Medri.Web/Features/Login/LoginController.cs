@@ -22,13 +22,16 @@ namespace Medri.Web.Features.Login
         public static string LoginErrorModelStateKey = "LoginError";
         private readonly AccountService accountService;
         private readonly AddFavoritePropertyCommand addFavoritePropertyCommand;
+        private readonly ClaimClientRequestsCommand claimClientRequestsCommand;
 
         public LoginController(
             AccountService accountService,
-            AddFavoritePropertyCommand addFavoritePropertyCommand)
+            AddFavoritePropertyCommand addFavoritePropertyCommand,
+            ClaimClientRequestsCommand claimClientRequestsCommand)
         {
             this.accountService = accountService;
             this.addFavoritePropertyCommand = addFavoritePropertyCommand;
+            this.claimClientRequestsCommand = claimClientRequestsCommand;
         }
 
         private async Task<ActionResult> LoginAndRedirect(
@@ -66,6 +69,11 @@ namespace Medri.Web.Features.Login
                     utente.Id,
                     pendingFavoritePropertyId.Value,
                     HttpContext.RequestAborted);
+            }
+
+            if (utente.Role == UserRoles.Client)
+            {
+                await ClaimPendingClientRequestsAsync(utente.Id);
             }
 
             var localReturnUrl = NormalizeLocalReturnUrl(returnUrl);
@@ -223,6 +231,21 @@ namespace Medri.Web.Features.Login
                     PendingFavoritePropertyId = pendingFavoritePropertyId
                 }
             };
+        }
+
+        private async Task ClaimPendingClientRequestsAsync(Guid userId)
+        {
+            var pendingRequestIds = PendingClientRequestSession.Read(HttpContext.Session);
+            if (pendingRequestIds.Count == 0)
+            {
+                return;
+            }
+
+            await claimClientRequestsCommand.ExecuteAsync(
+                userId,
+                pendingRequestIds,
+                HttpContext.RequestAborted);
+            PendingClientRequestSession.Clear(HttpContext.Session);
         }
 
         private void RemoveAuthReturnUrlModelState()

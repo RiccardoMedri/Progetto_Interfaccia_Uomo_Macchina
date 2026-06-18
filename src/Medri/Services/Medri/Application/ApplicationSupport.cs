@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -149,8 +149,6 @@ namespace Medri.Services.Medri.Application
 
     internal static class AdminNavigationCounts
     {
-        // Sidebar "Immobili" badge: managed listings not yet published
-        // (Incomplete / Ready / NeedsUpdate), archived ones excluded.
         public static Task<int> UnpublishedListingsAsync(
             MedriDbContext dbContext,
             CancellationToken cancellationToken)

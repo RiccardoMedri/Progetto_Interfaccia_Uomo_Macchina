@@ -1,4 +1,4 @@
-(() => {
+﻿(() => {
     interface AdminPropertyGeocodeResult {
         succeeded: boolean;
         latitude?: number | null;
@@ -355,8 +355,6 @@
         }
 
         event.preventDefault();
-        // Non-blocking: try to resolve coordinates, but always submit afterwards — never block
-        // the save because geocoding is unavailable or the address was not found.
         void geocodeLocation(root).finally(() => resubmitPropertyForm(form, activeSubmitter));
     });
 

@@ -206,9 +206,10 @@ namespace Medri.Services.Medri.Application
             this.dbContext = dbContext;
         }
 
-        public async Task<bool> ExecuteAsync(
+        public async Task<Guid?> ExecuteAsync(
             string slug,
             Guid appointmentId,
+            Guid? clientUserId,
             CancellationToken cancellationToken = default)
         {
             var appointment = await dbContext.Appointments
@@ -224,17 +225,31 @@ namespace Medri.Services.Medri.Application
 
             if (appointment == null)
             {
-                return false;
+                return null;
+            }
+
+            var lead = await dbContext.Leads
+                .Where(item => item.Id == appointment.LeadId)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (lead == null)
+            {
+                return null;
+            }
+
+            if (clientUserId.HasValue && !lead.ClientUserId.HasValue)
+            {
+                lead.ClientUserId = clientUserId.Value;
             }
 
             if (appointment.Status == AppointmentStatuses.Submitted)
             {
-                return true;
+                await dbContext.SaveChangesAsync(cancellationToken);
+                return appointment.LeadId;
             }
 
             if (appointment.Status != AppointmentStatuses.Draft)
             {
-                return false;
+                return null;
             }
 
             appointment.Status = AppointmentStatuses.Submitted;
@@ -247,7 +262,7 @@ namespace Medri.Services.Medri.Application
                 OccurredAtUtc = DateTime.UtcNow
             });
             await dbContext.SaveChangesAsync(cancellationToken);
-            return true;
+            return appointment.LeadId;
         }
     }
 }

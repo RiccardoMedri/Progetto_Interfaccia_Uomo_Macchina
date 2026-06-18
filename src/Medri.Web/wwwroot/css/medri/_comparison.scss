@@ -1,4 +1,4 @@
-@use "sass:map";
+﻿@use "sass:map";
 @use "tokens";
 @use "mixins";
 
@@ -678,7 +678,6 @@ $comparison-panel-shadow: 0 1.25rem 3rem rgba(31, 54, 88, 0.13);
     margin: 1.2cm;
   }
 
-  // Hide the site chrome (skip link, header, footer): only the comparison itself should print.
   .skip-link,
   .site-header,
   .medri-home-header,

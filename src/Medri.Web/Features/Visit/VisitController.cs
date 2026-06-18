@@ -114,9 +114,23 @@ namespace Medri.Web.Features.Visit
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> Submit(string slug, Guid appointmentId)
         {
-            return await submitPropertyContactRequestCommand.ExecuteAsync(slug, appointmentId, HttpContext.RequestAborted)
-                ? RedirectToConfirmation(slug, appointmentId)
-                : NotFound();
+            var userId = AuthenticatedUserId.Get(User);
+            var leadId = await submitPropertyContactRequestCommand.ExecuteAsync(
+                slug,
+                appointmentId,
+                userId,
+                HttpContext.RequestAborted);
+            if (!leadId.HasValue)
+            {
+                return NotFound();
+            }
+
+            if (!userId.HasValue)
+            {
+                PendingClientRequestSession.Add(HttpContext.Session, leadId.Value);
+            }
+
+            return RedirectToConfirmation(slug, appointmentId);
         }
 
         [HttpGet]

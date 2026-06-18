@@ -99,14 +99,13 @@ namespace Medri.Web
             }
 
             app.UseResponseCompression();
+            app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {

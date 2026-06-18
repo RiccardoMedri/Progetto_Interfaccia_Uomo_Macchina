@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     const compareKey = "medri.comparePropertyIds";
     const maxCompareItems = 4;
 
@@ -229,7 +229,6 @@
                         await navigator.share(shareData);
                     } else if (navigator.clipboard) {
                         await navigator.clipboard.writeText(shareData.url);
-                        // Visible confirmation: swap the label to "Link copiato" + a copied state, then restore.
                         button.textContent = "Link copiato";
                         button.classList.add("is-copied");
                         button.setAttribute("aria-label", "Link confronto copiato");

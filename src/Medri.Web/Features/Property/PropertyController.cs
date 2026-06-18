@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using Medri.Services.Medri.Application;
@@ -23,7 +23,6 @@ namespace Medri.Web.Features.Property
         [HttpGet]
         public virtual async Task<IActionResult> Detail(string slug, bool preview = false)
         {
-            // Allow the admin "Anteprima" iframe to preview a not-yet-published listing.
             var includeUnpublished = preview &&
                 (User.IsInRole(UserRoles.Admin) || User.IsInRole(UserRoles.Operator));
 

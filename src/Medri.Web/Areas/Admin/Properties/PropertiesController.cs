@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Globalization;
@@ -74,8 +74,6 @@ namespace Medri.Web.Areas.Admin.Properties
             return View(AdminPropertyListViewModelMapper.Create(result, input, User));
         }
 
-        // Tracks the draft auto-created in the CURRENT creation flow (media upload before save),
-        // so "Esci senza salvare" can discard only that one and never a pre-existing incomplete listing.
         private const string PendingDraftSessionKey = "admin:pendingDraftProperty";
 
         [HttpGet]
@@ -115,9 +113,6 @@ namespace Medri.Web.Areas.Admin.Properties
         {
             var isMediaUploadAction = IsMediaUploadAction();
 
-            // Media upload during creation: persist a draft (skipping the full required-field
-            // validation) so the operator can upload media, see the cards and reorder them,
-            // and only afterwards fill the remaining fields before the final save. Mirrors Update().
             if (!ModelState.IsValid && isMediaUploadAction && HasUploadedMedia(input))
             {
                 var draftResult = await adminCreatePropertyCommand.ExecuteAsync(
@@ -164,8 +159,6 @@ namespace Medri.Web.Areas.Admin.Properties
                 return NotFound();
             }
 
-            // "Esci senza salvare" discards a draft ONLY if it is the one auto-created in the current
-            // creation flow (session-tracked); a pre-existing incomplete listing is never deleted.
             var pendingDraftReference = HttpContext.Session.GetString(PendingDraftSessionKey);
             var canDiscardDraft = pendingDraftReference != null &&
                 string.Equals(pendingDraftReference, result.Reference, StringComparison.Ordinal);
@@ -220,7 +213,6 @@ namespace Medri.Web.Areas.Admin.Properties
 
             if (!isMediaUploadAction)
             {
-                // Explicit save = the creation is finalized; it can no longer be auto-discarded.
                 HttpContext.Session.Remove(PendingDraftSessionKey);
                 Alerts.AddSuccess(this, $"Immobile {commandResult.Reference} aggiornato.");
             }
@@ -301,8 +293,6 @@ namespace Medri.Web.Areas.Admin.Properties
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> Discard(string reference)
         {
-            // "Esci senza salvare": elimina SOLO la bozza auto-creata in questa sessione di creazione
-            // (tracciata in sessione) e solo se ancora incompleta; altrimenti esce e basta.
             var pendingDraftReference = HttpContext.Session.GetString(PendingDraftSessionKey);
             if (pendingDraftReference != null &&
                 string.Equals(pendingDraftReference, reference, StringComparison.Ordinal))

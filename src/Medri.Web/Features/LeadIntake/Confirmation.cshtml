@@ -147,7 +147,8 @@
         </section>
 
         <section class="medri-lead-confirmation__actions">
-            <a class="primary-cta btn btn-primary" asp-controller="Search" asp-action="Index">Cerca immobili</a>
+            <a class="primary-cta btn btn-primary" asp-area="Client" asp-controller="Requests" asp-action="Index">Vedi la richiesta nell'Area cliente</a>
+            <a class="secondary-cta btn btn-outline-secondary" asp-controller="Search" asp-action="Index">Cerca immobili</a>
             <a class="secondary-cta btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Torna alla home</a>
             <a class="secondary-cta btn btn-outline-secondary" href="@agencyContact.PhoneHref">Chiama l'agenzia</a>
         </section>

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,8 +121,6 @@ namespace Medri.Services.Medri.Application
             this.dbContext = dbContext;
         }
 
-        // Hard-deletes a still-incomplete draft (used by "Esci senza salvare" during creation).
-        // Anything already promoted (Ready/Published/NeedsUpdate/Archived) is left untouched.
         public async Task<AdminPropertyCommandResult> ExecuteAsync(
             string reference,
             CancellationToken cancellationToken = default)
