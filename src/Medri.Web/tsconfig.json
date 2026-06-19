@@ -1,18 +1,17 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "noEmitOnError": true,
+    "noEmit": true,
     "noImplicitAny": false,
-    "removeComments": true,
-    "sourceMap": false,
-    "target": "es5",
+    "target": "es2019",
     "lib": [ "dom", "es2019" ],
     "ignoreDeprecations": "6.0",
-
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "skipLibCheck": true
   },
   "include": [
-    "wwwroot/js/**/*.ts"
+    "ClientAssets/ts/**/*.ts"
   ],
   "exclude": [
     "bin",

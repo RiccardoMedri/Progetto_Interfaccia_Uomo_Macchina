@@ -85,26 +85,14 @@
 </div>
 
 @section styles {
-    <environment include="Development">
-        <link rel="stylesheet" href="/css/bundle-medri-base.css" asp-append-version="true" />
-        <link rel="stylesheet" href="/css/bundle-medri-search.css" asp-append-version="true" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="/css/bundle-medri-base.min.css" asp-append-version="true" />
-        <link rel="stylesheet" href="/css/bundle-medri-search.min.css" asp-append-version="true" />
-    </environment>
+    <link rel="stylesheet" href="/css/medri-base.css" />
+    <link rel="stylesheet" href="/css/medri-search.css" />
 }
 
 @section scripts {
     @if (Model.HasMarker)
     {
-        <environment include="Development">
-            <script src="/js/bundle-vue.js" defer asp-append-version="true"></script>
-            <script src="/js/bundle-medri-search-map.js" defer asp-append-version="true"></script>
-        </environment>
-        <environment exclude="Development">
-            <script src="/js/bundle-vue.min.js" defer asp-append-version="true"></script>
-            <script src="/js/bundle-medri-search-map.min.js" defer asp-append-version="true"></script>
-        </environment>
+        <script src="https://cdn.jsdelivr.net/npm/vue@3.5.38/dist/vue.runtime.global.prod.js" defer></script>
+        <script src="/js/search-map.js" defer></script>
     }
 }

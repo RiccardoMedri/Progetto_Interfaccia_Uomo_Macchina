@@ -36,9 +36,7 @@ namespace Medri.Services.Medri.Application
                         item => item.PublicReference != null && item.Status != RequestStatuses.Archived,
                         cancellationToken),
                 ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken),
-                Advisors = await dbContext.AgencyUsers
-                    .AsNoTracking()
-                    .Where(advisor => !advisor.IsSystemSeed)
+                Advisors = await StaffUserQueries.Assignable(dbContext)
                     .OrderBy(advisor => advisor.DisplayName)
                     .Select(advisor => new AdminLeadAdvisorDto
                     {
@@ -131,9 +129,7 @@ namespace Medri.Services.Medri.Application
                     item => item.PublicReference != null && item.Status != RequestStatuses.Archived,
                     cancellationToken);
             result.ListingCount = await AdminNavigationCounts.UnpublishedListingsAsync(dbContext, cancellationToken);
-            result.Advisors = await dbContext.AgencyUsers
-                .AsNoTracking()
-                .Where(advisor => !advisor.IsSystemSeed)
+            result.Advisors = await StaffUserQueries.Assignable(dbContext)
                 .OrderBy(advisor => advisor.DisplayName)
                 .Select(advisor => new AdminLeadAdvisorDto
                 {

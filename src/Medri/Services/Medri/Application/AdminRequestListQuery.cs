@@ -26,9 +26,7 @@ namespace Medri.Services.Medri.Application
             var filteredQuery = ApplyFilters(baseQuery, filter)
                 .OrderByDescending(row => row.Reference);
 
-            var advisors = await dbContext.AgencyUsers
-                .AsNoTracking()
-                .Where(advisor => !advisor.IsSystemSeed)
+            var advisors = await StaffUserQueries.Assignable(dbContext)
                 .OrderBy(advisor => advisor.DisplayName)
                 .ToArrayAsync(cancellationToken);
             var pageSize = NormalizePageSize(filter.PageSize);
@@ -76,7 +74,7 @@ namespace Medri.Services.Medri.Application
                    join preference in dbContext.LeadPreferences.AsNoTracking()
                         on lead.Id equals preference.LeadId into preferenceRows
                    from preference in preferenceRows.DefaultIfEmpty()
-                   join advisor in dbContext.AgencyUsers.AsNoTracking()
+                   join advisor in StaffUserQueries.Assignable(dbContext)
                         on lead.AssignedAgencyUserId equals (Guid?)advisor.Id into advisorRows
                    from advisor in advisorRows.DefaultIfEmpty()
                    where profile.PublicReference != null &&

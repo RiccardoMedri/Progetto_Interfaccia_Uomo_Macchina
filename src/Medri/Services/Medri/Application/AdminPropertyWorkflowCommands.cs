@@ -177,8 +177,7 @@ namespace Medri.Services.Medri.Application
                 return new AdminPropertyBulkCommandResult();
             }
 
-            var advisorExists = await dbContext.AgencyUsers
-                .AsNoTracking()
+            var advisorExists = await StaffUserQueries.Assignable(dbContext)
                 .AnyAsync(
                     advisor => advisor.Id == assignedAgencyUserId.Value,
                     cancellationToken);

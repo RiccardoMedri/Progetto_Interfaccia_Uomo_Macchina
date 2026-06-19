@@ -6,11 +6,14 @@ using Medri.Services;
 using Medri.Services.Medri;
 using Medri.Services.Medri.Application;
 using Medri.Services.Medri.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Medri.Infrastructure
 {
     public class DataGenerator
     {
+        private const int SeedListingCount = 50;
+
         public static void InitializeUsers(MedriDbContext context)
         {
             if (context.Users.Any())
@@ -18,26 +21,68 @@ namespace Medri.Infrastructure
                 return;
             }
 
+            var refs = new SeedReferences();
+            var demoPasswordHash = AccountPasswordHasher.Hash("password");
+
             context.Users.AddRange(
                 new User
                 {
-                    Id = Guid.Parse("40000000-0000-0000-0000-000000000001"),
+                    Id = refs.ClientUserId,
                     Email = "elena.gori@email.it",
-                    Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg=",
+                    Password = demoPasswordHash,
                     FirstName = "Elena",
                     LastName = "Gori",
                     NickName = "Elena",
+                    DisplayName = "Elena Gori",
                     Role = UserRoles.Client
                 },
                 new User
                 {
-                    Id = Guid.Parse("40000000-0000-0000-0000-000000000002"),
+                    Id = refs.Martina,
+                    Email = "martina.ricci@example.test",
+                    Password = demoPasswordHash,
+                    FirstName = "Martina",
+                    LastName = "Ricci",
+                    NickName = "Martina",
+                    DisplayName = "Martina Ricci",
+                    Role = UserRoles.Operator,
+                    AgencyRole = AgencyStaffRoles.Advisor
+                },
+                new User
+                {
+                    Id = refs.Chiara,
                     Email = "chiara.medri@email.it",
-                    Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg=",
+                    Password = demoPasswordHash,
                     FirstName = "Chiara",
                     LastName = "Medri",
                     NickName = "Chiara",
-                    Role = UserRoles.Admin
+                    DisplayName = "Chiara Medri",
+                    Role = UserRoles.Admin,
+                    AgencyRole = AgencyStaffRoles.Manager
+                },
+                new User
+                {
+                    Id = refs.Lorenzo,
+                    Email = "lorenzo.bassi@example.test",
+                    Password = demoPasswordHash,
+                    FirstName = "Lorenzo",
+                    LastName = "Bassi",
+                    NickName = "Lorenzo",
+                    DisplayName = "Lorenzo Bassi",
+                    Role = UserRoles.Operator,
+                    AgencyRole = AgencyStaffRoles.Operator
+                },
+                new User
+                {
+                    Id = refs.Marco,
+                    Email = "marco.guidi@example.test",
+                    Password = demoPasswordHash,
+                    FirstName = "Marco",
+                    LastName = "Guidi",
+                    NickName = "Marco",
+                    DisplayName = "Marco Guidi",
+                    Role = UserRoles.Operator,
+                    AgencyRole = AgencyStaffRoles.Operator
                 });
 
             context.SaveChanges();
@@ -45,124 +90,159 @@ namespace Medri.Infrastructure
 
         public static void InitializeMedriDemoData(MedriDbContext context)
         {
-            if (context.AgencyUsers.Any())
+            if (context.PropertyListings.IgnoreQueryFilters().Any())
             {
                 return;
             }
 
             var refs = new SeedReferences();
 
-            SeedAgencyUsers(context, refs);
             SeedListings(context, refs);
             SeedFavorites(context, refs);
             SeedNotificationPreferences(context, refs);
-            SeedLeads(context, refs);
-            SeedSearchProfiles(context, refs);
-            SeedLeadPreferences(context, refs);
-            SeedInteractions(context, refs);
+            SeedStandaloneLeads(context, refs);
+            SeedRequests(context, refs);
             SeedAppointments(context, refs);
 
             context.SaveChanges();
         }
 
 
-        private static void SeedAgencyUsers(MedriDbContext context, SeedReferences refs)
-        {
-            context.AgencyUsers.AddRange(
-                new AgencyUser
-                {
-                    Id = refs.AgencyUserId,
-                    DisplayName = "Segreteria Medri",
-                    Email = "segreteria.medri@example.test",
-                    Role = AgencyUserRoles.Advisor,
-                    IsSystemSeed = true
-                },
-                new AgencyUser
-                {
-                    Id = refs.Martina,
-                    DisplayName = "Martina Ricci",
-                    Email = "martina.ricci@example.test",
-                    Role = AgencyUserRoles.Advisor
-                },
-                new AgencyUser
-                {
-                    Id = refs.Chiara,
-                    DisplayName = "Chiara Medri",
-                    Email = "chiara.medri@email.it",
-                    Role = AgencyUserRoles.Manager
-                },
-                new AgencyUser
-                {
-                    Id = refs.Lorenzo,
-                    DisplayName = "Lorenzo Bassi",
-                    Email = "lorenzo.bassi@example.test",
-                    Role = AgencyUserRoles.Operator
-                },
-                new AgencyUser
-                {
-                    Id = refs.Marco,
-                    DisplayName = "Marco Guidi",
-                    Email = "marco.guidi@example.test",
-                    Role = AgencyUserRoles.Operator
-                });
-        }
-
-
         private static void SeedListings(MedriDbContext context, SeedReferences refs)
         {
-            var operationalListings = BuildOperationalListings(refs);
-            var publishedAdminListings = BuildPublishedAdminListings(refs);
-            var reservedAdminListings = BuildReservedAdminListings(refs);
+            var listings = BuildSeedListings(refs);
 
-            BackfillGeneratedListingDetails(
-                operationalListings.Concat(reservedAdminListings).ToArray());
+            CompleteSeedListingDetails(listings);
 
-            CompleteSeedListingDetails(
-                operationalListings
-                    .Concat(publishedAdminListings)
-                    .Concat(reservedAdminListings)
-                    .ToArray());
-
-            context.PropertyListings.AddRange(operationalListings);
-            context.PropertyListings.AddRange(publishedAdminListings);
-            context.PropertyListings.AddRange(reservedAdminListings);
-
-            var adminPropertyMediaTitles = new[]
-            {
-                "Copertina",
-                "Esterno",
-                "Soggiorno",
-                "Cucina",
-                "Giardino",
-                "Camera matrimoniale",
-                "Bagno",
-                "Camera singola"
-            };
-
-            context.PropertyMedia.AddRange(adminPropertyMediaTitles.Select((title, index) => new PropertyMedia
-            {
-                Id = Guid.Parse($"21000000-0000-0000-0000-{100 + index + 1:000000000000}"),
-                PropertyListingId = Guid.Parse("20000000-0000-0000-0000-000000001042"),
-                Url = "/medri-reference/assets/properties/property-03.jpg",
-                AltText = title,
-                SortOrder = index + 1
-            }));
-
-            AddGalleryMediaForListings(
-                context,
-                operationalListings
-                    .Concat(publishedAdminListings)
-                    .Concat(reservedAdminListings)
-                    .ToArray());
+            context.PropertyListings.AddRange(listings);
+            AddGalleryMediaForListings(context, listings);
+            ApplySeedCompletion(listings, context.PropertyMedia.Local);
         }
 
-        private static PropertyListing OperationalListing(
+        private static PropertyListing[] BuildSeedListings(SeedReferences refs)
+        {
+            var specs = SeedListingSpecs();
+            if (specs.Length != SeedListingCount)
+            {
+                throw new InvalidOperationException(
+                    $"Expected {SeedListingCount.ToString(CultureInfo.InvariantCulture)} seed listings, found {specs.Length.ToString(CultureInfo.InvariantCulture)}.");
+            }
+
+            return specs
+                .Select((spec, index) => CreateSeedListing(spec, refs, index))
+                .ToArray();
+        }
+
+        private static PropertyListing CreateSeedListing(
+            SeedListingSpec spec,
+            SeedReferences refs,
+            int index)
+        {
+            return new PropertyListing
+            {
+                Id = Guid.Parse($"20000000-0000-0000-0000-{spec.IdSuffix}"),
+                InternalReference = spec.Reference,
+                PublicationStatus = spec.PublicationStatus,
+                AssignedAgencyUserId = ResolveStaffUserId(spec.AssignedUser, refs),
+                FeaturedSortOrder = spec.FeaturedSortOrder,
+                Title = spec.Title,
+                Slug = spec.Slug,
+                Location = "Cesena",
+                DisplayLocation = spec.DisplayLocation,
+                Price = spec.Price,
+                Rooms = spec.Rooms,
+                Bathrooms = spec.Bathrooms,
+                SurfaceSquareMeters = spec.SurfaceSquareMeters,
+                Status = spec.Contract,
+                Contract = spec.Contract,
+                PropertyType = spec.PropertyType,
+                Zone = spec.Zone,
+                FeatureKeys = spec.FeatureKeys,
+                ImageUrl = spec.ImageUrl,
+                Latitude = spec.Latitude,
+                Longitude = spec.Longitude,
+                Address = spec.Address,
+                EnergyClass = spec.EnergyClass,
+                SortOrder = spec.SortOrder,
+                UpdatedAtUtc = refs.SeedDate.AddDays(-(index + 1))
+            };
+        }
+
+        private static Guid ResolveStaffUserId(string assignedUser, SeedReferences refs)
+        {
+            return assignedUser switch
+            {
+                "Martina" => refs.Martina,
+                "Lorenzo" => refs.Lorenzo,
+                "Marco" => refs.Marco,
+                _ => refs.Chiara
+            };
+        }
+
+        private static SeedListingSpec[] SeedListingSpecs()
+        {
+            return new[]
+            {
+                Spec("000000000101", "IM-342", PropertyPublicationStatuses.Incomplete, "Chiara", "Trilocale ristrutturato", "bozza-im-342", "Cesena - Centro", 235000m, 3, 1, 88, "Vendita", "Trilocale", "Centro", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-06.jpg", 44.1390d, 12.2430d, "Via Mura Barriera Ponente 12, Cesena", "C", 201),
+                Spec("000000000102", "IM-329", PropertyPublicationStatuses.NeedsUpdate, "Martina", "Appartamento con terrazzo", "bozza-im-329", "Cesena - Fiorenzuola", 260000m, 4, 2, 105, "Vendita", "Appartamento", "Fiorenzuola", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-05.jpg", 44.1334d, 12.2550d, "Via Fiorenzuola 16, Cesena", "C", 202),
+                Spec("000000000103", "IM-318", PropertyPublicationStatuses.Ready, "Lorenzo", "Villetta a schiera", "bozza-im-318", "Cesena - S. Egidio", 285000m, 4, 2, 120, "Vendita", "Villetta", "Sant'Egidio", "|garden|garage|parking|renovation-needed|near-services|", "/medri-reference/assets/properties/property-03.jpg", 44.1530d, 12.2860d, "Via S. Egidio 42, Cesena", "D", 203),
+                Spec("000000001039", "IM-1039", PropertyPublicationStatuses.Incomplete, "Martina", "Appartamento con giardino", "admin-im-1039", "Cesena - Centro", 210000m, 3, 1, 95, "Vendita", "Appartamento", "Centro", "|garden|move-in-ready|near-services|", "/medri-reference/assets/properties/property-01.jpg", 44.1396d, 12.2431d, "Via Cesare Battisti 6, Cesena", "C", 11),
+                Spec("000000001046", "IM-1046", PropertyPublicationStatuses.Ready, "Lorenzo", "Nuovo appartamento in classe A", "admin-im-1046", "Cesena - Diegaro", 310000m, 4, 2, 110, "Vendita", "Appartamento", "Diegaro", "|terrace|elevator|move-in-ready|high-energy-class|", "/medri-reference/assets/properties/property-08.jpg", 44.1005d, 12.2140d, "Via Diegaro 8, Cesena", "A", 12),
+                Spec("000000000208", "AF-208", PropertyPublicationStatuses.NeedsUpdate, "Marco", "Trilocale arredato", "admin-af-208", "Cesena - Oltresavio", 750m, 3, 1, 75, "Affitto", "Trilocale", "Oltresavio", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-07.jpg", 44.1285d, 12.2370d, "Via Savio 18, Cesena", "E", 13),
+                Spec("000000001050", "IM-1050", PropertyPublicationStatuses.Ready, "Chiara", "Bilocale in centro", "admin-im-1050", "Cesena - Centro", 165000m, 2, 1, 62, "Vendita", "Bilocale", "Centro", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-02.jpg", 44.1403d, 12.2462d, "Corso Sozzi 14, Cesena", "E", 30),
+                Spec("000000001051", "IM-1051", PropertyPublicationStatuses.Ready, "Martina", "Casa indipendente", "admin-im-1051", "Cesena - Case Finali", 390000m, 5, 2, 160, "Vendita", "Casa indipendente", "Case Finali", "|garden|garage|parking|renovation-needed|", "/medri-reference/assets/properties/property-06.jpg", 44.1565d, 12.2275d, "Via Case Finali 21, Cesena", "D", 31),
+                Spec("000000001052", "IM-1052", PropertyPublicationStatuses.Ready, "Lorenzo", "Loft zona stazione", "admin-im-1052", "Cesena - Stazione", 198000m, 2, 1, 70, "Vendita", "Loft", "Stazione", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-04.jpg", 44.1467d, 12.2467d, "Via Stazione 4, Cesena", "E", 32),
+                Spec("000000001053", "IM-1053", PropertyPublicationStatuses.Ready, "Marco", "Porzione con corte", "admin-im-1053", "Cesena - San Mauro", 248000m, 4, 2, 116, "Vendita", "Porzione", "San Mauro", "|garden|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-05.jpg", 44.1431d, 12.2245d, "Via San Mauro 17, Cesena", "C", 33),
+                Spec("000000001054", "AF-209", PropertyPublicationStatuses.Ready, "Martina", "Monolocale arredato", "admin-af-209", "Cesena - Centro", 580m, 1, 1, 42, "Affitto", "Monolocale", "Centro", "|furnished|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-07.jpg", 44.1391d, 12.2464d, "Via Zeffirino Re 9, Cesena", "E", 34),
+                Spec("000000001055", "IM-1055", PropertyPublicationStatuses.NeedsUpdate, "Chiara", "Quadrilocale luminoso", "admin-im-1055", "Cesena - Ponte Abbadesse", 255000m, 4, 2, 108, "Vendita", "Quadrilocale", "Ponte Abbadesse", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-02.jpg", 44.1294d, 12.2528d, "Via Ponte Abbadesse 11, Cesena", "D", 40),
+                Spec("000000001056", "AF-210", PropertyPublicationStatuses.NeedsUpdate, "Marco", "Bilocale arredato", "admin-af-210", "Cesena - Fiorita", 690m, 2, 1, 58, "Affitto", "Bilocale", "Fiorita", "|furnished|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-01.jpg", 44.1364d, 12.2642d, "Via Fiorita 5, Cesena", "E", 41),
+
+                Spec("000000000301", "IM-P001", PropertyPublicationStatuses.Published, "Chiara", "Trilocale con balcone", "admin-pubblicato-01", "Cesena - Centro", 169200m, 3, 1, 86, "Vendita", "Trilocale", "Centro", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-01.jpg", 44.1396d, 12.2431d, "Via Mura Barriera Ponente 12, Cesena", "C", 301, 1),
+                Spec("000000000302", "IM-P002", PropertyPublicationStatuses.Published, "Martina", "Appartamento con terrazzo", "admin-pubblicato-02", "Cesena - Oltresavio", 173400m, 3, 1, 78, "Vendita", "Appartamento", "Oltresavio", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-07.jpg", 44.1285d, 12.2370d, "Via Savio 18, Cesena", "E", 302, 2),
+                Spec("000000000303", "IM-P003", PropertyPublicationStatuses.Published, "Lorenzo", "Villetta con giardino", "admin-pubblicato-03", "Cesena - S. Egidio", 177600m, 4, 2, 118, "Vendita", "Villetta", "Sant'Egidio", "|garden|garage|parking|renovation-needed|near-services|", "/medri-reference/assets/properties/property-03.jpg", 44.1530d, 12.2860d, "Via S. Egidio 42, Cesena", "D", 303, 3),
+                Spec("000000000304", "IM-P004", PropertyPublicationStatuses.Published, "Marco", "Quadrilocale in classe A", "admin-pubblicato-04", "Cesena - Diegaro", 181800m, 4, 2, 106, "Vendita", "Appartamento", "Diegaro", "|terrace|elevator|move-in-ready|high-energy-class|", "/medri-reference/assets/properties/property-08.jpg", 44.1005d, 12.2140d, "Via Diegaro 8, Cesena", "A", 304),
+                Spec("000000000305", "AF-P005", PropertyPublicationStatuses.Published, "Chiara", "Bilocale arredato in centro", "admin-pubblicato-05", "Cesena - Centro", 715m, 2, 1, 58, "Affitto", "Bilocale", "Centro", "|furnished|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-02.jpg", 44.1406d, 12.2440d, "Via Chiaramonti 3, Cesena", "E", 305),
+                Spec("000000000306", "IM-P006", PropertyPublicationStatuses.Published, "Lorenzo", "Bilocale zona stazione", "admin-pubblicato-06", "Cesena - Stazione", 190200m, 2, 1, 64, "Vendita", "Bilocale", "Stazione", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-02.jpg", 44.1467d, 12.2467d, "Via Stazione 4, Cesena", "E", 306),
+                Spec("000000000307", "IM-P007", PropertyPublicationStatuses.Published, "Chiara", "Porzione con terrazzo", "admin-pubblicato-07", "Cesena - Fiorenzuola", 194400m, 4, 2, 104, "Vendita", "Porzione", "Fiorenzuola", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-05.jpg", 44.1334d, 12.2550d, "Via Fiorenzuola 16, Cesena", "C", 307),
+                Spec("000000000308", "IM-P008", PropertyPublicationStatuses.Published, "Marco", "Appartamento ultimo piano", "admin-pubblicato-08", "Cesena - Centro storico", 198600m, 3, 1, 82, "Vendita", "Appartamento", "Centro storico", "|terrace|move-in-ready|high-energy-class|near-services|", "/medri-reference/assets/properties/property-04.jpg", 44.1391d, 12.2464d, "Via Centro Storico 9, Cesena", "B", 308),
+                Spec("000000000309", "IM-P009", PropertyPublicationStatuses.Published, "Lorenzo", "Casa indipendente con corte", "admin-pubblicato-09", "Cesena - Case Finali", 202800m, 5, 2, 158, "Vendita", "Casa indipendente", "Case Finali", "|garden|garage|parking|renovation-needed|", "/medri-reference/assets/properties/property-06.jpg", 44.1565d, 12.2275d, "Via Case Finali 21, Cesena", "D", 309),
+                Spec("000000000310", "AF-P010", PropertyPublicationStatuses.Published, "Martina", "Trilocale arredato Oltresavio", "admin-pubblicato-10", "Cesena - Oltresavio", 575m, 3, 1, 70, "Affitto", "Trilocale", "Oltresavio", "|furnished|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-07.jpg", 44.1279d, 12.2381d, "Via Savio 22, Cesena", "E", 310),
+                Spec("000000000311", "IM-P011", PropertyPublicationStatuses.Published, "Chiara", "Appartamento con terrazzo", "admin-pubblicato-11", "Cesena - Oltresavio", 211200m, 3, 1, 79, "Vendita", "Appartamento", "Oltresavio", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-07.jpg", 44.1290d, 12.2362d, "Via Savio 30, Cesena", "E", 311),
+                Spec("000000000312", "IM-P012", PropertyPublicationStatuses.Published, "Marco", "Villetta con giardino", "admin-pubblicato-12", "Cesena - S. Egidio", 215400m, 4, 2, 120, "Vendita", "Villetta", "Sant'Egidio", "|garden|garage|parking|renovation-needed|near-services|", "/medri-reference/assets/properties/property-03.jpg", 44.1521d, 12.2848d, "Via S. Egidio 58, Cesena", "D", 312),
+                Spec("000000000313", "IM-P013", PropertyPublicationStatuses.Published, "Chiara", "Quadrilocale in classe A", "admin-pubblicato-13", "Cesena - Diegaro", 219600m, 4, 2, 108, "Vendita", "Appartamento", "Diegaro", "|terrace|elevator|move-in-ready|high-energy-class|", "/medri-reference/assets/properties/property-08.jpg", 44.1014d, 12.2151d, "Via Diegaro 12, Cesena", "A", 313),
+                Spec("000000000314", "IM-P014", PropertyPublicationStatuses.Published, "Martina", "Casa indipendente con corte", "admin-pubblicato-14", "Cesena - Case Finali", 223800m, 5, 2, 160, "Vendita", "Casa indipendente", "Case Finali", "|garden|garage|parking|renovation-needed|", "/medri-reference/assets/properties/property-06.jpg", 44.1572d, 12.2284d, "Via Case Finali 32, Cesena", "D", 314),
+                Spec("000000000315", "AF-P015", PropertyPublicationStatuses.Published, "Lorenzo", "Bilocale pronto zona stazione", "admin-pubblicato-15", "Cesena - Stazione", 750m, 2, 1, 55, "Affitto", "Bilocale", "Stazione", "|furnished|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-02.jpg", 44.1460d, 12.2475d, "Via Stazione 12, Cesena", "E", 315),
+                Spec("000000000316", "IM-P016", PropertyPublicationStatuses.Published, "Marco", "Porzione con terrazzo", "admin-pubblicato-16", "Cesena - Fiorenzuola", 232200m, 4, 2, 106, "Vendita", "Porzione", "Fiorenzuola", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-05.jpg", 44.1343d, 12.2561d, "Via Fiorenzuola 24, Cesena", "C", 316),
+                Spec("000000000317", "IM-P017", PropertyPublicationStatuses.Published, "Chiara", "Appartamento ultimo piano", "admin-pubblicato-17", "Cesena - Centro storico", 236400m, 3, 1, 84, "Vendita", "Appartamento", "Centro storico", "|terrace|move-in-ready|high-energy-class|near-services|", "/medri-reference/assets/properties/property-04.jpg", 44.1386d, 12.2472d, "Via Centro Storico 15, Cesena", "B", 317),
+                Spec("000000000318", "IM-P018", PropertyPublicationStatuses.Published, "Lorenzo", "Trilocale con balcone", "admin-pubblicato-18", "Cesena - Centro", 240600m, 3, 1, 89, "Vendita", "Trilocale", "Centro", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-01.jpg", 44.1401d, 12.2424d, "Via Mura Barriera Ponente 20, Cesena", "C", 318),
+                Spec("000000000319", "IM-P019", PropertyPublicationStatuses.Published, "Chiara", "Appartamento con terrazzo", "admin-pubblicato-19", "Cesena - Oltresavio", 244800m, 3, 1, 81, "Vendita", "Appartamento", "Oltresavio", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-07.jpg", 44.1282d, 12.2358d, "Via Savio 36, Cesena", "E", 319),
+                Spec("000000000320", "AF-P020", PropertyPublicationStatuses.Published, "Marco", "Casa arredata con giardino", "admin-pubblicato-20", "Cesena - Case Finali", 610m, 4, 2, 112, "Affitto", "Casa indipendente", "Case Finali", "|furnished|garden|garage|parking|move-in-ready|", "/medri-reference/assets/properties/property-06.jpg", 44.1558d, 12.2268d, "Via Case Finali 45, Cesena", "D", 320),
+                Spec("000000000321", "IM-P021", PropertyPublicationStatuses.Published, "Martina", "Bilocale zona stazione", "admin-pubblicato-21", "Cesena - Stazione", 253200m, 2, 1, 66, "Vendita", "Bilocale", "Stazione", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-02.jpg", 44.1472d, 12.2460d, "Via Stazione 18, Cesena", "E", 321),
+                Spec("000000000322", "IM-P022", PropertyPublicationStatuses.Published, "Chiara", "Porzione con terrazzo", "admin-pubblicato-22", "Cesena - Fiorenzuola", 257400m, 4, 2, 108, "Vendita", "Porzione", "Fiorenzuola", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-05.jpg", 44.1326d, 12.2544d, "Via Fiorenzuola 30, Cesena", "C", 322),
+                Spec("000000000323", "IM-P023", PropertyPublicationStatuses.Published, "Lorenzo", "Appartamento ultimo piano", "admin-pubblicato-23", "Cesena - Centro storico", 261600m, 3, 1, 86, "Vendita", "Appartamento", "Centro storico", "|terrace|move-in-ready|high-energy-class|near-services|", "/medri-reference/assets/properties/property-04.jpg", 44.1398d, 12.2458d, "Via Centro Storico 22, Cesena", "B", 323),
+                Spec("000000000324", "IM-P024", PropertyPublicationStatuses.Published, "Marco", "Villetta con giardino", "admin-pubblicato-24", "Cesena - S. Egidio", 265800m, 4, 2, 122, "Vendita", "Villetta", "Sant'Egidio", "|garden|garage|parking|renovation-needed|near-services|", "/medri-reference/assets/properties/property-03.jpg", 44.1540d, 12.2852d, "Via S. Egidio 66, Cesena", "D", 324),
+                Spec("000000000325", "AF-P025", PropertyPublicationStatuses.Published, "Chiara", "Appartamento recente arredato", "admin-pubblicato-25", "Cesena - Diegaro", 785m, 3, 1, 74, "Affitto", "Appartamento", "Diegaro", "|furnished|terrace|elevator|move-in-ready|high-energy-class|", "/medri-reference/assets/properties/property-08.jpg", 44.1000d, 12.2133d, "Via Diegaro 19, Cesena", "A", 325),
+                Spec("000000000326", "IM-P026", PropertyPublicationStatuses.Published, "Martina", "Casa indipendente con corte", "admin-pubblicato-26", "Cesena - Case Finali", 274200m, 5, 2, 162, "Vendita", "Casa indipendente", "Case Finali", "|garden|garage|parking|renovation-needed|", "/medri-reference/assets/properties/property-06.jpg", 44.1569d, 12.2291d, "Via Case Finali 54, Cesena", "D", 326),
+                Spec("000000000327", "IM-P027", PropertyPublicationStatuses.Published, "Lorenzo", "Bilocale zona stazione", "admin-pubblicato-27", "Cesena - Stazione", 278400m, 2, 1, 68, "Vendita", "Bilocale", "Stazione", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-02.jpg", 44.1464d, 12.2483d, "Via Stazione 25, Cesena", "E", 327),
+                Spec("000000000328", "IM-P028", PropertyPublicationStatuses.Published, "Marco", "Porzione con terrazzo", "admin-pubblicato-28", "Cesena - Fiorenzuola", 282600m, 4, 2, 110, "Vendita", "Porzione", "Fiorenzuola", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-05.jpg", 44.1339d, 12.2558d, "Via Fiorenzuola 38, Cesena", "C", 328),
+                Spec("000000000329", "IM-P029", PropertyPublicationStatuses.Published, "Chiara", "Appartamento ultimo piano", "admin-pubblicato-29", "Cesena - Centro storico", 286800m, 3, 1, 88, "Vendita", "Appartamento", "Centro storico", "|terrace|move-in-ready|high-energy-class|near-services|", "/medri-reference/assets/properties/property-04.jpg", 44.1389d, 12.2469d, "Via Centro Storico 31, Cesena", "B", 329),
+                Spec("000000000330", "AF-P030", PropertyPublicationStatuses.Published, "Martina", "Mansarda arredata in centro", "admin-pubblicato-30", "Cesena - Centro storico", 645m, 2, 1, 58, "Affitto", "Mansarda", "Centro storico", "|furnished|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-04.jpg", 44.1394d, 12.2475d, "Via Centro Storico 40, Cesena", "B", 330),
+                Spec("000000000331", "IM-P031", PropertyPublicationStatuses.Published, "Lorenzo", "Trilocale con balcone", "admin-pubblicato-31", "Cesena - Centro", 295200m, 3, 1, 91, "Vendita", "Trilocale", "Centro", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-01.jpg", 44.1407d, 12.2420d, "Via Mura Barriera Ponente 28, Cesena", "C", 331),
+                Spec("000000000332", "IM-P032", PropertyPublicationStatuses.Published, "Marco", "Quadrilocale in classe A", "admin-pubblicato-32", "Cesena - Diegaro", 299400m, 4, 2, 112, "Vendita", "Appartamento", "Diegaro", "|terrace|elevator|move-in-ready|high-energy-class|", "/medri-reference/assets/properties/property-08.jpg", 44.1011d, 12.2146d, "Via Diegaro 27, Cesena", "A", 332),
+
+                Spec("000000000501", "IM-R001", PropertyPublicationStatuses.Reserved, "Chiara", "Quadrilocale in classe A", "admin-riservato-01", "Cesena - Diegaro", 212500m, 4, 2, 106, "Vendita", "Appartamento", "Diegaro", "|terrace|elevator|move-in-ready|high-energy-class|", "/medri-reference/assets/properties/property-08.jpg", 44.1008d, 12.2144d, "Via Diegaro 31, Cesena", "A", 501),
+                Spec("000000000502", "IM-R002", PropertyPublicationStatuses.Reserved, "Martina", "Casa indipendente con corte", "admin-riservato-02", "Cesena - Case Finali", 215000m, 5, 2, 158, "Vendita", "Casa indipendente", "Case Finali", "|garden|garage|parking|renovation-needed|", "/medri-reference/assets/properties/property-06.jpg", 44.1560d, 12.2280d, "Via Case Finali 61, Cesena", "D", 502),
+                Spec("000000000503", "IM-R003", PropertyPublicationStatuses.Reserved, "Chiara", "Bilocale zona stazione", "admin-riservato-03", "Cesena - Stazione", 217500m, 2, 1, 64, "Vendita", "Bilocale", "Stazione", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-02.jpg", 44.1469d, 12.2471d, "Via Stazione 31, Cesena", "E", 503),
+                Spec("000000000504", "IM-R004", PropertyPublicationStatuses.Reserved, "Martina", "Porzione con terrazzo", "admin-riservato-04", "Cesena - Fiorenzuola", 220000m, 4, 2, 104, "Vendita", "Porzione", "Fiorenzuola", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-05.jpg", 44.1331d, 12.2553d, "Via Fiorenzuola 44, Cesena", "C", 504),
+                Spec("000000000505", "IM-R005", PropertyPublicationStatuses.Reserved, "Chiara", "Appartamento ultimo piano", "admin-riservato-05", "Cesena - Centro storico", 222500m, 3, 1, 82, "Vendita", "Appartamento", "Centro storico", "|terrace|move-in-ready|high-energy-class|near-services|", "/medri-reference/assets/properties/property-04.jpg", 44.1390d, 12.2466d, "Via Centro Storico 48, Cesena", "B", 505)
+            };
+        }
+
+        private static SeedListingSpec Spec(
             string idSuffix,
             string reference,
             string publicationStatus,
-            int completionPercent,
-            string missingItems,
-            Guid assignedAgencyUserId,
+            string assignedUser,
             string title,
             string slug,
             string displayLocation,
@@ -173,250 +253,38 @@ namespace Medri.Infrastructure
             string contract,
             string propertyType,
             string zone,
+            string featureKeys,
             string imageUrl,
-            int sortOrder)
+            double latitude,
+            double longitude,
+            string address,
+            string energyClass,
+            int sortOrder,
+            int? featuredSortOrder = null)
         {
-            return new PropertyListing
-            {
-                Id = Guid.Parse($"20000000-0000-0000-0000-{idSuffix}"),
-                InternalReference = reference,
-                PublicationStatus = publicationStatus,
-                CompletionPercent = completionPercent,
-                MissingItems = missingItems,
-                AssignedAgencyUserId = assignedAgencyUserId,
-                Title = title,
-                Slug = slug,
-                Location = "Cesena",
-                DisplayLocation = displayLocation,
-                Price = price,
-                Rooms = rooms,
-                Bathrooms = bathrooms,
-                SurfaceSquareMeters = surfaceSquareMeters,
-                Status = contract,
-                Contract = contract,
-                PropertyType = propertyType,
-                Zone = zone,
-                FeatureKeys = "|draft|",
-                ImageUrl = imageUrl,
-                SortOrder = sortOrder
-            };
-        }
-
-        private static PropertyListing[] BuildOperationalListings(SeedReferences refs)
-        {
-            return new[]
-            {
-                OperationalListing("000000000101", "IM-342", "Incomplete", 78, "Foto esterne, nota impianti", refs.Chiara, "Trilocale ristrutturato", "bozza-im-342", "Cesena - Centro", 235000m, 3, 1, 88, "Vendita", "Trilocale", "Centro", "/medri-reference/assets/properties/property-06.jpg", 201),
-                OperationalListing("000000000102", "IM-329", "NeedsUpdate", 76, "Prezzo, disponibilita", refs.Martina, "Appartamento con terrazzo", "bozza-im-329", "Cesena - Fiorenzuola", 260000m, 4, 2, 105, "Vendita", "Appartamento", "Fiorenzuola", "/medri-reference/assets/properties/property-05.jpg", 202),
-                OperationalListing("000000000103", "IM-318", "Ready", 100, "Nessun dato mancante", refs.Lorenzo, "Villetta a schiera", "bozza-im-318", "Cesena - S. Egidio", 285000m, 4, 2, 120, "Vendita", "Villetta", "Sant'Egidio", "/medri-reference/assets/properties/property-03.jpg", 203),
-
-                new PropertyListing
-                {
-                    Id = Guid.Parse("20000000-0000-0000-0000-000000001042"),
-                    InternalReference = "IM-1042",
-                    PublicationStatus = "Incomplete",
-                    CompletionPercent = 82,
-                    MissingItems = "Planimetria, nota lavori",
-                    AssignedAgencyUserId = refs.Chiara,
-                    Title = "Villetta a schiera",
-                    Slug = "admin-im-1042",
-                    Location = "Cesena",
-                    DisplayLocation = "Cesena - S. Egidio",
-                    Price = 285000m,
-                    Rooms = 4,
-                    Bathrooms = 2,
-                    SurfaceSquareMeters = 120,
-                    Status = "Vendita",
-                    Contract = "Vendita",
-                    PropertyType = "Villetta",
-                    ListingCategory = "Abitazione",
-                    Zone = "Sant'Egidio",
-                    FeatureKeys = "|draft|",
-                    ImageUrl = "/medri-reference/assets/properties/property-03.jpg",
-                    SortOrder = 10,
-                    Address = "Via del Tiglio 18",
-                    BedroomsLabel = "3 camere",
-                    FloorLabel = "Terra e primo",
-                    ElevatorLabel = "No",
-                    GarageLabel = "Garage e posto auto",
-                    OutdoorSpaceLabel = "Giardino privato",
-                    EnergyClass = "D",
-                    RequiredWorksLabel = "Buono, lavori leggeri",
-                    CondoFeesLabel = "Nessuna",
-                    SummaryParagraph1 = "Villetta a schiera in contesto residenziale tranquillo, con spazi adatti a una famiglia, ingresso indipendente e giardino privato.",
-                    AccessLabel = "Ingresso indipendente e giardino privato",
-                    ContextNote = "Zona residenziale tranquilla",
-                    MainCompromise = "Lavori leggeri da pianificare",
-                    NearbyServicesLabel = "Garage e posto auto",
-                    DecisionMarginNote = "",
-                    CostsNote = "",
-                    HumanFitNote = "Cerchi indipendenza, giardino e una casa familiare senza arrivare al costo di una villa indipendente."
-                },
-
-                OperationalListing("000000001039", "IM-1039", "Incomplete", 61, "Foto zona giorno, APE, spese", refs.Martina, "Appartamento con giardino", "admin-im-1039", "Cesena - Centro", 210000m, 3, 1, 95, "Vendita", "Appartamento", "Centro", "/medri-reference/assets/properties/property-01.jpg", 11),
-                OperationalListing("000000001046", "IM-1046", "Ready", 100, "Nessun dato mancante", refs.Lorenzo, "Nuovo appartamento in classe A", "admin-im-1046", "Cesena - Diegaro", 310000m, 4, 2, 110, "Vendita", "Appartamento", "Diegaro", "/medri-reference/assets/properties/property-08.jpg", 12),
-                OperationalListing("000000000208", "AF-208", "NeedsUpdate", 74, "Canone, disponibilita, regole", refs.Marco, "Trilocale arredato", "admin-af-208", "Cesena - Oltresavio", 750m, 3, 1, 75, "Affitto", "Trilocale", "Oltresavio", "/medri-reference/assets/properties/property-07.jpg", 13),
-                OperationalListing("000000001050", "IM-1050", "Ready", 100, "Nessun dato mancante", refs.Chiara, "Bilocale in centro", "admin-im-1050", "Cesena - Centro", 165000m, 2, 1, 62, "Vendita", "Bilocale", "Centro", "/medri-reference/assets/properties/property-02.jpg", 30),
-                OperationalListing("000000001051", "IM-1051", "Ready", 100, "Nessun dato mancante", refs.Martina, "Casa indipendente", "admin-im-1051", "Cesena - Case Finali", 390000m, 5, 2, 160, "Vendita", "Casa indipendente", "Case Finali", "/medri-reference/assets/properties/property-06.jpg", 31),
-                OperationalListing("000000001052", "IM-1052", "Ready", 100, "Nessun dato mancante", refs.Lorenzo, "Loft zona stazione", "admin-im-1052", "Cesena - Stazione", 198000m, 2, 1, 70, "Vendita", "Loft", "Stazione", "/medri-reference/assets/properties/property-04.jpg", 32),
-                OperationalListing("000000001053", "IM-1053", "Ready", 100, "Nessun dato mancante", refs.Marco, "Porzione con corte", "admin-im-1053", "Cesena - San Mauro", 248000m, 4, 2, 116, "Vendita", "Porzione", "San Mauro", "/medri-reference/assets/properties/property-05.jpg", 33),
-                OperationalListing("000000001054", "AF-209", "Ready", 100, "Nessun dato mancante", refs.Martina, "Monolocale arredato", "admin-af-209", "Cesena - Centro", 580m, 1, 1, 42, "Affitto", "Monolocale", "Centro", "/medri-reference/assets/properties/property-07.jpg", 34),
-                OperationalListing("000000001055", "IM-1055", "NeedsUpdate", 72, "Prezzo, foto bagno", refs.Chiara, "Quadrilocale luminoso", "admin-im-1055", "Cesena - Ponte Abbadesse", 255000m, 4, 2, 108, "Vendita", "Quadrilocale", "Ponte Abbadesse", "/medri-reference/assets/properties/property-02.jpg", 40),
-                OperationalListing("000000001056", "AF-210", "NeedsUpdate", 68, "Disponibilita, regole animali", refs.Marco, "Bilocale arredato", "admin-af-210", "Cesena - Fiorita", 690m, 2, 1, 58, "Affitto", "Bilocale", "Fiorita", "/medri-reference/assets/properties/property-01.jpg", 41)
-            };
-        }
-
-        private static GeneratedListingBlueprint[] GeneratedListingBlueprints()
-        {
-            return new[]
-            {
-                new GeneratedListingBlueprint("Trilocale con balcone", "Bilocale arredato in centro", "Cesena - Centro", "Centro", "Trilocale", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-01.jpg", 44.1396d, 12.2431d, "Via Mura Barriera Ponente 12, Cesena", 3, 1, 86, "C"),
-                new GeneratedListingBlueprint("Appartamento con terrazzo", "Trilocale arredato Oltresavio", "Cesena - Oltresavio", "Oltresavio", "Appartamento", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-07.jpg", 44.1285d, 12.2370d, "Via Savio 18, Cesena", 3, 1, 78, "E"),
-                new GeneratedListingBlueprint("Villetta con giardino", "Porzione con corte privata", "Cesena - S. Egidio", "Sant'Egidio", "Villetta", "|garden|garage|parking|renovation-needed|near-services|", "/medri-reference/assets/properties/property-03.jpg", 44.1530d, 12.2860d, "Via S. Egidio 42, Cesena", 4, 2, 118, "D"),
-                new GeneratedListingBlueprint("Quadrilocale in classe A", "Appartamento recente arredato", "Cesena - Diegaro", "Diegaro", "Appartamento", "|terrace|elevator|move-in-ready|high-energy-class|", "/medri-reference/assets/properties/property-08.jpg", 44.1005d, 12.2140d, "Via Diegaro 8, Cesena", 4, 2, 106, "A"),
-                new GeneratedListingBlueprint("Casa indipendente con corte", "Casa arredata con giardino", "Cesena - Case Finali", "Case Finali", "Casa indipendente", "|garden|garage|parking|renovation-needed|", "/medri-reference/assets/properties/property-06.jpg", 44.1565d, 12.2275d, "Via Case Finali 21, Cesena", 5, 2, 158, "D"),
-                new GeneratedListingBlueprint("Bilocale zona stazione", "Bilocale pronto zona stazione", "Cesena - Stazione", "Stazione", "Bilocale", "|terrace|move-in-ready|near-services|near-public-transport|", "/medri-reference/assets/properties/property-02.jpg", 44.1467d, 12.2467d, "Via Stazione 4, Cesena", 2, 1, 64, "E"),
-                new GeneratedListingBlueprint("Porzione con terrazzo", "Trilocale con posto auto", "Cesena - Fiorenzuola", "Fiorenzuola", "Porzione", "|terrace|parking|move-in-ready|near-services|", "/medri-reference/assets/properties/property-05.jpg", 44.1334d, 12.2550d, "Via Fiorenzuola 16, Cesena", 4, 2, 104, "C"),
-                new GeneratedListingBlueprint("Appartamento ultimo piano", "Mansarda arredata in centro", "Cesena - Centro storico", "Centro storico", "Appartamento", "|terrace|move-in-ready|high-energy-class|near-services|", "/medri-reference/assets/properties/property-04.jpg", 44.1391d, 12.2464d, "Via Centro Storico 9, Cesena", 3, 1, 82, "B")
-            };
-        }
-
-        private static PropertyListing[] BuildPublishedAdminListings(SeedReferences refs)
-        {
-            var blueprints = GeneratedListingBlueprints();
-
-            return Enumerable.Range(1, 42)
-                .Select(index =>
-                {
-                    var blueprint = blueprints[(index - 1) % blueprints.Length];
-                    var isRent = index % 5 == 0;
-                    var contract = isRent ? "Affitto" : "Vendita";
-                    var title = isRent ? blueprint.RentTitle : blueprint.SaleTitle;
-                    var price = isRent
-                        ? 540m + (index % 9) * 35m
-                        : 165000m + index * 4200m;
-
-                    return new PropertyListing
-                    {
-                        Id = Guid.Parse($"20000000-0000-0000-0000-{300 + index:000000000000}"),
-                        InternalReference = isRent ? $"AF-P{index:000}" : $"IM-P{index:000}",
-                        PublicationStatus = "Published",
-                        CompletionPercent = 100,
-                        MissingItems = "Nessun dato mancante",
-                        FeaturedSortOrder = index <= 3 ? index : (int?)null,
-                        AssignedAgencyUserId = index % 4 == 0
-                            ? refs.Marco
-                            : index % 3 == 0
-                                ? refs.Lorenzo
-                                : index % 2 == 0
-                                    ? refs.Martina
-                                    : refs.Chiara,
-                        Title = title,
-                        Slug = $"admin-pubblicato-{index:00}",
-                        Location = blueprint.DisplayLocation,
-                        DisplayLocation = blueprint.DisplayLocation,
-                        Price = price,
-                        Rooms = isRent ? Math.Max(1, blueprint.Rooms - 1) : blueprint.Rooms,
-                        Bathrooms = blueprint.Bathrooms,
-                        SurfaceSquareMeters = isRent ? Math.Max(38, blueprint.Surface - 18) : blueprint.Surface + index % 6,
-                        Status = contract,
-                        Contract = contract,
-                        PropertyType = blueprint.PropertyType,
-                        Zone = blueprint.Zone,
-                        FeatureKeys = blueprint.FeatureKeys,
-                        ImageUrl = blueprint.ImageUrl,
-                        Latitude = blueprint.Latitude + ((index % 3) - 1) * 0.0012d,
-                        Longitude = blueprint.Longitude + ((index % 4) - 1.5d) * 0.0012d,
-                        Address = blueprint.Address,
-                        BedroomsLabel = isRent
-                            ? Math.Max(1, blueprint.Rooms - 2).ToString()
-                            : Math.Max(1, blueprint.Rooms - 1).ToString(),
-                        FloorLabel = index % 3 == 0 ? "Piano alto" : "Piano intermedio",
-                        GarageLabel = index % 2 == 0 ? "Posto auto" : "Garage",
-                        OutdoorSpaceLabel = blueprint.FeatureKeys.Contains("|garden|") ? "Giardino" : "Balcone",
-                        EnergyClass = blueprint.EnergyClass,
-                        AvailabilityLabel = isRent ? "Libero da concordare" : "Disponibile a rogito",
-                        HeatingLabel = "Autonomo",
-                        RequiredWorksLabel = index % 4 == 0 ? "Aggiornamenti leggeri" : "Buono",
-                        SummaryTitle = title,
-                        SummaryParagraph1 = string.Empty,
-                        SummaryParagraph2 = string.Empty,
-                        HumanFitNote = string.Empty,
-                        SortOrder = 300 + index,
-                        UpdatedAtUtc = refs.SeedDate.AddDays(-index)
-                    };
-                })
-                .ToArray();
-        }
-
-        private static PropertyListing[] BuildReservedAdminListings(SeedReferences refs)
-        {
-            var blueprints = GeneratedListingBlueprints();
-
-            return Enumerable.Range(1, 5)
-                .Select(index =>
-                {
-                    var blueprint = blueprints[(index + 2) % blueprints.Length];
-
-                    return new PropertyListing
-                    {
-                        Id = Guid.Parse($"20000000-0000-0000-0000-{500 + index:000000000000}"),
-                        InternalReference = $"IM-R{index:000}",
-                        PublicationStatus = "Reserved",
-                        CompletionPercent = 90,
-                        MissingItems = "Verifica finale",
-                        AssignedAgencyUserId = index % 2 == 0 ? refs.Martina : refs.Chiara,
-                        Title = blueprint.SaleTitle,
-                        Slug = $"admin-riservato-{index:00}",
-                        Location = blueprint.DisplayLocation,
-                        DisplayLocation = blueprint.DisplayLocation,
-                        Price = 210000m + index * 2500m,
-                        Rooms = blueprint.Rooms,
-                        Bathrooms = blueprint.Bathrooms,
-                        SurfaceSquareMeters = blueprint.Surface,
-                        Status = "Vendita",
-                        Contract = "Vendita",
-                        PropertyType = blueprint.PropertyType,
-                        Zone = blueprint.Zone,
-                        FeatureKeys = blueprint.FeatureKeys,
-                        ImageUrl = blueprint.ImageUrl,
-                        Latitude = blueprint.Latitude,
-                        Longitude = blueprint.Longitude,
-                        Address = blueprint.Address,
-                        EnergyClass = blueprint.EnergyClass,
-                        SortOrder = 500 + index
-                    };
-                })
-                .ToArray();
-        }
-
-        private static void BackfillGeneratedListingDetails(PropertyListing[] listings)
-        {
-            var blueprints = GeneratedListingBlueprints();
-
-            foreach (var item in listings.Select((listing, index) => new { listing, index }))
-            {
-                var blueprint = blueprints
-                    .FirstOrDefault(candidate =>
-                        item.listing.DisplayLocation?.IndexOf(candidate.Zone, StringComparison.OrdinalIgnoreCase) >= 0) ??
-                    blueprints[item.index % blueprints.Length];
-
-                if (item.listing.Latitude == 0d && item.listing.Longitude == 0d)
-                {
-                    item.listing.Latitude = blueprint.Latitude + ((item.index % 3) - 1) * 0.001d;
-                    item.listing.Longitude = blueprint.Longitude + ((item.index % 4) - 1.5d) * 0.001d;
-                }
-
-                if (string.IsNullOrWhiteSpace(item.listing.Address))
-                {
-                    item.listing.Address = blueprint.Address;
-                }
-
-                if (string.IsNullOrWhiteSpace(item.listing.EnergyClass))
-                {
-                    item.listing.EnergyClass = blueprint.EnergyClass;
-                }
-            }
+            return new SeedListingSpec(
+                idSuffix,
+                reference,
+                publicationStatus,
+                assignedUser,
+                title,
+                slug,
+                displayLocation,
+                price,
+                rooms,
+                bathrooms,
+                surfaceSquareMeters,
+                contract,
+                propertyType,
+                zone,
+                featureKeys,
+                imageUrl,
+                latitude,
+                longitude,
+                address,
+                energyClass,
+                sortOrder,
+                featuredSortOrder);
         }
 
 
@@ -483,50 +351,23 @@ namespace Medri.Infrastructure
         }
 
 
-        private static void SeedLeads(MedriDbContext context, SeedReferences refs)
+        private static void SeedStandaloneLeads(MedriDbContext context, SeedReferences refs)
         {
             var seedDate = refs.SeedDate;
-
-            context.Leads.Add(new Lead
-            {
-                Id = refs.LeadId,
-                FullName = "Lead seed tecnico",
-                Email = "lead.seed@example.test",
-                Phone = "+390000000000",
-                SourceChannel = "Seed",
-                WorkflowStatus = "Qualified",
-                CreatedAtUtc = seedDate
-            });
 
             context.Leads.AddRange(
                 new Lead
                 {
-                    Id = refs.ClientBuyLeadId,
-                    ClientUserId = refs.ClientUserId,
-                    PublicReference = "RQ-2047",
-                    FullName = "Elena Gori",
-                    Email = "elena.gori@email.it",
-                    Phone = "347 9988776",
-                    SourceChannel = "Lead convertito",
-                    RequestType = "Buy",
+                    Id = refs.LeadId,
                     WorkflowStatus = "Qualified",
-                    AssignedAgencyUserId = refs.Martina,
-                    Notes = "3 immobili proposti",
-                    CreatedAtUtc = seedDate.AddDays(-2)
-                },
-                new Lead
-                {
-                    Id = refs.ClientValuationLeadId,
-                    ClientUserId = refs.ClientUserId,
-                    PublicReference = "RQ-2034",
-                    FullName = "Elena Gori",
-                    Email = "elena.gori@email.it",
-                    Phone = "333 2034000",
-                    SourceChannel = "Public lead intake",
-                    RequestType = "Valuation",
-                    WorkflowStatus = "Qualified",
-                    Notes = "Da ricontattare",
-                    CreatedAtUtc = seedDate.AddDays(-8)
+                    QualificationPercent = 100,
+                    FullName = "Lead seed tecnico",
+                    Email = "lead.seed@example.test",
+                    Phone = "+390000000000",
+                    SourceChannel = "Seed",
+                    RequestType = RequestTypes.Seed,
+                    CreatedAtUtc = seedDate,
+                    UpdatedAtUtc = seedDate
                 },
                 new Lead
                 {
@@ -541,279 +382,361 @@ namespace Medri.Infrastructure
                     SourceChannel = "Telefono",
                     RequestType = "Valuation",
                     Notes = "Ha chiamato per capire se sia il momento giusto per vendere un immobile familiare. Sembra prudente, vuole prima parlare con un referente esperto e non desidera una stima automatica.",
-                    CreatedAtUtc = seedDate.AddDays(-1)
+                    CreatedAtUtc = seedDate.AddDays(-1),
+                    UpdatedAtUtc = seedDate.AddDays(-1)
                 },
                 new Lead
                 {
-                    Id = refs.NiccoloLeadId,
-                    InternalReference = "LD-1176",
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000205"),
+                    InternalReference = "LD-1181",
                     WorkflowStatus = "InContact",
-                    QualificationPercent = 64,
-                    NextAction = "Chiedere budget massimo e garanzie",
-                    AssignedAgencyUserId = refs.Lorenzo,
-                    FullName = "Niccolo Fabbri",
-                    Email = "niccolo.f@email.it",
+                    QualificationPercent = 72,
+                    NextAction = "Inviare recap con 3 immobili compatibili",
+                    AssignedAgencyUserId = refs.Martina,
+                    FullName = "Elena Gori",
+                    Phone = "347 9988776",
+                    SourceChannel = "WhatsApp",
+                    RequestType = "Buy",
+                    CreatedAtUtc = seedDate.AddHours(-96),
+                    UpdatedAtUtc = seedDate.AddHours(-96)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000206"),
+                    InternalReference = "LD-1168",
+                    WorkflowStatus = "New",
+                    QualificationPercent = 42,
+                    NextAction = "Capire budget sostenibile e zona prioritaria",
+                    FullName = "Sara Monti",
+                    Email = "sara.monti@example.test",
+                    Phone = "333 1168000",
+                    SourceChannel = "Telefono",
+                    RequestType = "Buy",
+                    CreatedAtUtc = seedDate.AddHours(-240),
+                    UpdatedAtUtc = seedDate.AddHours(-240)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000207"),
+                    InternalReference = "LD-1167",
+                    WorkflowStatus = "New",
+                    QualificationPercent = 36,
+                    NextAction = "Verificare garanzie e tempi di ingresso",
+                    FullName = "Giulio Neri",
+                    Email = "giulio.neri@example.test",
+                    Phone = "333 1167000",
                     SourceChannel = "Email",
                     RequestType = "Rent",
-                    CreatedAtUtc = seedDate.AddDays(-2)
+                    CreatedAtUtc = seedDate.AddHours(-264),
+                    UpdatedAtUtc = seedDate.AddHours(-264)
                 },
                 new Lead
                 {
-                    Id = refs.AnnaLeadId,
-                    InternalReference = "LD-1169",
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000208"),
+                    InternalReference = "LD-1166",
                     WorkflowStatus = "New",
-                    QualificationPercent = 38,
-                    NextAction = "Completare recapito e indirizzo immobile",
-                    FullName = "Anna Conti",
-                    Email = "anna.conti@example.test",
+                    QualificationPercent = 51,
+                    NextAction = "Raccogliere indirizzo e stato immobile",
+                    AssignedAgencyUserId = refs.Chiara,
+                    FullName = "Marta Serra",
+                    Email = "marta.serra@example.test",
+                    Phone = "333 1166000",
+                    SourceChannel = "WhatsApp",
+                    RequestType = "Sell",
+                    CreatedAtUtc = seedDate.AddHours(-288),
+                    UpdatedAtUtc = seedDate.AddHours(-288)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000209"),
+                    InternalReference = "LD-1165",
+                    WorkflowStatus = "New",
+                    QualificationPercent = 40,
+                    NextAction = "Fissare primo confronto telefonico",
+                    FullName = "Luca Bellini",
+                    Email = "luca.bellini@example.test",
+                    Phone = "333 1165000",
                     SourceChannel = "Ufficio",
                     RequestType = "Valuation",
-                    Notes = "Valutazione casa familiare",
-                    CreatedAtUtc = seedDate.AddDays(-3)
+                    CreatedAtUtc = seedDate.AddHours(-312),
+                    UpdatedAtUtc = seedDate.AddHours(-312)
                 },
                 new Lead
                 {
-                    Id = refs.MarcoLeadId,
-                    WorkflowStatus = "Qualified",
-                    FullName = "Marco Guidi",
-                    Email = "marco.guidi@example.test",
-                    Phone = "333 2028000",
-                    SourceChannel = "Agency",
-                    RequestType = "Sell",
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000210"),
+                    InternalReference = "LD-1164",
+                    WorkflowStatus = "New",
+                    QualificationPercent = 48,
+                    NextAction = "Completare esigenze familiari",
+                    AssignedAgencyUserId = refs.Martina,
+                    FullName = "Francesca Ricci",
+                    Email = "francesca.ricci@example.test",
+                    Phone = "333 1164000",
+                    SourceChannel = "Telefono",
+                    RequestType = "Buy",
+                    CreatedAtUtc = seedDate.AddHours(-336),
+                    UpdatedAtUtc = seedDate.AddHours(-336)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000211"),
+                    InternalReference = "LD-1163",
+                    WorkflowStatus = "New",
+                    QualificationPercent = 44,
+                    NextAction = "Chiarire disponibilita e contratto desiderato",
                     AssignedAgencyUserId = refs.Chiara,
-                    Notes = "Vuole vendere appartamento",
-                    CreatedAtUtc = seedDate.AddDays(-4),
-                    UpdatedAtUtc = seedDate.AddDays(-4)
+                    FullName = "Roberto Fini",
+                    Email = "roberto.fini@example.test",
+                    Phone = "333 1163000",
+                    SourceChannel = "Email",
+                    RequestType = "RentOut",
+                    CreatedAtUtc = seedDate.AddHours(-360),
+                    UpdatedAtUtc = seedDate.AddHours(-360)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000212"),
+                    InternalReference = "LD-1162",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 68,
+                    NextAction = "Inviare immobili zona Centro",
+                    AssignedAgencyUserId = refs.Martina,
+                    FullName = "Irene Vitali",
+                    Email = "irene.vitali@example.test",
+                    Phone = "333 1162000",
+                    SourceChannel = "WhatsApp",
+                    RequestType = "Buy",
+                    CreatedAtUtc = seedDate.AddHours(-384),
+                    UpdatedAtUtc = seedDate.AddHours(-384)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000213"),
+                    InternalReference = "LD-1161",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 59,
+                    NextAction = "Concordare sopralluogo",
+                    AssignedAgencyUserId = refs.Chiara,
+                    FullName = "Carlo Benini",
+                    Email = "carlo.benini@example.test",
+                    Phone = "333 1161000",
+                    SourceChannel = "Telefono",
+                    RequestType = "Sell",
+                    CreatedAtUtc = seedDate.AddHours(-408),
+                    UpdatedAtUtc = seedDate.AddHours(-408)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000214"),
+                    InternalReference = "LD-1160",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 63,
+                    NextAction = "Richiedere documentazione garanzie",
+                    AssignedAgencyUserId = refs.Lorenzo,
+                    FullName = "Laura Guidi",
+                    Email = "laura.guidi@example.test",
+                    Phone = "333 1160000",
+                    SourceChannel = "Email",
+                    RequestType = "Rent",
+                    CreatedAtUtc = seedDate.AddHours(-432),
+                    UpdatedAtUtc = seedDate.AddHours(-432)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000215"),
+                    InternalReference = "LD-1159",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 70,
+                    NextAction = "Preparare riepilogo valutazione",
+                    AssignedAgencyUserId = refs.Chiara,
+                    FullName = "Davide Farina",
+                    Email = "davide.farina@example.test",
+                    Phone = "333 1159000",
+                    SourceChannel = "Ufficio",
+                    RequestType = "Valuation",
+                    CreatedAtUtc = seedDate.AddHours(-456),
+                    UpdatedAtUtc = seedDate.AddHours(-456)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000216"),
+                    InternalReference = "LD-1158",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 61,
+                    NextAction = "Aggiornare preferenze terrazzo",
+                    AssignedAgencyUserId = refs.Martina,
+                    FullName = "Silvia Moretti",
+                    Email = "silvia.moretti@example.test",
+                    Phone = "333 1158000",
+                    SourceChannel = "WhatsApp",
+                    RequestType = "Buy",
+                    CreatedAtUtc = seedDate.AddHours(-480),
+                    UpdatedAtUtc = seedDate.AddHours(-480)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000217"),
+                    InternalReference = "LD-1157",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 58,
+                    NextAction = "Definire canone atteso",
+                    AssignedAgencyUserId = refs.Lorenzo,
+                    FullName = "Enrico Berti",
+                    Email = "enrico.berti@example.test",
+                    Phone = "333 1157000",
+                    SourceChannel = "Telefono",
+                    RequestType = "RentOut",
+                    CreatedAtUtc = seedDate.AddHours(-504),
+                    UpdatedAtUtc = seedDate.AddHours(-504)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000218"),
+                    InternalReference = "LD-1156",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 66,
+                    NextAction = "Mandare recap compatibilita",
+                    AssignedAgencyUserId = refs.Martina,
+                    FullName = "Alessia Fontana",
+                    Email = "alessia.fontana@example.test",
+                    Phone = "333 1156000",
+                    SourceChannel = "Email",
+                    RequestType = "Buy",
+                    CreatedAtUtc = seedDate.AddHours(-528),
+                    UpdatedAtUtc = seedDate.AddHours(-528)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000219"),
+                    InternalReference = "LD-1155",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 55,
+                    NextAction = "Confermare documenti catastali",
+                    AssignedAgencyUserId = refs.Chiara,
+                    FullName = "Giorgio Lombardi",
+                    Email = "giorgio.lombardi@example.test",
+                    Phone = "333 1155000",
+                    SourceChannel = "Telefono",
+                    RequestType = "Sell",
+                    CreatedAtUtc = seedDate.AddHours(-552),
+                    UpdatedAtUtc = seedDate.AddHours(-552)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000226"),
+                    InternalReference = "LD-1148",
+                    WorkflowStatus = "InContact",
+                    QualificationPercent = 57,
+                    NextAction = "Richiedere indirizzo preciso per prima valutazione",
+                    AssignedAgencyUserId = refs.Chiara,
+                    FullName = "Valeria Mancini",
+                    Email = "valeria.mancini@example.test",
+                    Phone = "333 1148000",
+                    SourceChannel = "WhatsApp",
+                    RequestType = "Valuation",
+                    CreatedAtUtc = seedDate.AddHours(-564),
+                    UpdatedAtUtc = seedDate.AddHours(-564)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000220"),
+                    InternalReference = "LD-1154",
+                    WorkflowStatus = "Archived",
+                    QualificationPercent = 22,
+                    NextAction = "Contatto non piu interessato",
+                    FullName = "Paola Santi",
+                    Email = "paola.santi@example.test",
+                    Phone = "333 1154000",
+                    SourceChannel = "Email",
+                    RequestType = "Buy",
+                    CreatedAtUtc = seedDate.AddHours(-576),
+                    UpdatedAtUtc = seedDate.AddHours(-576)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000221"),
+                    InternalReference = "LD-1153",
+                    WorkflowStatus = "Archived",
+                    QualificationPercent = 18,
+                    NextAction = "Budget non compatibile",
+                    FullName = "Andrea Russo",
+                    Email = "andrea.russo@example.test",
+                    Phone = "333 1153000",
+                    SourceChannel = "Telefono",
+                    RequestType = "Rent",
+                    CreatedAtUtc = seedDate.AddHours(-600),
+                    UpdatedAtUtc = seedDate.AddHours(-600)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000222"),
+                    InternalReference = "LD-1152",
+                    WorkflowStatus = "Archived",
+                    QualificationPercent = 25,
+                    NextAction = "Valutazione rinviata",
+                    FullName = "Monica De Angelis",
+                    Email = "monica.deangelis@example.test",
+                    Phone = "333 1152000",
+                    SourceChannel = "WhatsApp",
+                    RequestType = "Valuation",
+                    CreatedAtUtc = seedDate.AddHours(-624),
+                    UpdatedAtUtc = seedDate.AddHours(-624)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000223"),
+                    InternalReference = "LD-1151",
+                    WorkflowStatus = "Archived",
+                    QualificationPercent = 20,
+                    NextAction = "Ha scelto altra agenzia",
+                    FullName = "Stefano Riva",
+                    Email = "stefano.riva@example.test",
+                    Phone = "333 1151000",
+                    SourceChannel = "Ufficio",
+                    RequestType = "Sell",
+                    CreatedAtUtc = seedDate.AddHours(-648),
+                    UpdatedAtUtc = seedDate.AddHours(-648)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000224"),
+                    InternalReference = "LD-1150",
+                    WorkflowStatus = "Archived",
+                    QualificationPercent = 15,
+                    NextAction = "Richiesta non coltivabile",
+                    FullName = "Claudia Gatti",
+                    Email = "claudia.gatti@example.test",
+                    Phone = "333 1150000",
+                    SourceChannel = "Email",
+                    RequestType = "Buy",
+                    CreatedAtUtc = seedDate.AddHours(-672),
+                    UpdatedAtUtc = seedDate.AddHours(-672)
+                },
+                new Lead
+                {
+                    Id = Guid.Parse("30000000-0000-0000-0000-000000000225"),
+                    InternalReference = "LD-1149",
+                    WorkflowStatus = "Archived",
+                    QualificationPercent = 19,
+                    NextAction = "Immobile non disponibile",
+                    FullName = "Filippo Marchetti",
+                    Email = "filippo.marchetti@example.test",
+                    Phone = "333 1149000",
+                    SourceChannel = "Telefono",
+                    RequestType = "RentOut",
+                    CreatedAtUtc = seedDate.AddHours(-696),
+                    UpdatedAtUtc = seedDate.AddHours(-696)
                 });
-
-            Lead AdminLead(
-                int idSuffix,
-                string reference,
-                string workflowStatus,
-                string fullName,
-                string email,
-                string phone,
-                string sourceChannel,
-                string requestType,
-                int qualificationPercent,
-                string nextAction,
-                Guid? assignedAgencyUserId,
-                int hoursOffset)
-            {
-                return new Lead
-                {
-                    Id = Guid.Parse($"30000000-0000-0000-0000-{idSuffix:000000000000}"),
-                    InternalReference = reference,
-                    WorkflowStatus = workflowStatus,
-                    QualificationPercent = qualificationPercent,
-                    NextAction = nextAction,
-                    AssignedAgencyUserId = assignedAgencyUserId,
-                    FullName = fullName,
-                    Email = email,
-                    Phone = phone,
-                    SourceChannel = sourceChannel,
-                    RequestType = requestType,
-                    CreatedAtUtc = seedDate.AddHours(hoursOffset),
-                    UpdatedAtUtc = seedDate.AddHours(hoursOffset)
-                };
-            }
-
-            context.Leads.AddRange(
-                AdminLead(205, "LD-1181", "InContact", "Elena Gori", null, "347 9988776", "WhatsApp", "Buy", 72, "Inviare recap con 3 immobili compatibili", refs.Martina, -96),
-                AdminLead(206, "LD-1168", "New", "Sara Monti", "sara.monti@example.test", "333 1168000", "Telefono", "Buy", 42, "Capire budget sostenibile e zona prioritaria", null, -240),
-                AdminLead(207, "LD-1167", "New", "Giulio Neri", "giulio.neri@example.test", "333 1167000", "Email", "Rent", 36, "Verificare garanzie e tempi di ingresso", null, -264),
-                AdminLead(208, "LD-1166", "New", "Marta Serra", "marta.serra@example.test", "333 1166000", "WhatsApp", "Sell", 51, "Raccogliere indirizzo e stato immobile", refs.Chiara, -288),
-                AdminLead(209, "LD-1165", "New", "Luca Bellini", "luca.bellini@example.test", "333 1165000", "Ufficio", "Valuation", 40, "Fissare primo confronto telefonico", null, -312),
-                AdminLead(210, "LD-1164", "New", "Francesca Ricci", "francesca.ricci@example.test", "333 1164000", "Telefono", "Buy", 48, "Completare esigenze familiari", refs.Martina, -336),
-                AdminLead(211, "LD-1163", "New", "Roberto Fini", "roberto.fini@example.test", "333 1163000", "Email", "RentOut", 44, "Chiarire disponibilita e contratto desiderato", refs.Chiara, -360),
-                AdminLead(212, "LD-1162", "InContact", "Irene Vitali", "irene.vitali@example.test", "333 1162000", "WhatsApp", "Buy", 68, "Inviare immobili zona Centro", refs.Martina, -384),
-                AdminLead(213, "LD-1161", "InContact", "Carlo Benini", "carlo.benini@example.test", "333 1161000", "Telefono", "Sell", 59, "Concordare sopralluogo", refs.Chiara, -408),
-                AdminLead(214, "LD-1160", "InContact", "Laura Guidi", "laura.guidi@example.test", "333 1160000", "Email", "Rent", 63, "Richiedere documentazione garanzie", refs.Lorenzo, -432),
-                AdminLead(215, "LD-1159", "InContact", "Davide Farina", "davide.farina@example.test", "333 1159000", "Ufficio", "Valuation", 70, "Preparare riepilogo valutazione", refs.Chiara, -456),
-                AdminLead(216, "LD-1158", "InContact", "Silvia Moretti", "silvia.moretti@example.test", "333 1158000", "WhatsApp", "Buy", 61, "Aggiornare preferenze terrazzo", refs.Martina, -480),
-                AdminLead(217, "LD-1157", "InContact", "Enrico Berti", "enrico.berti@example.test", "333 1157000", "Telefono", "RentOut", 58, "Definire canone atteso", refs.Lorenzo, -504),
-                AdminLead(218, "LD-1156", "InContact", "Alessia Fontana", "alessia.fontana@example.test", "333 1156000", "Email", "Buy", 66, "Mandare recap compatibilita", refs.Martina, -528),
-                AdminLead(219, "LD-1155", "InContact", "Giorgio Lombardi", "giorgio.lombardi@example.test", "333 1155000", "Telefono", "Sell", 55, "Confermare documenti catastali", refs.Chiara, -552),
-                AdminLead(226, "LD-1148", "InContact", "Valeria Mancini", "valeria.mancini@example.test", "333 1148000", "WhatsApp", "Valuation", 57, "Richiedere indirizzo preciso per prima valutazione", refs.Chiara, -564),
-                AdminLead(220, "LD-1154", "Archived", "Paola Santi", "paola.santi@example.test", "333 1154000", "Email", "Buy", 22, "Contatto non piu interessato", null, -576),
-                AdminLead(221, "LD-1153", "Archived", "Andrea Russo", "andrea.russo@example.test", "333 1153000", "Telefono", "Rent", 18, "Budget non compatibile", null, -600),
-                AdminLead(222, "LD-1152", "Archived", "Monica De Angelis", "monica.deangelis@example.test", "333 1152000", "WhatsApp", "Valuation", 25, "Valutazione rinviata", null, -624),
-                AdminLead(223, "LD-1151", "Archived", "Stefano Riva", "stefano.riva@example.test", "333 1151000", "Ufficio", "Sell", 20, "Ha scelto altra agenzia", null, -648),
-                AdminLead(224, "LD-1150", "Archived", "Claudia Gatti", "claudia.gatti@example.test", "333 1150000", "Email", "Buy", 15, "Richiesta non coltivabile", null, -672),
-                AdminLead(225, "LD-1149", "Archived", "Filippo Marchetti", "filippo.marchetti@example.test", "333 1149000", "Telefono", "RentOut", 19, "Immobile non disponibile", null, -696));
-
-            Lead RequestLead(
-                int idSuffix,
-                string fullName,
-                string email,
-                string phone,
-                string requestType,
-                string notes,
-                Guid? assignedAgencyUserId,
-                int daysOffset)
-            {
-                return new Lead
-                {
-                    Id = Guid.Parse($"30000000-0000-0000-0000-{idSuffix:000000000000}"),
-                    WorkflowStatus = "Qualified",
-                    AssignedAgencyUserId = assignedAgencyUserId,
-                    FullName = fullName,
-                    Email = email,
-                    Phone = phone,
-                    SourceChannel = "Agency",
-                    RequestType = requestType,
-                    Notes = notes,
-                    CreatedAtUtc = seedDate.AddDays(daysOffset),
-                    UpdatedAtUtc = seedDate.AddDays(daysOffset)
-                };
-            }
-
-            context.Leads.AddRange(
-                RequestLead(301, "Sara Monti", "sara.monti@example.test", "333 2027000", "Buy", "Richiesta da primo colloquio", null, -5),
-                RequestLead(302, "Giulio Neri", "giulio.neri@example.test", "333 2026000", "Rent", "Richiesta affitto da qualificare", null, -6),
-                RequestLead(303, "Marta Serra", "marta.serra@example.test", "333 2025000", "Sell", "Profilo pronto per matching proprietario", refs.Martina, -7),
-                RequestLead(304, "Luca Bellini", "luca.bellini@example.test", "333 2024000", "Valuation", "Richiesta valutazione assegnata", refs.Chiara, -8),
-                RequestLead(305, "Francesca Ricci", "francesca.ricci@example.test", "333 2023000", "Buy", "Profilo acquisto assegnato", refs.Lorenzo, -9),
-                RequestLead(306, "Roberto Fini", "roberto.fini@example.test", "333 2022000", "RentOut", "Ricerca in matching da affinare", null, -10),
-                RequestLead(307, "Irene Vitali", "irene.vitali@example.test", "333 2021000", "Buy", "Richiesta in matching", null, -11),
-                RequestLead(308, "Carlo Benini", "carlo.benini@example.test", "333 2020000", "Sell", "Profilo vendita in matching", null, -12),
-                RequestLead(309, "Laura Guidi", "laura.guidi@example.test", "333 2019000", "Rent", "Aggiornare preferenze canone", null, -13),
-                RequestLead(310, "Davide Farina", "davide.farina@example.test", "333 2018000", "Valuation", "Aggiornare obiettivo valutazione", null, -14));
-        }
-
-
-        private static void SeedSearchProfiles(MedriDbContext context, SeedReferences refs)
-        {
-            var seedDate = refs.SeedDate;
-
-            SearchProfile RequestProfile(int idSuffix, int leadSuffix, string publicReference, string status, string criteria, string contactEmail, string source, int daysOffset)
-            {
-                return new SearchProfile
-                {
-                    Id = Guid.Parse($"31000000-0000-0000-0000-{idSuffix:000000000000}"),
-                    LeadId = Guid.Parse($"30000000-0000-0000-0000-{leadSuffix:000000000000}"),
-                    PublicReference = publicReference,
-                    Status = status,
-                    CriteriaSummary = criteria,
-                    ContactEmail = contactEmail,
-                    SourceQueryString = source,
-                    CreatedAtUtc = seedDate.AddDays(daysOffset),
-                    UpdatedAtUtc = seedDate.AddDays(daysOffset)
-                };
-            }
-
-            context.SearchProfiles.AddRange(
-                new SearchProfile
-                {
-                    Id = Guid.Parse("31000000-0000-0000-0000-000000000001"),
-                    LeadId = refs.LeadId,
-                    CriteriaSummary = "Profilo seed tecnico",
-                    ContactEmail = "lead.seed@example.test",
-                    SourceQueryString = "",
-                    CreatedAtUtc = seedDate,
-                    UpdatedAtUtc = seedDate
-                },
-                new SearchProfile
-                {
-                    Id = Guid.Parse("31000000-0000-0000-0000-000000000101"),
-                    LeadId = refs.ClientBuyLeadId,
-                    PublicReference = "RQ-2047",
-                    Status = "InMatching",
-                    CriteriaSummary = "Cesena Centro|max EUR 260.000|2 camere",
-                    ContactEmail = "elena.gori@email.it",
-                    SourceQueryString = "da lead LD-1181",
-                    CreatedAtUtc = seedDate.AddDays(-2),
-                    UpdatedAtUtc = seedDate.Date.AddHours(11).AddMinutes(20)
-                },
-                new SearchProfile
-                {
-                    Id = Guid.Parse("31000000-0000-0000-0000-000000000104"),
-                    LeadId = refs.NiccoloLeadId,
-                    PublicReference = "RQ-2039",
-                    Status = "New",
-                    CriteriaSummary = "Bilocale|vicino campus|max EUR 750",
-                    ContactEmail = "niccolo.f@email.it",
-                    SourceQueryString = "Affitto studenti - email",
-                    CreatedAtUtc = seedDate.AddDays(-2),
-                    UpdatedAtUtc = seedDate.Date.AddDays(-1).AddHours(16).AddMinutes(40)
-                },
-                new SearchProfile
-                {
-                    Id = Guid.Parse("31000000-0000-0000-0000-000000000102"),
-                    LeadId = refs.AnnaLeadId,
-                    PublicReference = "RQ-2034",
-                    Status = "New",
-                    CriteriaSummary = "Sopralluogo|Cesena - Diegaro|entro mese",
-                    ContactEmail = "anna.conti@example.test",
-                    SourceQueryString = "Valutazione casa familiare",
-                    CreatedAtUtc = seedDate.AddDays(-3),
-                    UpdatedAtUtc = seedDate.Date.AddHours(9).AddMinutes(10)
-                },
-                new SearchProfile
-                {
-                    Id = Guid.Parse("31000000-0000-0000-0000-000000000103"),
-                    LeadId = refs.MarcoLeadId,
-                    PublicReference = "RQ-2028",
-                    Status = "Updating",
-                    CriteriaSummary = "Documenti|foto mancanti|prezzo da validare",
-                    ContactEmail = "marco.guidi@example.test",
-                    SourceQueryString = "",
-                    CreatedAtUtc = seedDate.AddDays(-4),
-                    UpdatedAtUtc = new DateTime(2026, 4, 26, 12, 15, 0, DateTimeKind.Utc)
-                },
-                RequestProfile(201, 301, "RQ-2027", "New", "Centro storico|budget da definire|prima visita", "sara.monti@example.test", "Richiesta da primo colloquio", -5),
-                RequestProfile(202, 302, "RQ-2026", "New", "Affitto|garanzie da verificare|ingresso rapido", "giulio.neri@example.test", "Richiesta affitto da qualificare", -6),
-                RequestProfile(203, 303, "RQ-2025", "InMatching", "Trilocale|zona Stadio|box auto", "marta.serra@example.test", "Profilo pronto per matching proprietario", -7),
-                RequestProfile(204, 304, "RQ-2024", "InMatching", "Sopralluogo|zona Borello|documenti pronti", "luca.bellini@example.test", "Richiesta valutazione assegnata", -8),
-                RequestProfile(205, 305, "RQ-2023", "InMatching", "Villetta|giardino|mutuo avviato", "francesca.ricci@example.test", "Profilo acquisto assegnato", -9),
-                RequestProfile(206, 306, "RQ-2022", "InMatching", "Affitto gestito|contratto concordato|arredo parziale", "roberto.fini@example.test", "Ricerca in matching da affinare", -10),
-                RequestProfile(207, 307, "RQ-2021", "InMatching", "Casa indipendente|zona Ponte Abbadesse|garage", "irene.vitali@example.test", "Richiesta in matching", -11),
-                RequestProfile(208, 308, "RQ-2020", "InMatching", "Vendita appartamento|foto da produrre|prezzo coerente", "carlo.benini@example.test", "Profilo vendita in matching", -12),
-                RequestProfile(209, 309, "RQ-2019", "Updating", "Bilocale|canone aggiornato|garanzie", "laura.guidi@example.test", "Aggiornare preferenze canone", -13),
-                RequestProfile(210, 310, "RQ-2018", "Updating", "Valutazione|obiettivo cambiato|richiamare", "davide.farina@example.test", "Aggiornare obiettivo valutazione", -14));
-        }
-
-
-        private static void SeedLeadPreferences(MedriDbContext context, SeedReferences refs)
-        {
-            context.LeadPreferences.Add(new LeadPreference
-            {
-                Id = Guid.Parse("32000000-0000-0000-0000-000000000001"),
-                LeadId = refs.LeadId,
-                MinimumPrice = 150000m,
-                MaximumPrice = 300000m,
-                DesiredLocation = "Area seed",
-                MinimumRooms = 3
-            });
 
             context.LeadPreferences.AddRange(
                 new LeadPreference
                 {
-                    Id = Guid.Parse("32000000-0000-0000-0000-000000000101"),
-                    LeadId = refs.ClientBuyLeadId,
-                    MaximumPrice = 260000m,
-                    DesiredLocation = "Cesena Centro, San Mauro",
-                    AcceptableLocations = "Oltresavio, S. Egidio, Diegaro",
-                    MinimumRooms = 2,
-                    SustainableBudgetLabel = "max EUR 260.000",
-                    ExpectedPriceOrMainQuestion = "EUR 230.000 - 245.000",
-                    Timing = "Alta",
-                    DesiredMoveIn = "Entro 3 mesi",
-                    FinancingStatus = "Pre-delibera in corso",
-                    PropertyToSellStatus = "No",
-                    SearchStage = "Cerca una casa definitiva a Cesena, possibilmente comoda al centro ma non necessariamente in pieno centro. Budget chiaro, ricerca matura, preferisce evitare ristrutturazioni pesanti.",
-                    HouseholdDescription = "Vuole ricevere poche proposte ma motivate. Ha scartato immobili luminosi ma senza ascensore. Sensibile a spese condominiali e stato impianti.",
-                    PreferencesAndCompromises = "Terrazzo o piccolo giardino|Garage o posto auto|Pronta da abitare|Classe energetica buona",
-                    PropertyCondition = "Metratura flessibile|Piccoli lavori accettati|Quartieri limitrofi|Bagno singolo se casa valida",
-                    ValuationGoal = "Ricerca abitazione principale"
-                },
-                new LeadPreference
-                {
-                    Id = Guid.Parse("32000000-0000-0000-0000-000000000102"),
-                    LeadId = refs.ClientValuationLeadId,
-                    DesiredLocation = "Diegaro",
-                    PropertyType = "Casa familiare",
-                    ValuationGoal = "Prima valutazione"
+                    Id = Guid.Parse("32000000-0000-0000-0000-000000000001"),
+                    LeadId = refs.LeadId,
+                    MinimumPrice = 150000m,
+                    MaximumPrice = 300000m,
+                    DesiredLocation = "Area seed",
+                    MinimumRooms = 3
                 },
                 new LeadPreference
                 {
@@ -822,49 +745,618 @@ namespace Medri.Infrastructure
                     Timing = "Da capire",
                     ValuationGoal = "Vuole capire se vendere entro l'anno",
                     PreferencesAndCompromises = "Zona precisa, metratura indicativa, stato dell'immobile, tempi desiderati, eventuali vincoli familiari."
-                },
-                new LeadPreference
+                });
+
+            context.Interactions.AddRange(
+                new Interaction
                 {
-                    Id = Guid.Parse("32000000-0000-0000-0000-000000000202"),
-                    LeadId = refs.NiccoloLeadId,
-                    PropertyType = "Bilocale",
-                    DesiredLocation = "vicino campus",
-                    SustainableBudgetLabel = "max EUR 750",
-                    Timing = "Media"
+                    Id = Guid.Parse("33000000-0000-0000-0000-000000000201"),
+                    LeadId = refs.PaoloLeadId,
+                    Channel = "Telefonata registrata",
+                    Notes = "Michela ha annotato il primo contatto e i dati minimi disponibili.",
+                    OccurredAtUtc = seedDate.AddDays(-1).Date.AddHours(10).AddMinutes(42)
                 },
-                new LeadPreference
+                new Interaction
                 {
-                    Id = Guid.Parse("32000000-0000-0000-0000-000000000203"),
-                    LeadId = refs.AnnaLeadId,
-                    PropertyType = "Sopralluogo",
-                    DesiredLocation = "Cesena - Diegaro",
-                    ValuationGoal = "entro mese",
-                    Timing = "Alta"
-                },
-                new LeadPreference
-                {
-                    Id = Guid.Parse("32000000-0000-0000-0000-000000000204"),
-                    LeadId = refs.MarcoLeadId,
-                    PropertyToSellStatus = "Documenti",
-                    PreferencesAndCompromises = "foto mancanti",
-                    ExpectedPriceOrMainQuestion = "prezzo da validare",
-                    Timing = "Media"
+                    Id = Guid.Parse("33000000-0000-0000-0000-000000000202"),
+                    LeadId = refs.PaoloLeadId,
+                    Channel = "Prossima azione proposta",
+                    Notes = "Richiamare per completare zona, tempi e caratteristiche dell'immobile.",
+                    OccurredAtUtc = seedDate.AddDays(-1).Date.AddHours(10).AddMinutes(45)
                 });
         }
 
 
-        private static void SeedInteractions(MedriDbContext context, SeedReferences refs)
+        private static void SeedRequests(MedriDbContext context, SeedReferences refs)
         {
             var seedDate = refs.SeedDate;
 
-            context.Interactions.Add(new Interaction
+            var requests = new[]
             {
-                Id = Guid.Parse("33000000-0000-0000-0000-000000000001"),
-                LeadId = refs.LeadId,
-                Channel = "Seed",
-                Notes = "Interazione seed tecnico",
-                OccurredAtUtc = seedDate
-            });
+                (
+                    Lead: new Lead
+                    {
+                        Id = refs.ClientBuyLeadId,
+                        ClientUserId = refs.ClientUserId,
+                        PublicReference = "RQ-2047",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        AssignedAgencyUserId = refs.Martina,
+                        FullName = "Elena Gori",
+                        Email = "elena.gori@email.it",
+                        Phone = "347 9988776",
+                        SourceChannel = "Lead convertito",
+                        RequestType = RequestTypes.Buy,
+                        Notes = "3 immobili proposti",
+                        CreatedAtUtc = seedDate.AddDays(-2),
+                        UpdatedAtUtc = seedDate.AddDays(-2)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000101"),
+                        LeadId = refs.ClientBuyLeadId,
+                        MaximumPrice = 260000m,
+                        DesiredLocation = "Cesena Centro, San Mauro",
+                        AcceptableLocations = "Oltresavio, S. Egidio, Diegaro",
+                        MinimumRooms = 2,
+                        SustainableBudgetLabel = "max EUR 260.000",
+                        ExpectedPriceOrMainQuestion = "EUR 230.000 - 245.000",
+                        Timing = "Alta",
+                        DesiredMoveIn = "Entro 3 mesi",
+                        FinancingStatus = "Pre-delibera in corso",
+                        PropertyToSellStatus = "No",
+                        SearchStage = "Cerca una casa definitiva a Cesena, possibilmente comoda al centro ma non necessariamente in pieno centro. Budget chiaro, ricerca matura, preferisce evitare ristrutturazioni pesanti.",
+                        HouseholdDescription = "Vuole ricevere poche proposte ma motivate. Ha scartato immobili luminosi ma senza ascensore. Sensibile a spese condominiali e stato impianti.",
+                        PreferencesAndCompromises = "Terrazzo o piccolo giardino|Garage o posto auto|Pronta da abitare|Classe energetica buona",
+                        PropertyCondition = "Metratura flessibile|Piccoli lavori accettati|Quartieri limitrofi|Bagno singolo se casa valida",
+                        ValuationGoal = "Ricerca abitazione principale"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000101"),
+                        LeadId = refs.ClientBuyLeadId,
+                        PublicReference = "RQ-2047",
+                        Status = RequestStatuses.InMatching,
+                        CriteriaSummary = "Cesena Centro|max EUR 260.000|2 camere",
+                        ContactEmail = "elena.gori@email.it",
+                        SourceQueryString = "da lead LD-1181",
+                        CreatedAtUtc = seedDate.AddDays(-2),
+                        UpdatedAtUtc = seedDate.Date.AddHours(11).AddMinutes(20)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = refs.ClientValuationLeadId,
+                        ClientUserId = refs.ClientUserId,
+                        PublicReference = "RQ-2040",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        AssignedAgencyUserId = refs.Chiara,
+                        FullName = "Elena Gori",
+                        Email = "elena.gori@email.it",
+                        Phone = "333 2034000",
+                        SourceChannel = "Public lead intake",
+                        RequestType = RequestTypes.Valuation,
+                        Notes = "Da ricontattare",
+                        CreatedAtUtc = seedDate.AddDays(-8),
+                        UpdatedAtUtc = seedDate.AddDays(-8)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000102"),
+                        LeadId = refs.ClientValuationLeadId,
+                        DesiredLocation = "Diegaro",
+                        PropertyType = "Casa familiare",
+                        ValuationGoal = "Prima valutazione",
+                        Timing = "Media"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000105"),
+                        LeadId = refs.ClientValuationLeadId,
+                        PublicReference = "RQ-2040",
+                        Status = RequestStatuses.New,
+                        CriteriaSummary = "Valutazione|Diegaro|prima valutazione",
+                        ContactEmail = "elena.gori@email.it",
+                        SourceQueryString = "Public lead intake",
+                        CreatedAtUtc = seedDate.AddDays(-8),
+                        UpdatedAtUtc = seedDate.AddDays(-8)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = refs.NiccoloLeadId,
+                        InternalReference = "LD-1176",
+                        PublicReference = "RQ-2039",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        NextAction = "Chiedere budget massimo e garanzie",
+                        AssignedAgencyUserId = refs.Lorenzo,
+                        FullName = "Niccolo Fabbri",
+                        Email = "niccolo.f@email.it",
+                        SourceChannel = "Email",
+                        RequestType = RequestTypes.Rent,
+                        CreatedAtUtc = seedDate.AddDays(-2),
+                        UpdatedAtUtc = seedDate.AddDays(-2)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000202"),
+                        LeadId = refs.NiccoloLeadId,
+                        PropertyType = "Bilocale",
+                        DesiredLocation = "vicino campus",
+                        SustainableBudgetLabel = "max EUR 750",
+                        Timing = "Media"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000104"),
+                        LeadId = refs.NiccoloLeadId,
+                        PublicReference = "RQ-2039",
+                        Status = RequestStatuses.New,
+                        CriteriaSummary = "Bilocale|vicino campus|max EUR 750",
+                        ContactEmail = "niccolo.f@email.it",
+                        SourceQueryString = "Affitto studenti - email",
+                        CreatedAtUtc = seedDate.AddDays(-2),
+                        UpdatedAtUtc = seedDate.Date.AddDays(-1).AddHours(16).AddMinutes(40)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = refs.AnnaLeadId,
+                        InternalReference = "LD-1169",
+                        PublicReference = "RQ-2034",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        NextAction = "Completare recapito e indirizzo immobile",
+                        FullName = "Anna Conti",
+                        Email = "anna.conti@example.test",
+                        SourceChannel = "Ufficio",
+                        RequestType = RequestTypes.Valuation,
+                        Notes = "Valutazione casa familiare",
+                        CreatedAtUtc = seedDate.AddDays(-3),
+                        UpdatedAtUtc = seedDate.AddDays(-3)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000203"),
+                        LeadId = refs.AnnaLeadId,
+                        PropertyType = "Sopralluogo",
+                        DesiredLocation = "Cesena - Diegaro",
+                        ValuationGoal = "entro mese",
+                        Timing = "Alta"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000102"),
+                        LeadId = refs.AnnaLeadId,
+                        PublicReference = "RQ-2034",
+                        Status = RequestStatuses.New,
+                        CriteriaSummary = "Sopralluogo|Cesena - Diegaro|entro mese",
+                        ContactEmail = "anna.conti@example.test",
+                        SourceQueryString = "Valutazione casa familiare",
+                        CreatedAtUtc = seedDate.AddDays(-3),
+                        UpdatedAtUtc = seedDate.Date.AddHours(9).AddMinutes(10)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = refs.MarcoLeadId,
+                        PublicReference = "RQ-2028",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        FullName = "Marco Guidi",
+                        Email = "marco.guidi@example.test",
+                        Phone = "333 2028000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Sell,
+                        AssignedAgencyUserId = refs.Chiara,
+                        Notes = "Vuole vendere appartamento",
+                        CreatedAtUtc = seedDate.AddDays(-4),
+                        UpdatedAtUtc = seedDate.AddDays(-4)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000204"),
+                        LeadId = refs.MarcoLeadId,
+                        PropertyToSellStatus = "Documenti",
+                        PreferencesAndCompromises = "foto mancanti",
+                        ExpectedPriceOrMainQuestion = "prezzo da validare",
+                        Timing = "Media"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000103"),
+                        LeadId = refs.MarcoLeadId,
+                        PublicReference = "RQ-2028",
+                        Status = RequestStatuses.Updating,
+                        CriteriaSummary = "Documenti|foto mancanti|prezzo da validare",
+                        ContactEmail = "marco.guidi@example.test",
+                        SourceQueryString = "",
+                        CreatedAtUtc = seedDate.AddDays(-4),
+                        UpdatedAtUtc = new DateTime(2026, 4, 26, 12, 15, 0, DateTimeKind.Utc)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000301"),
+                        PublicReference = "RQ-2027",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        FullName = "Sara Monti",
+                        Email = "sara.monti@example.test",
+                        Phone = "333 2027000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Buy,
+                        Notes = "Richiesta da primo colloquio",
+                        CreatedAtUtc = seedDate.AddDays(-5),
+                        UpdatedAtUtc = seedDate.AddDays(-5)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000301"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000301"),
+                        DesiredLocation = "Centro storico",
+                        SustainableBudgetLabel = "budget da definire",
+                        ExpectedPriceOrMainQuestion = "prima visita",
+                        Timing = "Alta"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000201"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000301"),
+                        PublicReference = "RQ-2027",
+                        Status = RequestStatuses.New,
+                        CriteriaSummary = "Centro storico|budget da definire|prima visita",
+                        ContactEmail = "sara.monti@example.test",
+                        SourceQueryString = "Richiesta da primo colloquio",
+                        CreatedAtUtc = seedDate.AddDays(-5),
+                        UpdatedAtUtc = seedDate.AddDays(-5)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000302"),
+                        PublicReference = "RQ-2026",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        FullName = "Giulio Neri",
+                        Email = "giulio.neri@example.test",
+                        Phone = "333 2026000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Rent,
+                        Notes = "Richiesta affitto da qualificare",
+                        CreatedAtUtc = seedDate.AddDays(-6),
+                        UpdatedAtUtc = seedDate.AddDays(-6)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000302"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000302"),
+                        PropertyType = "Bilocale",
+                        DesiredLocation = "zona universitaria",
+                        SustainableBudgetLabel = "max EUR 750",
+                        AvailableGuarantees = "garanzie da verificare",
+                        DesiredMoveIn = "ingresso rapido"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000202"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000302"),
+                        PublicReference = "RQ-2026",
+                        Status = RequestStatuses.New,
+                        CriteriaSummary = "Affitto|garanzie da verificare|ingresso rapido",
+                        ContactEmail = "giulio.neri@example.test",
+                        SourceQueryString = "Richiesta affitto da qualificare",
+                        CreatedAtUtc = seedDate.AddDays(-6),
+                        UpdatedAtUtc = seedDate.AddDays(-6)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000303"),
+                        PublicReference = "RQ-2025",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        AssignedAgencyUserId = refs.Martina,
+                        FullName = "Marta Serra",
+                        Email = "marta.serra@example.test",
+                        Phone = "333 2025000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Sell,
+                        Notes = "Profilo pronto per matching proprietario",
+                        CreatedAtUtc = seedDate.AddDays(-7),
+                        UpdatedAtUtc = seedDate.AddDays(-7)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000303"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000303"),
+                        PropertyType = "Trilocale",
+                        DesiredLocation = "zona Stadio",
+                        Appurtenances = "box auto",
+                        PropertyToSellStatus = "Profilo pronto per matching proprietario"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000203"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000303"),
+                        PublicReference = "RQ-2025",
+                        Status = RequestStatuses.InMatching,
+                        CriteriaSummary = "Trilocale|zona Stadio|box auto",
+                        ContactEmail = "marta.serra@example.test",
+                        SourceQueryString = "Profilo pronto per matching proprietario",
+                        CreatedAtUtc = seedDate.AddDays(-7),
+                        UpdatedAtUtc = seedDate.AddDays(-7)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000304"),
+                        PublicReference = "RQ-2024",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        AssignedAgencyUserId = refs.Chiara,
+                        FullName = "Luca Bellini",
+                        Email = "luca.bellini@example.test",
+                        Phone = "333 2024000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Valuation,
+                        Notes = "Richiesta valutazione assegnata",
+                        CreatedAtUtc = seedDate.AddDays(-8),
+                        UpdatedAtUtc = seedDate.AddDays(-8)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000304"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000304"),
+                        PropertyType = "Sopralluogo",
+                        DesiredLocation = "zona Borello",
+                        ValuationGoal = "documenti pronti",
+                        Timing = "Alta"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000204"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000304"),
+                        PublicReference = "RQ-2024",
+                        Status = RequestStatuses.InMatching,
+                        CriteriaSummary = "Sopralluogo|zona Borello|documenti pronti",
+                        ContactEmail = "luca.bellini@example.test",
+                        SourceQueryString = "Richiesta valutazione assegnata",
+                        CreatedAtUtc = seedDate.AddDays(-8),
+                        UpdatedAtUtc = seedDate.AddDays(-8)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000305"),
+                        PublicReference = "RQ-2023",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        AssignedAgencyUserId = refs.Lorenzo,
+                        FullName = "Francesca Ricci",
+                        Email = "francesca.ricci@example.test",
+                        Phone = "333 2023000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Buy,
+                        Notes = "Profilo acquisto assegnato",
+                        CreatedAtUtc = seedDate.AddDays(-9),
+                        UpdatedAtUtc = seedDate.AddDays(-9)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000305"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000305"),
+                        PropertyType = "Villetta",
+                        DesiredLocation = "Cesena",
+                        SustainableBudgetLabel = "max EUR 320.000",
+                        PreferencesAndCompromises = "giardino",
+                        FinancingStatus = "mutuo avviato"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000205"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000305"),
+                        PublicReference = "RQ-2023",
+                        Status = RequestStatuses.InMatching,
+                        CriteriaSummary = "Villetta|giardino|mutuo avviato",
+                        ContactEmail = "francesca.ricci@example.test",
+                        SourceQueryString = "Profilo acquisto assegnato",
+                        CreatedAtUtc = seedDate.AddDays(-9),
+                        UpdatedAtUtc = seedDate.AddDays(-9)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000306"),
+                        PublicReference = "RQ-2022",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        FullName = "Roberto Fini",
+                        Email = "roberto.fini@example.test",
+                        Phone = "333 2022000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.RentOut,
+                        Notes = "Ricerca in matching da affinare",
+                        CreatedAtUtc = seedDate.AddDays(-10),
+                        UpdatedAtUtc = seedDate.AddDays(-10)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000306"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000306"),
+                        PropertyType = "Affitto gestito",
+                        DesiredContractType = "contratto concordato",
+                        PropertyCondition = "arredo parziale"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000206"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000306"),
+                        PublicReference = "RQ-2022",
+                        Status = RequestStatuses.InMatching,
+                        CriteriaSummary = "Affitto gestito|contratto concordato|arredo parziale",
+                        ContactEmail = "roberto.fini@example.test",
+                        SourceQueryString = "Ricerca in matching da affinare",
+                        CreatedAtUtc = seedDate.AddDays(-10),
+                        UpdatedAtUtc = seedDate.AddDays(-10)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000307"),
+                        PublicReference = "RQ-2021",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        FullName = "Irene Vitali",
+                        Email = "irene.vitali@example.test",
+                        Phone = "333 2021000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Buy,
+                        Notes = "Richiesta in matching",
+                        CreatedAtUtc = seedDate.AddDays(-11),
+                        UpdatedAtUtc = seedDate.AddDays(-11)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000307"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000307"),
+                        PropertyType = "Casa indipendente",
+                        DesiredLocation = "Ponte Abbadesse",
+                        Appurtenances = "garage"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000207"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000307"),
+                        PublicReference = "RQ-2021",
+                        Status = RequestStatuses.InMatching,
+                        CriteriaSummary = "Casa indipendente|zona Ponte Abbadesse|garage",
+                        ContactEmail = "irene.vitali@example.test",
+                        SourceQueryString = "Richiesta in matching",
+                        CreatedAtUtc = seedDate.AddDays(-11),
+                        UpdatedAtUtc = seedDate.AddDays(-11)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000308"),
+                        PublicReference = "RQ-2020",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        FullName = "Carlo Benini",
+                        Email = "carlo.benini@example.test",
+                        Phone = "333 2020000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Sell,
+                        Notes = "Profilo vendita in matching",
+                        CreatedAtUtc = seedDate.AddDays(-12),
+                        UpdatedAtUtc = seedDate.AddDays(-12)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000308"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000308"),
+                        PropertyType = "Appartamento",
+                        PropertyCondition = "foto da produrre",
+                        ExpectedPriceOrMainQuestion = "prezzo coerente"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000208"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000308"),
+                        PublicReference = "RQ-2020",
+                        Status = RequestStatuses.InMatching,
+                        CriteriaSummary = "Vendita appartamento|foto da produrre|prezzo coerente",
+                        ContactEmail = "carlo.benini@example.test",
+                        SourceQueryString = "Profilo vendita in matching",
+                        CreatedAtUtc = seedDate.AddDays(-12),
+                        UpdatedAtUtc = seedDate.AddDays(-12)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000309"),
+                        PublicReference = "RQ-2019",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        FullName = "Laura Guidi",
+                        Email = "laura.guidi@example.test",
+                        Phone = "333 2019000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Rent,
+                        Notes = "Aggiornare preferenze canone",
+                        CreatedAtUtc = seedDate.AddDays(-13),
+                        UpdatedAtUtc = seedDate.AddDays(-13)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000309"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000309"),
+                        PropertyType = "Bilocale",
+                        SustainableBudgetLabel = "canone aggiornato",
+                        AvailableGuarantees = "garanzie"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000209"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000309"),
+                        PublicReference = "RQ-2019",
+                        Status = RequestStatuses.Updating,
+                        CriteriaSummary = "Bilocale|canone aggiornato|garanzie",
+                        ContactEmail = "laura.guidi@example.test",
+                        SourceQueryString = "Aggiornare preferenze canone",
+                        CreatedAtUtc = seedDate.AddDays(-13),
+                        UpdatedAtUtc = seedDate.AddDays(-13)
+                    }
+                ),
+                (
+                    Lead: new Lead
+                    {
+                        Id = Guid.Parse("30000000-0000-0000-0000-000000000310"),
+                        PublicReference = "RQ-2018",
+                        WorkflowStatus = LeadWorkflowStatuses.Qualified,
+                        FullName = "Davide Farina",
+                        Email = "davide.farina@example.test",
+                        Phone = "333 2018000",
+                        SourceChannel = "Agency",
+                        RequestType = RequestTypes.Valuation,
+                        Notes = "Aggiornare obiettivo valutazione",
+                        CreatedAtUtc = seedDate.AddDays(-14),
+                        UpdatedAtUtc = seedDate.AddDays(-14)
+                    },
+                    Preference: new LeadPreference
+                    {
+                        Id = Guid.Parse("32000000-0000-0000-0000-000000000310"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000310"),
+                        ValuationGoal = "obiettivo cambiato",
+                        ExpectedPriceOrMainQuestion = "richiamare"
+                    },
+                    Profile: new SearchProfile
+                    {
+                        Id = Guid.Parse("31000000-0000-0000-0000-000000000210"),
+                        LeadId = Guid.Parse("30000000-0000-0000-0000-000000000310"),
+                        PublicReference = "RQ-2018",
+                        Status = RequestStatuses.Updating,
+                        CriteriaSummary = "Valutazione|obiettivo cambiato|richiamare",
+                        ContactEmail = "davide.farina@example.test",
+                        SourceQueryString = "Aggiornare obiettivo valutazione",
+                        CreatedAtUtc = seedDate.AddDays(-14),
+                        UpdatedAtUtc = seedDate.AddDays(-14)
+                    }
+                )
+            };
+
+            foreach (var request in requests)
+            {
+                request.Lead.QualificationPercent = LeadQualificationCalculator.Calculate(
+                    request.Lead,
+                    request.Preference);
+
+                context.Leads.Add(request.Lead);
+                context.LeadPreferences.Add(request.Preference);
+                context.SearchProfiles.Add(request.Profile);
+            }
 
             context.Interactions.AddRange(
                 new Interaction
@@ -890,22 +1382,6 @@ namespace Medri.Infrastructure
                     Channel = "Primo contatto",
                     Notes = "Cliente interessata a ricevere proposte selezionate, non una lista generica di annunci.",
                     OccurredAtUtc = new DateTime(2026, 4, 26, 12, 0, 0, DateTimeKind.Utc)
-                },
-                new Interaction
-                {
-                    Id = Guid.Parse("33000000-0000-0000-0000-000000000201"),
-                    LeadId = refs.PaoloLeadId,
-                    Channel = "Telefonata registrata",
-                    Notes = "Michela ha annotato il primo contatto e i dati minimi disponibili.",
-                    OccurredAtUtc = seedDate.AddDays(-1).Date.AddHours(10).AddMinutes(42)
-                },
-                new Interaction
-                {
-                    Id = Guid.Parse("33000000-0000-0000-0000-000000000202"),
-                    LeadId = refs.PaoloLeadId,
-                    Channel = "Prossima azione proposta",
-                    Notes = "Richiamare per completare zona, tempi e caratteristiche dell'immobile.",
-                    OccurredAtUtc = seedDate.AddDays(-1).Date.AddHours(10).AddMinutes(45)
                 });
         }
 
@@ -919,7 +1395,7 @@ namespace Medri.Infrastructure
                 Id = Guid.Parse("35000000-0000-0000-0000-000000000001"),
                 LeadId = refs.LeadId,
                 PropertyListingId = refs.PropertyListingId,
-                AgencyUserId = refs.AgencyUserId,
+                AgencyUserId = refs.Chiara,
                 ScheduledAtUtc = seedDate.AddDays(1),
                 Status = "Scheduled",
                 RequestType = "Seed",
@@ -1074,13 +1550,14 @@ namespace Medri.Infrastructure
                     .Where(media => media.PropertyListingId == listing.Id)
                     .Select(media => media.SortOrder)
                     .ToHashSet();
+                var targetCount = SeedGalleryTargetCount(listing);
 
-                if (existingSortOrders.Count >= 4)
+                if (existingSortOrders.Count >= targetCount)
                 {
                     continue;
                 }
 
-                for (var sortOrder = 1; sortOrder <= 4; sortOrder++)
+                for (var sortOrder = 1; sortOrder <= targetCount; sortOrder++)
                 {
                     if (existingSortOrders.Contains(sortOrder))
                     {
@@ -1097,6 +1574,31 @@ namespace Medri.Infrastructure
                     });
                 }
             }
+        }
+
+        private static void ApplySeedCompletion(
+            PropertyListing[] listings,
+            IEnumerable<PropertyMedia> media)
+        {
+            var mediaCounts = media
+                .GroupBy(item => item.PropertyListingId)
+                .ToDictionary(group => group.Key, group => group.Count());
+
+            foreach (var listing in listings)
+            {
+                mediaCounts.TryGetValue(listing.Id, out var mediaCount);
+                AdminPropertyCompletionCalculator.ApplyToListing(
+                    listing,
+                    AdminPropertyCompletionCalculator.Calculate(listing, mediaCount));
+            }
+        }
+
+        private static int SeedGalleryTargetCount(PropertyListing listing)
+        {
+            return listing.PublicationStatus == PropertyPublicationStatuses.Incomplete ||
+                listing.PublicationStatus == PropertyPublicationStatuses.NeedsUpdate
+                    ? 4
+                    : 6;
         }
 
         private static string GalleryImageUrl(PropertyListing listing, int sortOrder)
@@ -1131,6 +1633,8 @@ namespace Medri.Infrastructure
                 2 => "Zona giorno",
                 3 => listing.OutdoorSpaceLabel,
                 4 => "Camera e servizi",
+                5 => "Dettagli e finiture",
+                6 => "Contesto esterno",
                 _ => "Foto immobile"
             };
         }
@@ -1148,7 +1652,6 @@ namespace Medri.Infrastructure
         {
             public DateTime SeedDate { get; } = new DateTime(2026, 5, 26, 12, 0, 0, DateTimeKind.Utc);
 
-            public Guid AgencyUserId { get; } = Guid.Parse("10000000-0000-0000-0000-000000000001");
             public Guid Martina { get; } = Guid.Parse("10000000-0000-0000-0000-000000000002");
             public Guid Chiara { get; } = Guid.Parse("10000000-0000-0000-0000-000000000003");
             public Guid Lorenzo { get; } = Guid.Parse("10000000-0000-0000-0000-000000000004");
@@ -1167,54 +1670,78 @@ namespace Medri.Infrastructure
             public Guid ClientUserId { get; } = Guid.Parse("40000000-0000-0000-0000-000000000001");
         }
 
-        private sealed class GeneratedListingBlueprint
+        private sealed class SeedListingSpec
         {
-            public GeneratedListingBlueprint(
-                string saleTitle,
-                string rentTitle,
+            public SeedListingSpec(
+                string idSuffix,
+                string reference,
+                string publicationStatus,
+                string assignedUser,
+                string title,
+                string slug,
                 string displayLocation,
-                string zone,
+                decimal price,
+                int rooms,
+                int bathrooms,
+                int surfaceSquareMeters,
+                string contract,
                 string propertyType,
+                string zone,
                 string featureKeys,
                 string imageUrl,
                 double latitude,
                 double longitude,
                 string address,
-                int rooms,
-                int bathrooms,
-                int surface,
-                string energyClass)
+                string energyClass,
+                int sortOrder,
+                int? featuredSortOrder)
             {
-                SaleTitle = saleTitle;
-                RentTitle = rentTitle;
+                IdSuffix = idSuffix;
+                Reference = reference;
+                PublicationStatus = publicationStatus;
+                AssignedUser = assignedUser;
+                Title = title;
+                Slug = slug;
                 DisplayLocation = displayLocation;
-                Zone = zone;
+                Price = price;
+                Rooms = rooms;
+                Bathrooms = bathrooms;
+                SurfaceSquareMeters = surfaceSquareMeters;
+                Contract = contract;
                 PropertyType = propertyType;
+                Zone = zone;
                 FeatureKeys = featureKeys;
                 ImageUrl = imageUrl;
                 Latitude = latitude;
                 Longitude = longitude;
                 Address = address;
-                Rooms = rooms;
-                Bathrooms = bathrooms;
-                Surface = surface;
                 EnergyClass = energyClass;
+                SortOrder = sortOrder;
+                FeaturedSortOrder = featuredSortOrder;
             }
 
-            public string SaleTitle { get; }
-            public string RentTitle { get; }
+            public string IdSuffix { get; }
+            public string Reference { get; }
+            public string PublicationStatus { get; }
+            public string AssignedUser { get; }
+            public string Title { get; }
+            public string Slug { get; }
             public string DisplayLocation { get; }
-            public string Zone { get; }
+            public decimal Price { get; }
+            public int Rooms { get; }
+            public int Bathrooms { get; }
+            public int SurfaceSquareMeters { get; }
+            public string Contract { get; }
             public string PropertyType { get; }
+            public string Zone { get; }
             public string FeatureKeys { get; }
             public string ImageUrl { get; }
             public double Latitude { get; }
             public double Longitude { get; }
             public string Address { get; }
-            public int Rooms { get; }
-            public int Bathrooms { get; }
-            public int Surface { get; }
             public string EnergyClass { get; }
+            public int SortOrder { get; }
+            public int? FeaturedSortOrder { get; }
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Medri.Services.Medri.Application
 
             var rows = await filteredLeads
                 .GroupJoin(
-                    dbContext.AgencyUsers.AsNoTracking(),
+                    StaffUserQueries.Assignable(dbContext),
                     lead => lead.AssignedAgencyUserId,
                     advisor => advisor.Id,
                     (lead, advisors) => new
@@ -87,8 +87,7 @@ namespace Medri.Services.Medri.Application
                 PageSize = pageSize,
                 TotalItems = totalItems,
                 Leads = rows,
-                Advisors = await dbContext.AgencyUsers
-                    .AsNoTracking()
+                Advisors = await StaffUserQueries.Assignable(dbContext)
                     .OrderBy(advisor => advisor.DisplayName)
                     .Select(advisor => new AdminLeadAdvisorDto
                     {

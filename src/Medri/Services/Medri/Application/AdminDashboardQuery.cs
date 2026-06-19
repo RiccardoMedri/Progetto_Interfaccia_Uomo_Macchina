@@ -52,6 +52,7 @@ namespace Medri.Services.Medri.Application
                     (listing.PublicationStatus == PropertyPublicationStatuses.Incomplete ||
                      listing.PublicationStatus == PropertyPublicationStatuses.NeedsUpdate ||
                      listing.PublicationStatus == PropertyPublicationStatuses.Ready));
+            var staffUsers = StaffUserQueries.Assignable(dbContext);
 
             return new AdminDashboardResultDto
             {
@@ -68,7 +69,7 @@ namespace Medri.Services.Medri.Application
                         Reference = lead.InternalReference,
                         ContactName = lead.FullName,
                         RequestType = lead.RequestType,
-                        AdvisorDisplayName = dbContext.AgencyUsers
+                        AdvisorDisplayName = staffUsers
                             .Where(advisor => advisor.Id == lead.AssignedAgencyUserId)
                             .Select(advisor => advisor.DisplayName)
                             .FirstOrDefault()
@@ -94,7 +95,7 @@ namespace Medri.Services.Medri.Application
                         Reference = item.PublicReference,
                         CustomerName = item.FullName,
                         Status = item.Status,
-                        AdvisorDisplayName = dbContext.AgencyUsers
+                        AdvisorDisplayName = staffUsers
                             .Where(advisor => advisor.Id == item.AssignedAgencyUserId)
                             .Select(advisor => advisor.DisplayName)
                             .FirstOrDefault()
@@ -110,7 +111,7 @@ namespace Medri.Services.Medri.Application
                         Reference = listing.InternalReference,
                         Title = listing.Title,
                         Status = listing.PublicationStatus,
-                        AdvisorDisplayName = dbContext.AgencyUsers
+                        AdvisorDisplayName = staffUsers
                             .Where(advisor => advisor.Id == listing.AssignedAgencyUserId)
                             .Select(advisor => advisor.DisplayName)
                             .FirstOrDefault()

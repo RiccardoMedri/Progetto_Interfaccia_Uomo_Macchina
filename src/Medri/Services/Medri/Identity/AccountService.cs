@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -73,6 +74,8 @@ namespace Medri.Services.Medri.Identity
                 FirstName = firstName,
                 LastName = lastName,
                 NickName = firstName,
+                DisplayName = string.Join(" ", new[] { firstName, lastName }
+                    .Where(value => !string.IsNullOrWhiteSpace(value))),
                 Role = UserRoles.Client
             };
 

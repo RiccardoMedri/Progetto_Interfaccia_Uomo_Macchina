@@ -169,9 +169,7 @@ namespace Medri.Services.Medri.Application
         private async Task<IReadOnlyList<AdminPropertyAdvisorDto>> AdvisorsAsync(
             CancellationToken cancellationToken)
         {
-            return await dbContext.AgencyUsers
-                .AsNoTracking()
-                .Where(advisor => !advisor.IsSystemSeed)
+            return await StaffUserQueries.Assignable(dbContext)
                 .OrderBy(advisor => advisor.DisplayName)
                 .Select(advisor => new AdminPropertyAdvisorDto
                 {

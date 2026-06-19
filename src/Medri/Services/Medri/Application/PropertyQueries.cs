@@ -376,18 +376,20 @@ namespace Medri.Services.Medri.Application
 
             if (detail.AssignedAgencyUserId.HasValue)
             {
-                var advisor = await dbContext.AgencyUsers
-                    .AsNoTracking()
+                var advisor = await StaffUserQueries.Assignable(dbContext)
                     .Where(item => item.Id == detail.AssignedAgencyUserId.Value)
                     .Select(item => new
                     {
                         item.DisplayName,
+                        item.AgencyRole,
                         item.Role
                     })
                     .FirstOrDefaultAsync(cancellationToken);
 
                 detail.AdvisorDisplayName = advisor?.DisplayName;
-                detail.AdvisorRole = advisor?.Role;
+                detail.AdvisorRole = advisor == null
+                    ? null
+                    : StaffUserQueries.AgencyRoleLabel(advisor.AgencyRole, advisor.Role);
             }
 
             detail.Media = await dbContext.PropertyMedia

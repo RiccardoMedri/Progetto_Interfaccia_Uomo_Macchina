@@ -16,7 +16,9 @@ namespace Medri.Services.Medri.Identity
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string NickName { get; set; }
+        public string DisplayName { get; set; }
         public string Role { get; set; }
+        public string AgencyRole { get; set; }
 
         public bool IsMatchWithPassword(string password)
         {

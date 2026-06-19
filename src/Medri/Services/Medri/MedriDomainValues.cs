@@ -22,6 +22,7 @@ namespace Medri.Services.Medri
         public const string Ready = "Ready";
         public const string Published = "Published";
         public const string NeedsUpdate = "NeedsUpdate";
+        public const string Reserved = "Reserved";
         public const string Archived = "Archived";
     }
 
@@ -46,7 +47,7 @@ namespace Medri.Services.Medri
         public const string Seed = "Seed";
     }
 
-    public static class AgencyUserRoles
+    public static class AgencyStaffRoles
     {
         public const string Advisor = "Advisor";
         public const string Manager = "Responsabile agenzia";

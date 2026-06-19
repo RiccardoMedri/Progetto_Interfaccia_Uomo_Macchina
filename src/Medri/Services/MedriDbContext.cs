@@ -16,8 +16,6 @@ namespace Medri.Services
 
         public DbSet<User> Users { get; set; }
 
-        public DbSet<AgencyUser> AgencyUsers { get; set; }
-
         public DbSet<PropertyListing> PropertyListings { get; set; }
 
         public DbSet<PropertyMedia> PropertyMedia { get; set; }
@@ -52,7 +50,7 @@ namespace Medri.Services
                     property.PublicationStatus == PropertyPublicationStatuses.Published);
 
             modelBuilder.Entity<PropertyListing>()
-                .HasOne<AgencyUser>()
+                .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(property => property.AssignedAgencyUserId);
 
@@ -100,7 +98,7 @@ namespace Medri.Services
                 .HasForeignKey(lead => lead.ClientUserId);
 
             modelBuilder.Entity<Lead>()
-                .HasOne<AgencyUser>()
+                .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(lead => lead.AssignedAgencyUserId);
 
@@ -125,7 +123,7 @@ namespace Medri.Services
                 .HasForeignKey(appointment => appointment.PropertyListingId);
 
             modelBuilder.Entity<Appointment>()
-                .HasOne<AgencyUser>()
+                .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(appointment => appointment.AgencyUserId);
 
